@@ -1,0 +1,52 @@
+# Code Convention Rules
+
+1. **File Naming**
+    - Use lowercase letters and hyphens for file names (e.g., `user-profile.js`).
+    - Avoid spaces and special characters.
+
+2. **Indentation**
+    - Use 2 spaces per indentation level.
+    - Do not use tabs.
+
+3. **Variable Naming**
+    - Use camelCase for variables and functions (e.g., `userName`).
+    - Use PascalCase for classes and React components (e.g., `UserProfile`).
+    - Use UPPER_CASE for constants (e.g., `MAX_USERS`).
+
+4. **Line Length**
+    - Limit lines to 100 characters.
+
+5. **Braces**
+    - Use K&R style braces:
+      ```
+      if (condition) {
+         // code
+      }
+      ```
+
+6. **Semicolons**
+    - Always use semicolons at the end of statements.
+
+7. **Quotes**
+    - Use single quotes for strings (e.g., `'text'`).
+    - Use double quotes for JSX attributes.
+
+8. **Comments**
+    - Use `//` for single-line comments.
+    - Use `/** ... */` for multi-line or documentation comments.
+
+9. **Imports**
+    - Place all imports at the top of the file.
+    - Use absolute imports if supported.
+
+10. **Whitespace**
+     - Remove trailing whitespace.
+     - Add a newline at the end of each file.
+
+11. **Functions**
+     - Prefer arrow functions for callbacks and anonymous functions.
+     - Use function declarations for named functions.
+
+12. **Others**
+     - Avoid magic numbers; use named constants.
+     - Write self-explanatory code; use comments where necessary.
