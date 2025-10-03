@@ -213,22 +213,25 @@ const handleSignup = () => {
                         
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                                <label class="block text-sm font-medium text-gray-300 mb-2" for="email">Email</label>
                                 <input 
                                     v-model="signupForm.email"
                                     type="email" 
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
                                     placeholder="Enter your email"
+                                    id="email"
                                 >
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                                <label class="block text-sm font-medium text-gray-300 mb-2" for="pw-reg">Password</label>
                                 <input 
                                     v-model="signupForm.password"
                                     type="password" 
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
                                     placeholder="Create a password"
+                                    id="pw-reg"
                                 >
+                                <button></button>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>

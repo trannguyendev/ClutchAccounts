@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { RouterLink } from 'vue-router'
 
 // Drag state tracking
 const isDragging = ref(false)
@@ -207,12 +208,12 @@ const advantages = ref([
                         Elevate your game with exclusive Chamber-focused accounts and rare collections
                     </p>
                     <div class="space-x-4">
-                        <button class="bg-amber-400 hover:bg-amber-500 text-black px-8 py-3 rounded-full font-bold transition-all">
-                            Shop Now
-                        </button>
-                        <button class="border-2 border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black px-8 py-3 rounded-full font-bold transition-all">
-                            Learn More
-                        </button>
+                        <RouterLink to="/auth" class="bg-amber-400 hover:bg-amber-500 text-black px-8 py-3 rounded-full font-bold transition-all">
+                            Login to shop now
+                        </RouterLink>
+                        <RouterLink to="/auth" class="border-2 border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-black px-8 py-3 rounded-full font-bold transition-all">
+                            SignUp
+                        </RouterLink>
                     </div>
                 </div>
             </div>
