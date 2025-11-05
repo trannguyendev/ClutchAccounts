@@ -10,36 +10,32 @@ const createParticle = () => ({
     x: Math.random() * window.innerWidth,
     y: Math.random() * window.innerHeight,
     size: Math.random() * 3 + 1,
-    speedX: Math.random() * 2 - 1,
-    speedY: Math.random() * 2 - 1,
-    opacity: Math.random() * 0.5 + 0.3
+    speedX: Math.random() * 1 - 0.5,
+    speedY: Math.random() * 1 - 0.5,
+    opacity: Math.random() * 0.5 + 0.3,
+    hue: Math.random() * 30 + 30, // Golden hue range
+    rotation: Math.random() * 360,
+    rotationSpeed: (Math.random() * 2 - 1) * 0.5
 })
 
 const initParticles = () => {
     particles.value = Array.from({ length: 50 }, createParticle)
 }
 
-let animationFrame
+let animationFrame = null
+
 const animate = () => {
     particles.value.forEach(particle => {
-        // Update position
         particle.x += particle.speedX
         particle.y += particle.speedY
-
-        // Mouse interaction
-        const dx = mouse.value.x - particle.x
-        const dy = mouse.value.y - particle.y
-        const distance = Math.sqrt(dx * dx + dy * dy)
-        if (distance < 100) {
-            const angle = Math.atan2(dy, dx)
-            particle.x -= Math.cos(angle) * 1
-            particle.y -= Math.sin(angle) * 1
-        }
+        particle.rotation += particle.rotationSpeed
 
         // Bounce off edges
         if (particle.x < 0 || particle.x > window.innerWidth) particle.speedX *= -1
         if (particle.y < 0 || particle.y > window.innerHeight) particle.speedY *= -1
     })
+    
+    // Continue animation
     animationFrame = requestAnimationFrame(animate)
 }
 
@@ -98,15 +94,22 @@ const handleSignup = () => {
         <!-- Interactive Particles -->
         <div class="absolute inset-0">
             <svg class="w-full h-full">
-                <circle
-                    v-for="(particle, index) in particles"
+                <g v-for="(particle, index) in particles"
                     :key="index"
-                    :cx="particle.x"
-                    :cy="particle.y"
-                    :r="particle.size"
-                    :fill="`rgba(245, 158, 11, ${particle.opacity})`"
-                    class="transition-all duration-200 ease-out"
-                />
+                    :transform="`translate(${particle.x}, ${particle.y}) rotate(${particle.rotation})`">
+                    <circle
+                        :r="particle.size"
+                        :fill="`hsla(${particle.hue}, 80%, 50%, ${particle.opacity})`"
+                        class="transition-transform duration-200 ease-out"
+                    >
+                        <animate
+                            attributeName="opacity"
+                            :values="`${particle.opacity};${particle.opacity * 0.5};${particle.opacity}`"
+                            dur="2s"
+                            repeatCount="indefinite"
+                        />
+                    </circle>
+                </g>
             </svg>
         </div>
 
@@ -169,6 +172,7 @@ const handleSignup = () => {
                                     type="email" 
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
                                     placeholder="Enter your email"
+                                    required
                                 >
                             </div>
                             <div>
@@ -178,6 +182,7 @@ const handleSignup = () => {
                                     type="password" 
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
                                     placeholder="Enter your password"
+                                    required
                                 >
                             </div>
                         </div>
@@ -220,6 +225,7 @@ const handleSignup = () => {
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
                                     placeholder="Enter your email"
                                     id="email"
+                                    required
                                 >
                             </div>
                             <div>
@@ -230,6 +236,7 @@ const handleSignup = () => {
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
                                     placeholder="Create a password"
                                     id="pw-reg"
+                                    required
                                 >
                                 <button></button>
                             </div>
@@ -240,13 +247,14 @@ const handleSignup = () => {
                                     type="password" 
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
                                     placeholder="Confirm your password"
+                                    required
                                 >
                             </div>
                         </div>
 
                         <div class="text-sm text-gray-400">
                             <label class="flex items-center">
-                                <input type="checkbox" class="mr-2 accent-amber-500">
+                                <input type="checkbox" class="mr-2 accent-amber-500" required>
                                 I agree to the Terms of Service and Privacy Policy
                             </label>
                         </div>
