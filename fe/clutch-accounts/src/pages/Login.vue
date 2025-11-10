@@ -5,10 +5,13 @@ const isLogin = ref(true)
 const isAnimating = ref(false)
 const particles = ref([])
 const mouse = ref({ x: 0, y: 0 })
-const isShowingPsw = ref(false)
-
+const isShowingPswLogin = ref(false)
+const isShowingPswSignup = ref(false)
 const togglePswVisibility = () => {
     isShowingPsw.value = !isShowingPsw.value
+}
+const togglePswVisibilitySignup = () => {
+    isShowingPswSignup.value = !isShowingPswSignup.value
 }
 const createParticle = () => ({
     x: Math.random() * window.innerWidth,
@@ -185,14 +188,14 @@ const handleSignup = () => {
                                 <div class="relative">
                                     <input 
                                         v-model="loginForm.password"
-                                        :type="isShowingPsw ? 'text' : 'password'"
+                                        :type="isShowingPswLogin ? 'text' : 'password'"
                                         class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 pr-12 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
                                         placeholder="Enter your password"
                                         id="psw-login"
                                         required
                                     >
                                     <button type="button" id="show-pass" @click="togglePswVisibility" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-200">
-                                        <i :class="isShowingPsw ? 'fa fa-eye' : 'fa fa-eye-slash'" id="icon-show-psw"></i>
+                                        <i :class="isShowingPswLogin ? 'fa fa-eye' : 'fa fa-eye-slash'" id="icon-show-psw"></i>
                                     </button>
                                 </div>
                             </div>
@@ -228,7 +231,7 @@ const handleSignup = () => {
                         <h2 class="text-2xl font-bold text-center mb-8 text-amber-400">Create Account</h2>
                         
                         <div class="space-y-4">
-                            <div>
+                            <div class="relative">
                                 <label class="block text-sm font-medium text-gray-300 mb-2" for="email">Email</label>
                                 <input 
                                     v-model="signupForm.email"
@@ -238,41 +241,36 @@ const handleSignup = () => {
                                     id="email"
                                     required
                                 >
+                                <button>
+                                    
+                                </button>
                             </div>
-                            <div>
+                            <div class="relative">
                                 <label class="block text-sm font-medium text-gray-300 mb-2" for="pw-reg">Password</label>
                                 <input 
                                     v-model="signupForm.password"
-                                    type="password" 
-                                    class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
+                                    :type="isShowingPswSignup ? 'text' : 'password'"
+                                    class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 pr-12 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
                                     placeholder="Create a password"
                                     id="pw-reg"
                                     required
                                 >
-                                <button></button>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
-                                <input 
-                                    v-model="signupForm.confirmPassword"
-                                    type="password" 
-                                    class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
-                                    placeholder="Confirm your password"
-                                    required
-                                >
+                                <button type="button" id="show-pass" @click="togglePswVisibilitySignup" class="absolute right-3 top-1/2 transform translate-y-[0.5] text-amber-200">
+                                    <i :class="isShowingPswSignup ? 'fa fa-eye' : 'fa fa-eye-slash'" id="icon-show-psw"></i>
+                                </button>
                             </div>
                         </div>
 
                         <div class="text-sm text-gray-400">
                             <label class="flex items-center">
                                 <input type="checkbox" class="mr-2 accent-amber-500" required>
-                                I agree to the Terms of Service and Privacy Policy
+                               <span> I agree to the <a href="#" class=""> Terms of Service and Privacy Policy </a></span>
                             </label>
                         </div>
 
                         <button 
                             type="submit"
-                            class="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold py-3 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-300"
+                            class="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold py-3 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-500"
                         >
                             Create Account
                         </button>
