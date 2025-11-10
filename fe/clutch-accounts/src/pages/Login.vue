@@ -5,7 +5,11 @@ const isLogin = ref(true)
 const isAnimating = ref(false)
 const particles = ref([])
 const mouse = ref({ x: 0, y: 0 })
+const isShowingPsw = ref(false)
 
+const togglePswVisibility = () => {
+    isShowingPsw.value = !isShowingPsw.value
+}
 const createParticle = () => ({
     x: Math.random() * window.innerWidth,
     y: Math.random() * window.innerHeight,
@@ -166,24 +170,31 @@ const handleSignup = () => {
                         
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                                <label class="block text-sm font-medium text-gray-300 mb-2" for="email-login">Email</label>
                                 <input 
                                     v-model="loginForm.email"
                                     type="email" 
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
                                     placeholder="Enter your email"
+                                    id="email-login"
                                     required
                                 >
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                                <input 
-                                    v-model="loginForm.password"
-                                    type="password" 
-                                    class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
-                                    placeholder="Enter your password"
-                                    required
-                                >
+                                <label class="block text-sm font-medium text-gray-300 mb-2" for="psw-login">Password</label>
+                                <div class="relative">
+                                    <input 
+                                        v-model="loginForm.password"
+                                        :type="isShowingPsw ? 'text' : 'password'"
+                                        class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 pr-12 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
+                                        placeholder="Enter your password"
+                                        id="psw-login"
+                                        required
+                                    >
+                                    <button type="button" id="show-pass" @click="togglePswVisibility" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-200">
+                                        <i :class="isShowingPsw ? 'fa fa-eye' : 'fa fa-eye-slash'" id="icon-show-psw"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -273,6 +284,22 @@ const handleSignup = () => {
 </template>
 
 <style scoped>
+#show-pass {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+#icon-show-psw {
+    color: aliceblue;
+    transition: color 0.2s ease-in-out, transform 0.15s ease;
+}
+
+#show-pass:active #icon-show-psw {
+    transform: scale(0.95);
+}
+
 /* Custom scrollbar for inputs */
 input {
     scrollbar-width: thin;
