@@ -13,6 +13,18 @@ const routes = [
     name: 'auth',
     component: Login
   },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: "smth",
+    meta: { requiresAuth: true , roles: ['admin']}
+  },
+  {
+    path: '/main',
+    name: 'main',
+    component: "smth",
+    meta: { requiresAuth: true , roles: ['user', 'admin']}
+  }
 ]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
