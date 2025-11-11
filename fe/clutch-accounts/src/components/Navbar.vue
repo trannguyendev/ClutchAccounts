@@ -1,19 +1,34 @@
-<script setup></script>
+<script setup>
+import { ref } from 'vue'
+
+const isMenuOpen = ref(false)
+
+const toggleMenu = () => {
+    isMenuOpen.value = !isMenuOpen.value
+}
+
+const closeMenu = () => {
+    isMenuOpen.value = false
+}
+</script>
 <template>
-    <nav
-        class="bg-[rgba(10,10,10,0.7)] backdrop-blur-sm fixed w-full z-20 top-0 start-0 border-b border-amber-900/20">
-        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-            <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
-                <img src="smth" class="h-8" alt="Team Logo">
-                <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span>
+    <nav class="relative sticky top-0 z-30 w-full bg-black backdrop-blur-md border-b border-amber-700/20">
+        <!-- top-edge shimmer -->
+        <div class="nav-shimmer" aria-hidden="true">
+            <div class="nav-shimmer-inner"></div>
+        </div>
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-2 md:p-4">
+                <a href="/" class="flex items-center space-x-2 md:space-x-3 rtl:space-x-reverse py-2">
+                <img src="#" class="h-8 md:h-9" alt="Team Logo">
+                <span class="self-center text-lg md:text-2xl font-extrabold tracking-tight text-amber-300 drop-shadow-[0_3px_10px_rgba(255,184,28,0.12)]">Team name</span>
             </a>
-            <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+            <div class="flex md:order-2 space-x-2 md:space-x-3 rtl:space-x-reverse items-center">
                 <button type="button"
-                    class="text-black bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 focus:ring-4 focus:outline-none focus:ring-amber-300 font-medium rounded-md text-sm px-4 py-2 text-center shadow-sm">Get
+                    class="text-black bg-gradient-to-r from-amber-300 to-amber-500 hover:from-amber-400 hover:to-amber-600 focus:ring-4 focus:outline-none focus:ring-amber-300 font-semibold rounded-full text-xs md:text-sm px-3 md:px-5 py-2 text-center shadow-lg transition-all duration-200 active:scale-95">Get
                     started</button>
-                <button data-collapse-toggle="navbar-sticky" type="button"
-                    class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-amber-200 rounded-lg md:hidden hover:bg-amber-900/10 focus:outline-none focus:ring-2 focus:ring-amber-300"
-                    aria-controls="navbar-sticky" aria-expanded="false">
+                <button @click="toggleMenu" type="button"
+                    class="inline-flex items-center p-2.5 md:p-2 w-10 h-10 justify-center text-sm text-amber-200 rounded-lg md:hidden hover:bg-amber-900/12 focus:outline-none focus:ring-2 focus:ring-amber-300 transition-colors duration-200"
+                    aria-controls="navbar-sticky" :aria-expanded="isMenuOpen">
                     <span class="sr-only">Open main menu</span>
                     <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 17 14">
@@ -22,25 +37,25 @@
                     </svg>
                 </button>
             </div>
-            <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
+            <div v-show="isMenuOpen" class="w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
                 <ul
-                    class="flex flex-col p-4 md:p-0 mt-4 font-medium rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0">
+                    class="flex flex-col p-3 md:p-0 mt-3 md:mt-0 font-medium rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:border-0 bg-black/50 md:bg-transparent md:rounded-none space-y-2 md:space-y-0">
                     <li>
-                        <a href="#"
-                            class="block py-2 px-3 rounded-sm md:p-0 text-amber-200 hover:text-amber-50 md:hover:text-amber-100"
+                        <a href="#" @click="closeMenu"
+                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200"
                             aria-current="page">Home</a>
                     </li>
                     <li>
-                        <a href="#"
-                            class="block py-2 px-3 rounded-sm md:p-0 text-amber-200 hover:text-amber-50 md:hover:text-amber-100">About</a>
+                        <a href="#" @click="closeMenu"
+                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200">About</a>
                     </li>
                     <li>
-                        <a href="#"
-                            class="block py-2 px-3 rounded-sm md:p-0 text-amber-200 hover:text-amber-50 md:hover:text-amber-100">Services</a>
+                        <a href="#" @click="closeMenu"
+                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200">Services</a>
                     </li>
                     <li>
-                        <a href="#"
-                            class="block py-2 px-3 rounded-sm md:p-0 text-amber-200 hover:text-amber-50 md:hover:text-amber-100">Contact</a>
+                        <a href="#" @click="closeMenu"
+                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200">Contact</a>
                     </li>
                 </ul>
             </div>
@@ -50,28 +65,83 @@
 </template>
 <style scoped>
 nav {
-    /* subtle golden glow and glass */
-    box-shadow: 0 6px 30px rgba(255, 184, 28, 0.05);
+    /* warmer golden glow and softer glass */
+    box-shadow: 0 12px 40px rgba(255, 184, 28, 0.06);
     border-bottom: 1px solid rgba(214, 153, 7, 0.12);
+    /* ensure backdrop blur works across browsers */
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
 }
 
 .max-w-screen-xl a img {
-    filter: drop-shadow(0 2px 8px rgba(255, 184, 28, 0.06));
+    filter: drop-shadow(0 3px 10px rgba(255, 184, 28, 0.08));
 }
 
-a {
-    transition: color 0.15s ease, text-shadow 0.15s ease;
+.nav-link {
+    color: #FFD966; /* brighter gold */
+    transition: color 0.18s ease, text-shadow 0.18s ease, transform 0.12s ease;
 }
 
-a:hover {
-    text-shadow: 0 0 12px rgba(255, 184, 28, 0.12);
+.nav-link:hover {
+    color: #fff;
+    text-shadow: 0 4px 18px rgba(255, 184, 28, 0.14);
+    transform: translateY(-1px);
 }
 
-button.shadow-sm {
-    box-shadow: 0 8px 24px rgba(255, 165, 0, 0.08);
+/* subtle underline bar on focus/hover (desktop) */
+.nav-link::after {
+    content: '';
+    display: block;
+    height: 2px;
+    width: 0%;
+    background: linear-gradient(90deg, rgba(255,215,102,1), rgba(255,184,28,0.9));
+    transition: width 220ms ease;
 }
 
-.bg-amber-900\/10:hover {
-    background-color: rgba(255, 184, 28, 0.06) !important;
+.nav-link:hover::after,
+.nav-link:focus::after {
+    width: 100%;
+}
+
+button.shadow-lg {
+    box-shadow: 0 14px 38px rgba(255, 160, 0, 0.10);
+}
+
+/* mobile menu toggle hover */
+.md\:hidden:hover {
+    background-color: rgba(255, 184, 28, 0.035);
+}
+
+</style>
+<style scoped>
+/* shimmer effect */
+.nav-shimmer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 4px;
+    overflow: hidden;
+    pointer-events: none;
+}
+.nav-shimmer-inner {
+    position: absolute;
+    left: -40%;
+    top: 0;
+    height: 100%;
+    width: 40%;
+    background: linear-gradient(90deg, rgba(255,215,102,0) 0%, rgba(255,215,102,0.95) 50%, rgba(255,215,102,0) 100%);
+    filter: blur(6px);
+    opacity: 0.9;
+    transform: translateX(0);
+    animation: navShimmer 3.6s ease-in-out infinite;
+}
+
+@keyframes navShimmer {
+    0% { transform: translateX(-100%); opacity: 0.0 }
+    10% { opacity: 0.6 }
+    50% { transform: translateX(150%); opacity: 0.9 }
+    90% { opacity: 0.6 }
+    100% { transform: translateX(300%); opacity: 0 }
 }
 </style>
