@@ -1,14 +1,22 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-
+// Form state
 const isLogin = ref(true)
 const isAnimating = ref(false)
 const particles = ref([])
 const mouse = ref({ x: 0, y: 0 })
+// Password visibility
 const isShowingPswLogin = ref(false)
 const isShowingPswSignup = ref(false)
+
+
+//Check if has error stores error value
+const errorLoginMessage = ref('')
+const errorSignupMessage = ref('')
+
+
 const togglePswVisibility = () => {
-    isShowingPsw.value = !isShowingPsw.value
+    isShowingPswLogin.value = !isShowingPswLogin.value
 }
 const togglePswVisibilitySignup = () => {
     isShowingPswSignup.value = !isShowingPswSignup.value
@@ -41,7 +49,7 @@ const animate = () => {
         if (particle.x < 0 || particle.x > window.innerWidth) particle.speedX *= -1
         if (particle.y < 0 || particle.y > window.innerHeight) particle.speedY *= -1
     })
-    
+
     // Continue animation
     animationFrame = requestAnimationFrame(animate)
 }
@@ -101,20 +109,13 @@ const handleSignup = () => {
         <!-- Interactive Particles -->
         <div class="absolute inset-0">
             <svg class="w-full h-full">
-                <g v-for="(particle, index) in particles"
-                    :key="index"
+                <g v-for="(particle, index) in particles" :key="index"
                     :transform="`translate(${particle.x}, ${particle.y}) rotate(${particle.rotation})`">
-                    <circle
-                        :r="particle.size"
-                        :fill="`hsla(${particle.hue}, 80%, 50%, ${particle.opacity})`"
-                        class="transition-transform duration-200 ease-out"
-                    >
-                        <animate
-                            attributeName="opacity"
-                            :values="`${particle.opacity};${particle.opacity * 0.5};${particle.opacity}`"
-                            dur="2s"
-                            repeatCount="indefinite"
-                        />
+                    <circle :r="particle.size" :fill="`hsla(${particle.hue}, 80%, 50%, ${particle.opacity})`"
+                        class="transition-transform duration-200 ease-out">
+                        <animate attributeName="opacity"
+                            :values="`${particle.opacity};${particle.opacity * 0.5};${particle.opacity}`" dur="2s"
+                            repeatCount="indefinite" />
                     </circle>
                 </g>
             </svg>
@@ -122,8 +123,7 @@ const handleSignup = () => {
 
         <!-- Background Pattern -->
         <div class="absolute inset-0 opacity-5">
-            <div class="absolute inset-0" 
-                 style="background-image: linear-gradient(to right, transparent 49px, rgba(255,215,0,0.1) 50px),
+            <div class="absolute inset-0" style="background-image: linear-gradient(to right, transparent 49px, rgba(255,215,0,0.1) 50px),
                         linear-gradient(to bottom, transparent 49px, rgba(255,215,0,0.1) 50px);
                         background-size: 50px 50px;">
             </div>
@@ -137,22 +137,16 @@ const handleSignup = () => {
         <div class="w-full max-w-md md:max-w-lg lg:max-w-xl relative px-4 sm:px-6 md:px-8">
             <!-- Form Toggle Buttons -->
             <div class="flex mb-8 bg-black/40 p-1 rounded-lg border border-amber-900/30 relative z-10">
-                <button 
-                    @click="toggleForm" 
-                    :class="[
-                        'flex-1 py-3 text-center rounded-md transition-all duration-500',
-                        isLogin ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold' : 'text-gray-400'
-                    ]"
-                >
+                <button @click="toggleForm" :class="[
+                    'flex-1 py-3 text-center rounded-md transition-all duration-500',
+                    isLogin ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold' : 'text-gray-400'
+                ]">
                     Login
                 </button>
-                <button 
-                    @click="toggleForm"
-                    :class="[
-                        'flex-1 py-3 text-center rounded-md transition-all duration-500',
-                        !isLogin ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold' : 'text-gray-400'
-                    ]"
-                >
+                <button @click="toggleForm" :class="[
+                    'flex-1 py-3 text-center rounded-md transition-all duration-500',
+                    !isLogin ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold' : 'text-gray-400'
+                ]">
                     Sign Up
                 </button>
             </div>
@@ -160,43 +154,36 @@ const handleSignup = () => {
             <!-- Forms Container -->
             <div class="relative" style="min-height: 400px; height: auto">
                 <!-- Login Form -->
-                <form 
-                    @submit.prevent="handleLogin"
-                    :class="[
-                        'absolute w-full transition-all duration-500 ease-in-out',
-                        isLogin ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full'
-                    ]"
-                    :style="{ pointerEvents: isLogin ? 'auto' : 'none' }"
-                >
+                <form @submit.prevent="handleLogin" :class="[
+                    'absolute w-full transition-all duration-500 ease-in-out',
+                    isLogin ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full'
+                ]" :style="{ pointerEvents: isLogin ? 'auto' : 'none' }">
                     <div class="space-y-6 bg-black/40 p-8 rounded-lg border border-amber-900/30">
                         <h2 class="text-2xl font-bold text-center mb-8 text-amber-400">Welcome Back</h2>
-                        
+
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2" for="email-login">Email</label>
-                                <input 
-                                    v-model="loginForm.email"
-                                    type="email" 
+                                <label class="block text-sm font-medium text-gray-300 mb-2"
+                                    for="email-login">Email</label>
+                                <input v-model="loginForm.email" type="email"
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
-                                    placeholder="Enter your email"
-                                    id="email-login"
-                                    required
-                                >
+                                    placeholder="Enter your email" id="email-login" required>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2" for="psw-login">Password</label>
+                                <label class="block text-sm font-medium text-gray-300 mb-2"
+                                    for="psw-login">Password</label>
                                 <div class="relative">
-                                    <input 
-                                        v-model="loginForm.password"
-                                        :type="isShowingPswLogin ? 'text' : 'password'"
+                                    <input v-model="loginForm.password" :type="isShowingPswLogin ? 'text' : 'password'"
                                         class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 pr-12 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
-                                        placeholder="Enter your password"
-                                        id="psw-login"
-                                        required
-                                    >
-                                    <button type="button" id="show-pass" @click="togglePswVisibility" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-200">
-                                        <i :class="isShowingPswLogin ? 'fa fa-eye' : 'fa fa-eye-slash'" id="icon-show-psw"></i>
+                                        placeholder="Enter your password" id="psw-login" required>
+                                    <button type="button" id="show-pass" @click="togglePswVisibility"
+                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-200">
+                                        <i :class="isShowingPswLogin ? 'fa fa-eye' : 'fa fa-eye-slash'"
+                                            id="icon-show-psw"></i>
                                     </button>
+                                </div>
+                                <div v-if="errorLoginMessage">
+                                    <span id="show-error" class="text-wrap text-red-800 block">{{ errorLoginMessage}}</span>
                                 </div>
                             </div>
                         </div>
@@ -206,72 +193,63 @@ const handleSignup = () => {
                                 <input type="checkbox" class="mr-2 accent-amber-500">
                                 Remember me
                             </label>
-                            <a href="#" class="text-amber-400 hover:text-amber-300 transition-colors">Forgot Password?</a>
+                            <a href="#" class="text-amber-400 hover:text-amber-300 transition-colors">Forgot
+                                Password?</a>
                         </div>
 
-                        <button 
-                            type="submit"
-                            class="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold py-3 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-300"
-                        >
+                        <button type="submit"
+                            class="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold py-3 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-300">
                             Login
                         </button>
                     </div>
                 </form>
 
                 <!-- Sign Up Form -->
-                <form 
-                    @submit.prevent="handleSignup"
-                    :class="[
-                        'absolute w-full transition-all duration-500 ease-in-out',
-                        !isLogin ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
-                    ]"
-                    :style="{ pointerEvents: !isLogin ? 'auto' : 'none' }"
-                >
+                <form @submit.prevent="handleSignup" :class="[
+                    'absolute w-full transition-all duration-500 ease-in-out',
+                    !isLogin ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
+                ]" :style="{ pointerEvents: !isLogin ? 'auto' : 'none' }">
                     <div class="space-y-6 bg-black/40 p-8 rounded-lg border border-amber-900/30">
                         <h2 class="text-2xl font-bold text-center mb-8 text-amber-400">Create Account</h2>
-                        
+
                         <div class="space-y-4">
                             <div class="relative">
                                 <label class="block text-sm font-medium text-gray-300 mb-2" for="email">Email</label>
-                                <input 
-                                    v-model="signupForm.email"
-                                    type="email" 
+                                <input v-model="signupForm.email" type="email"
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
-                                    placeholder="Enter your email"
-                                    id="email"
-                                    required
-                                >
+                                    placeholder="Enter your email" id="email" required>
                                 <button>
-                                    
+
                                 </button>
                             </div>
                             <div class="relative">
-                                <label class="block text-sm font-medium text-gray-300 mb-2" for="pw-reg">Password</label>
-                                <input 
-                                    v-model="signupForm.password"
-                                    :type="isShowingPswSignup ? 'text' : 'password'"
+                                <label class="block text-sm font-medium text-gray-300 mb-2"
+                                    for="pw-reg">Password</label>
+                                <input v-model="signupForm.password" :type="isShowingPswSignup ? 'text' : 'password'"
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 pr-12 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
-                                    placeholder="Create a password"
-                                    id="pw-reg"
-                                    required
-                                >
-                                <button type="button" id="show-pass" @click="togglePswVisibilitySignup" class="absolute right-3 top-1/2 transform translate-y-[0.5] text-amber-200">
-                                    <i :class="isShowingPswSignup ? 'fa fa-eye' : 'fa fa-eye-slash'" id="icon-show-psw"></i>
+                                    placeholder="Create a password" id="pw-reg" required>
+                                <button type="button" id="show-pass" @click="togglePswVisibilitySignup"
+                                    class="absolute right-3 top-1/2 transform translate-y-[0.5] text-amber-200">
+                                    <i :class="isShowingPswSignup ? 'fa fa-eye' : 'fa fa-eye-slash'"
+                                        id="icon-show-psw"></i>
                                 </button>
+                            </div>
+                            <div v-if="errorSignupMessage">
+                                <span id="show-error"
+                                    class="text-wrap text-red-800 block">{{errorSignupMessage}}</span>
                             </div>
                         </div>
 
                         <div class="text-sm text-gray-400">
                             <label class="flex items-center">
                                 <input type="checkbox" class="mr-2 accent-amber-500" required>
-                               <span> I agree to the <a href="#" class=""> Terms of Service and Privacy Policy </a></span>
+                                <span> I agree to the <a href="#" class=""> Terms of Service and Privacy Policy
+                                    </a></span>
                             </label>
                         </div>
 
-                        <button 
-                            type="submit"
-                            class="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold py-3 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-500"
-                        >
+                        <button type="submit"
+                            class="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold py-3 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-500">
                             Create Account
                         </button>
                     </div>
@@ -363,7 +341,8 @@ form {
         margin-bottom: 1rem;
     }
 
-    input, button {
+    input,
+    button {
         font-size: 0.875rem;
     }
 }
