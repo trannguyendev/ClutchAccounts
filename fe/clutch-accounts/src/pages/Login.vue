@@ -176,7 +176,7 @@ const handleSignup = () => {
                                     <input v-model="loginForm.password" :type="isShowingPswLogin ? 'text' : 'password'"
                                         class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 pr-12 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
                                         placeholder="Enter your password" id="psw-login" required>
-                                    <button type="button" id="show-pass" @click="togglePswVisibility"
+                                    <button type="button" @click="togglePswVisibility"
                                         class="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-200">
                                         <i :class="isShowingPswLogin ? 'fa fa-eye' : 'fa fa-eye-slash'"
                                             id="icon-show-psw"></i>
@@ -228,7 +228,7 @@ const handleSignup = () => {
                                 <input v-model="signupForm.password" :type="isShowingPswSignup ? 'text' : 'password'"
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 pr-12 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
                                     placeholder="Create a password" id="pw-reg" required>
-                                <button type="button" id="show-pass" @click="togglePswVisibilitySignup"
+                                <button type="button" @click="togglePswVisibilitySignup"
                                     class="absolute right-3 top-1/2 transform translate-y-[0.5] text-amber-200">
                                     <i :class="isShowingPswSignup ? 'fa fa-eye' : 'fa fa-eye-slash'"
                                         id="icon-show-psw"></i>
@@ -260,20 +260,10 @@ const handleSignup = () => {
 </template>
 
 <style scoped>
-#show-pass {
-    background: transparent;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-}
 
 #icon-show-psw {
     color: aliceblue;
     transition: color 0.2s ease-in-out, transform 0.15s ease;
-}
-
-#show-pass:active #icon-show-psw {
-    transform: scale(0.95);
 }
 
 /* Custom scrollbar for inputs */
