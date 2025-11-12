@@ -19,9 +19,6 @@ const toggleMenu = () => {
                 <span class="self-center text-lg md:text-2xl font-extrabold tracking-tight text-amber-300 drop-shadow-[0_3px_10px_rgba(255,184,28,0.12)]">Team name</span>
             </a>
             <div class="flex md:order-2 space-x-2 md:space-x-3 rtl:space-x-reverse items-center">
-                <button type="button"
-                    class="text-black bg-gradient-to-r from-amber-300 to-amber-500 hover:from-amber-400 hover:to-amber-600 focus:ring-4 focus:outline-none focus:ring-amber-300 font-semibold rounded-full text-xs md:text-sm px-3 md:px-5 py-2 text-center shadow-lg transition-all duration-200 active:scale-95">Get
-                    started</button>
                 <button @click="toggleMenu" type="button"
                     class="inline-flex items-center p-2.5 md:p-2 w-10 h-10 justify-center text-sm text-amber-200 rounded-lg md:hidden hover:bg-amber-900/12 focus:outline-none focus:ring-2 focus:ring-amber-300 transition-colors duration-200"
                     aria-controls="navbar-sticky">
@@ -38,20 +35,20 @@ const toggleMenu = () => {
                     class="flex flex-col p-3 md:p-0 mt-3 md:mt-0 font-medium rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:border-0 bg-black/50 md:bg-transparent md:rounded-none space-y-2 md:space-y-0">
                     <li>
                         <a href="#"
-                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200"
+                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md"
                             aria-current="page">Home</a>
                     </li>
                     <li>
                         <a href="#"
-                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200">About</a>
+                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md">About</a>
                     </li>
                     <li>
                         <a href="#"
-                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200">Services</a>
+                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md">Services</a>
                     </li>
                     <li>
                         <a href="#"
-                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200">Contact</a>
+                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md">Contact</a>
                     </li>
                 </ul>
             </div>
@@ -76,12 +73,28 @@ nav {
 .nav-link {
     color: #FFD966; /* brighter gold */
     transition: color 0.18s ease, text-shadow 0.18s ease, transform 0.12s ease;
+    margin: 0px 4rem;
 }
 
 .nav-link:hover {
     color: #fff;
     text-shadow: 0 4px 18px rgba(255, 184, 28, 0.14);
     transform: translateY(-1px);
+}
+
+/* subtle underline bar on focus/hover (desktop) */
+.nav-link::after {
+    content: '';
+    display: block;
+    height: 2px;
+    width: 0%;
+    background: linear-gradient(90deg, rgba(255,215,102,1), rgba(255,184,28,0.9));
+    transition: width 220ms ease;
+}
+
+.nav-link:hover::after,
+.nav-link:focus::after {
+    width: 100%;
 }
 
 /* subtle underline bar on focus/hover (desktop) */
