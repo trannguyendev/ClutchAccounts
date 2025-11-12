@@ -6,13 +6,9 @@ const isMenuOpen = ref(false)
 const toggleMenu = () => {
     isMenuOpen.value = !isMenuOpen.value
 }
-
-const closeMenu = () => {
-    isMenuOpen.value = false
-}
 </script>
 <template>
-    <nav class="relative sticky top-0 z-30 w-full bg-black backdrop-blur-md border-b border-amber-700/20">
+    <nav class="sticky top-0 z-30 w-full bg-black backdrop-blur-md border-b border-amber-700/20">
         <!-- top-edge shimmer -->
         <div class="nav-shimmer" aria-hidden="true">
             <div class="nav-shimmer-inner"></div>
@@ -28,7 +24,7 @@ const closeMenu = () => {
                     started</button>
                 <button @click="toggleMenu" type="button"
                     class="inline-flex items-center p-2.5 md:p-2 w-10 h-10 justify-center text-sm text-amber-200 rounded-lg md:hidden hover:bg-amber-900/12 focus:outline-none focus:ring-2 focus:ring-amber-300 transition-colors duration-200"
-                    aria-controls="navbar-sticky" :aria-expanded="isMenuOpen">
+                    aria-controls="navbar-sticky">
                     <span class="sr-only">Open main menu</span>
                     <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                         viewBox="0 0 17 14">
@@ -37,24 +33,24 @@ const closeMenu = () => {
                     </svg>
                 </button>
             </div>
-            <div v-show="isMenuOpen" class="w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
+            <div :class="[isMenuOpen ? 'block' : 'hidden', 'w-full md:flex md:w-auto md:order-1']" id="navbar-sticky">
                 <ul
                     class="flex flex-col p-3 md:p-0 mt-3 md:mt-0 font-medium rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:border-0 bg-black/50 md:bg-transparent md:rounded-none space-y-2 md:space-y-0">
                     <li>
-                        <a href="#" @click="closeMenu"
+                        <a href="#"
                             class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200"
                             aria-current="page">Home</a>
                     </li>
                     <li>
-                        <a href="#" @click="closeMenu"
+                        <a href="#"
                             class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200">About</a>
                     </li>
                     <li>
-                        <a href="#" @click="closeMenu"
+                        <a href="#"
                             class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200">Services</a>
                     </li>
                     <li>
-                        <a href="#" @click="closeMenu"
+                        <a href="#"
                             class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200">Contact</a>
                     </li>
                 </ul>
