@@ -1,5 +1,6 @@
 import Index from '@/pages/index.vue'
 import Login from '@/pages/Login.vue'
+import MainUserPage from '@/pages/MainUserPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -22,9 +23,9 @@ const routes = [
   {
     path: '/main',
     name: 'main',
-    component: "smth",
+    component: MainUserPage,
     meta: { requiresAuth: true , roles: ['user', 'admin']}
-  }
+  },
 ]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
