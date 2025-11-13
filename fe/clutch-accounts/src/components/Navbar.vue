@@ -8,7 +8,7 @@ const toggleMenu = () => {
 }
 </script>
 <template>
-    <nav class="sticky top-0 z-30 w-full bg-black backdrop-blur-md border-b border-amber-700/20">
+    <nav class="sticky top-0 z-30 w-full bg-black/95 backdrop-blur-sm border-b border-amber-700/20">
         <!-- top-edge shimmer -->
         <div class="nav-shimmer" aria-hidden="true">
             <div class="nav-shimmer-inner"></div>
@@ -32,7 +32,7 @@ const toggleMenu = () => {
             </div>
             <div :class="[isMenuOpen ? 'block' : 'hidden', 'w-full md:flex md:w-auto md:order-1']" id="navbar-sticky">
                 <ul
-                    class="flex flex-col p-3 md:p-0 mt-3 md:mt-0 font-medium rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:border-0 bg-black/50 md:bg-transparent md:rounded-none space-y-2 md:space-y-0">
+                    class="backdrop-blur-sm flex flex-col p-3 md:p-0 mt-3 md:mt-0 font-medium rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:border-0 bg-black/50 md:bg-transparent md:rounded-none space-y-2 md:space-y-0">
                     <li>
                         <a href="#"
                             class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md"
@@ -62,8 +62,8 @@ nav {
     box-shadow: 0 12px 40px rgba(255, 184, 28, 0.06);
     border-bottom: 1px solid rgba(214, 153, 7, 0.12);
     /* ensure backdrop blur works across browsers */
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
 }
 
 .max-w-screen-xl a img {
