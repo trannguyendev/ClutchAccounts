@@ -3,6 +3,7 @@ import { ref } from 'vue'
 
 // const currentUser = ref([]); //this section for fetch user info from server <declare here for using later>
 
+
 const userTest = 
   {
     id: 1,
@@ -18,7 +19,7 @@ const categories = [
   { id: 4, name: 'ACC VALORANT', subtitle: 'RANDOM NEA', color: 'from-red-500 to-pink-500', img: '' }
 ]
 
-const pcGaming = [
+const otherProducts = [
   { id: 1, name: 'ĐẾN RIOT', image: '🎮' },
   { id: 2, name: 'DAO MỎ HÌNH MELEE', image: '⚔️' },
   { id: 3, name: 'COMBO HỢP 2-3 MỎ HÌNH', image: '🎯' },
@@ -159,7 +160,7 @@ const announcements = [
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div v-for="item in pcGaming" :key="item.id"
+          <div v-for="item in otherProducts" :key="item.id"
             class="group relative bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-md border border-cyan-500/30 rounded-2xl overflow-hidden hover:border-cyan-400/70 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30">
 
             <!-- Content -->
