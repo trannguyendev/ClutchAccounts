@@ -2,6 +2,9 @@ import Index from '@/pages/index.vue'
 import Login from '@/pages/Login.vue'
 import MainUserPage from '@/pages/MainUserPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import AccDropMail from '@/pages/AccDropMail.vue'
+import Error403 from '@/components/Error403.vue'
+import Error404 from '@/components/Error404.vue'
 
 const routes = [
   {
@@ -24,7 +27,24 @@ const routes = [
     path: '/main',
     name: 'main',
     component: MainUserPage,
-    meta: { requiresAuth: true , roles: ['user', 'admin']}
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
+  },
+  {
+    path: '/accounts/acc-drop-mail',
+    name: 'accdropmail',
+    component: AccDropMail,
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
+  },
+  //error path 
+  {
+    path: '/denied',
+    name: 'denied',
+    component: Error403
+  },
+  {
+    path: '/not-found',
+    name: 'not-found',
+    component: Error404
   },
 ]
 const router = createRouter({
@@ -32,5 +52,15 @@ const router = createRouter({
   routes,
 })
 // router.beforeEach( async (to, from, next) => {
+//   const isAuthenticated = true // placeholder for real auth check
+//   if (to.matched.some(record => record.meta.requiresAuth)) {
+//     if (!isAuthenticated) {
+//       next({ name: 'auth' })
+//     } else {
+//       next()
+//     }
+//   } else {
+//     next({name: 'denied'})
+//   }
 // })
 export default router
