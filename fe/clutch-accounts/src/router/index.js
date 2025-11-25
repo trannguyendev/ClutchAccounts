@@ -8,7 +8,7 @@ import Error404 from '@/components/Error404.vue'
 import AccSieuSale from '@/pages/AccSieuSale.vue'
 import AccRandomNFA from '@/pages/AccRandomNFA.vue'
 import AccRandomFA from '@/pages/AccRandomFA.vue'
-import { meta } from 'eslint-plugin-vue'
+
 
 const routes = [
   {
