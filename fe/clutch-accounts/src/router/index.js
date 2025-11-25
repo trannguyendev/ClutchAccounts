@@ -5,6 +5,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AccDropMail from '@/pages/AccDropMail.vue'
 import Error403 from '@/components/Error403.vue'
 import Error404 from '@/components/Error404.vue'
+import AccSieuSale from '@/pages/AccSieuSale.vue'
+import AccRandomNFA from '@/pages/AccRandomNFA.vue'
+import AccRandomFA from '@/pages/AccRandomFA.vue'
+import { meta } from 'eslint-plugin-vue'
 
 const routes = [
   {
@@ -23,16 +27,35 @@ const routes = [
     component: "smth",
     meta: { requiresAuth: true , roles: ['admin']}
   },
+  //path to main page for auth users
   {
     path: '/main',
     name: 'main',
     component: MainUserPage,
     meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
+  //path to type of accounts
   {
     path: '/accounts/acc-drop-mail',
-    name: 'accdropmail',
+    name: 'acc-drop-mail',
     component: AccDropMail,
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
+  },
+  {
+    path: '/accounts/acc-sieu-sale',
+    name: 'acc-sieu-sale',
+    component: AccSieuSale
+  },
+  {
+    path: '/accounts/acc-random-nfa',
+    name: 'acc-random-fa',
+    component: AccRandomNFA,
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
+  },
+  {
+    path: '/accounts/acc-random-fa',
+    name: 'acc-random-fa',
+    component: AccRandomFA,
     meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
   //error path 

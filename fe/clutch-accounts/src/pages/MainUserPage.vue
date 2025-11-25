@@ -15,8 +15,8 @@ const userTest =
 const categories = [
   { id: 1, name: 'ACC VALORANT', subtitle: 'DROPMAIL', color: 'from-yellow-500 to-orange-500', img: '' },
   { id: 2, name: 'ACC VALORANT', subtitle: 'SIÊU SALE', color: 'from-cyan-400 to-blue-500', img: '' },
-  { id: 3, name: 'ACC VALORANT', subtitle: 'RANDOM FA', color: 'from-pink-500 to-purple-500', img: '' },
-  { id: 4, name: 'ACC VALORANT', subtitle: 'RANDOM NEA', color: 'from-red-500 to-pink-500', img: '' }
+  { id: 3, name: 'ACC VALORANT', subtitle: 'RANDOM NFA', color: 'from-pink-500 to-purple-500', img: '' },
+  { id: 4, name: 'ACC VALORANT', subtitle: 'RANDOM FA', color: 'from-red-500 to-pink-500', img: '' }
 ]
 
 const otherProducts = [
