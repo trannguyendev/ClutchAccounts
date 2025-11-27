@@ -55,16 +55,15 @@ const announcements = [
       <!-- Content -->
       <div class="relative z-10 flex items-center justify-between h-full px-8">
         <div class="flex-1">
-          <h1 class="text-5xl font-black text-white mb-4 drop-shadow-lg">CHÀO MỪNG TRỞ LẠI</h1>
-          <p class="text-xl text-amber-300 font-semibold drop-shadow-md">Khám phá những tài khoản Valorant chất lượng
-            cao</p>
+          <h1 class="text-5xl font-black text-white mb-4 drop-shadow-lg">WELCOME BACK!</h1>
+          <p class="text-xl text-amber-300 font-semibold drop-shadow-md">Step into the game with top-tier Valorant accounts — variety, quality, and trust in one place</p>
         </div>
 
         <div class="flex gap-6">
           <!-- Balance Card -->
           <div
             class="bg-gradient-to-br from-amber-400/10 to-orange-600/10 backdrop-blur-md border border-amber-500/30 rounded-2xl p-6 min-w-max">
-            <p class="text-amber-200 text-sm font-semibold mb-2">SỐ DƯ HIỆN TẠI</p>
+            <p class="text-amber-200 text-sm font-semibold mb-2">CURRENT BALANCE</p>
             <p class="text-3xl font-black text-amber-300 drop-shadow-[0_3px_10px_rgba(255,184,28,0.3)]">{{
               userTest.balance}} VND</p>
           </div>
