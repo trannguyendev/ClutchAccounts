@@ -48,7 +48,7 @@ const routes = [
   },
   {
     path: '/accounts/acc-random-nfa',
-    name: 'acc-random-fa',
+    name: 'acc-random-nfa',
     component: AccRandomNFA,
     meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
@@ -69,6 +69,12 @@ const routes = [
     name: 'not-found',
     component: Error404
   },
+  //payment path
+  {
+    path: '/payment/:transaction_content',
+    name: 'payment',
+    component: "hehe"
+  }
 ]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
