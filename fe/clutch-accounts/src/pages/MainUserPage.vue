@@ -2,21 +2,21 @@
 import { ref } from 'vue'
 
 // const currentUser = ref([]); //this section for fetch user info from server <declare here for using later>
+import { RouterLink } from 'vue-router'
 
-
-const userTest = 
-  {
-    id: 1,
-    name: "Erik Tran",
-    role: "USER",
-    balance: 90726
-  }
+const userTest =
+{
+  id: 1,
+  name: "Erik Tran",
+  role: "USER",
+  balance: 90726
+}
 
 const categories = [
-  { id: 1, name: 'ACC VALORANT', subtitle: 'DROPMAIL', color: 'from-yellow-500 to-orange-500', img: '' },
-  { id: 2, name: 'ACC VALORANT', subtitle: 'SIÊU SALE', color: 'from-cyan-400 to-blue-500', img: '' },
-  { id: 3, name: 'ACC VALORANT', subtitle: 'RANDOM NFA', color: 'from-pink-500 to-purple-500', img: '' },
-  { id: 4, name: 'ACC VALORANT', subtitle: 'RANDOM FA', color: 'from-red-500 to-pink-500', img: '' }
+  { id: 1, name: 'ACC VALORANT', subtitle: 'DROPMAIL', color: 'from-yellow-500 to-orange-500', img: '', link: '/accounts/acc-drop-mail' },
+  { id: 2, name: 'ACC VALORANT', subtitle: 'SIÊU SALE', color: 'from-cyan-400 to-blue-500', img: '', link: '/accounts/acc-sieu-sale' },
+  { id: 3, name: 'ACC VALORANT', subtitle: 'RANDOM NFA', color: 'from-pink-500 to-purple-500', img: '', link: '/accounts/acc-random-nfa' },
+  { id: 4, name: 'ACC VALORANT', subtitle: 'RANDOM FA', color: 'from-red-500 to-pink-500', img: '', link: '/accounts/acc-random-fa' }
 ]
 
 const otherProducts = [
@@ -65,17 +65,21 @@ const announcements = [
           <div
             class="bg-gradient-to-br from-amber-400/10 to-orange-600/10 backdrop-blur-md border border-amber-500/30 rounded-2xl p-6 min-w-max">
             <p class="text-amber-200 text-sm font-semibold mb-2">SỐ DƯ HIỆN TẠI</p>
-            <p class="text-3xl font-black text-amber-300 drop-shadow-[0_3px_10px_rgba(255,184,28,0.3)]">{{ userTest.balance}} VND</p>
+            <p class="text-3xl font-black text-amber-300 drop-shadow-[0_3px_10px_rgba(255,184,28,0.3)]">{{
+              userTest.balance}} VND</p>
           </div>
 
           <!-- Level Card -->
           <div
             class="bg-gradient-to-br from-purple-400/10 to-pink-600/10 backdrop-blur-md border border-purple-500/30 rounded-2xl p-6 min-w-max">
             <div class="flex items-center gap-2.5">
-              <img class="w-10 h-10 rounded-full font-black text-purple-300 drop-shadow-[0_3px_10px_rgba(168,85,247,0.3)]" src="" alt="userAvt">
+              <img
+                class="w-10 h-10 rounded-full font-black text-purple-300 drop-shadow-[0_3px_10px_rgba(168,85,247,0.3)]"
+                src="" alt="userAvt">
               <div class="font-medium text-heading">
                 <div class="text-purple-200 text-sm font-semibold mb-2">Have a good day!</div>
-                <div class="text-2xl font-black text-purple-300 drop-shadow-[0_3px_10px_rgba(168,85,247,0.3)]">{{ userTest.name }}</div>
+                <div class="text-2xl font-black text-purple-300 drop-shadow-[0_3px_10px_rgba(168,85,247,0.3)]">{{
+                  userTest.name }}</div>
               </div>
             </div>
           </div>
@@ -92,7 +96,7 @@ const announcements = [
       <!-- Announcements Section -->
       <div class="mb-20">
         <h2 class="text-3xl font-black text-white mb-8 flex items-center gap-3">
-          <span class="text-amber-400">📢</span> TIN TỨC & THÔNG BÁO
+          <span class="text-amber-400">📢</span> NEWS
           <div class="flex-1 h-1 bg-gradient-to-r from-amber-400 to-transparent ml-4"></div>
         </h2>
 
@@ -137,10 +141,12 @@ const announcements = [
                 <span class="text-3xl text-amber-300">🎮</span>
               </div>
               <h3 class="text-white font-black text-xl mb-2">{{ item.name }}</h3>
-              <p
-                :class="`text-lg font-bold ${item.color.split(' ')[1].replace('to-', 'text-').replace('-500', '-400').replace('-600', '-400')}`">
-                {{ item.subtitle }}
-              </p>
+              <router-link :to="item.link">
+                <p
+                  :class="`text-lg font-bold ${item.color.split(' ')[1].replace('to-', 'text-').replace('-500', '-400').replace('-600', '-400')}`">
+                  {{ item.subtitle }}
+                </p>
+              </router-link>
               <p class="text-amber-400 text-xs mt-4 font-semibold">🔥 ĐỐI FULL THÔNG TIN 🔥</p>
             </div>
 

@@ -39,7 +39,7 @@ const userTest =
           <!-- Balance Card -->
           <div
             class="bg-gradient-to-br from-amber-400/10 to-orange-600/10 backdrop-blur-md border border-amber-500/30 rounded-2xl p-6 min-w-max">
-            <p class="text-amber-200 text-sm font-semibold mb-2">SỐ DƯ HIỆN TẠI</p>
+            <p class="text-amber-200 text-sm font-semibold mb-2">YOUR BALANCE</p>
             <p class="text-3xl font-black text-amber-300 drop-shadow-[0_3px_10px_rgba(255,184,28,0.3)]">{{userTest.balance}} VND</p>
           </div>
           <!-- Level Card -->
@@ -77,6 +77,7 @@ const userTest =
           <div v-for="item in accs" :key="item.id"
             class="group relative bg-gradient-to-br from-black/80 to-slate-950/80 backdrop-blur-md border border-amber-900/50 rounded-2xl overflow-hidden hover:border-amber-500/70 transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-amber-600/40">
             <div class="p-6">
+              <p class="text-center text-sm text-amber-200 mb-4">Acc #{{ item.id }}</p>
               <h3 class="text-xl font-bold text-amber-300 mb-2">{{ item.name }}</h3>
               <img :src="item.image" alt="Product Image" class="w-full h-40 object-cover rounded-lg mb-4 shimmer glow-amber">
               <p class="text-sm text-amber-200 mb-4">{{ item.description }}</p>
