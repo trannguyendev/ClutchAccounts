@@ -1,20 +1,20 @@
 <script setup>
 import { ref } from 'vue'
-
+import { useUserStore } from '../stores/user'
 // const currentUser = ref([]); //this section for fetch user info from server <declare here for using later>
 import { RouterLink } from 'vue-router'
-
-const userTest =
+const user = useUserStore()
+const currentUser =
 {
-  id: 1,
-  name: "Erik Tran",
-  role: "USER",
-  balance: 90726
+  id: user.id,
+  name: user.username,
+  balance: user.balance,
+  img: user.avatar
 }
-
+console.log(currentUser);
 const categories = [
   { id: 1, name: 'ACC VALORANT', subtitle: 'DROPMAIL', color: 'from-yellow-500 to-orange-500', img: '', link: '/accounts/acc-drop-mail' },
-  { id: 2, name: 'ACC VALORANT', subtitle: 'SIÊU SALE', color: 'from-cyan-400 to-blue-500', img: '', link: '/accounts/acc-sieu-sale' },
+  { id: 2, name: 'ACC VALORANT', subtitle: 'SUPER SALE', color: 'from-cyan-400 to-blue-500', img: '', link: '/accounts/acc-sieu-sale' },
   { id: 3, name: 'ACC VALORANT', subtitle: 'RANDOM NFA', color: 'from-pink-500 to-purple-500', img: '', link: '/accounts/acc-random-nfa' },
   { id: 4, name: 'ACC VALORANT', subtitle: 'RANDOM FA', color: 'from-red-500 to-pink-500', img: '', link: '/accounts/acc-random-fa' }
 ]
@@ -65,7 +65,7 @@ const announcements = [
             class="bg-gradient-to-br from-amber-400/10 to-orange-600/10 backdrop-blur-md border border-amber-500/30 rounded-2xl p-6 min-w-max">
             <p class="text-amber-200 text-sm font-semibold mb-2">CURRENT BALANCE</p>
             <p class="text-3xl font-black text-amber-300 drop-shadow-[0_3px_10px_rgba(255,184,28,0.3)]">{{
-              userTest.balance}} VND</p>
+              currentUser.balance}} VND</p>
           </div>
 
           <!-- Level Card -->
@@ -74,11 +74,11 @@ const announcements = [
             <div class="flex items-center gap-2.5">
               <img
                 class="w-10 h-10 rounded-full font-black text-purple-300 drop-shadow-[0_3px_10px_rgba(168,85,247,0.3)]"
-                src="" alt="userAvt">
+                :src="currentUser.img" alt="userAvt">
               <div class="font-medium text-heading">
                 <div class="text-purple-200 text-sm font-semibold mb-2">Have a good day!</div>
                 <div class="text-2xl font-black text-purple-300 drop-shadow-[0_3px_10px_rgba(168,85,247,0.3)]">{{
-                  userTest.name }}</div>
+                  currentUser.name }}</div>
               </div>
             </div>
           </div>
