@@ -1,6 +1,11 @@
 <script setup>
 import { ref } from 'vue'
+import { RouterLink } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
+const currentUser = useUserStore()
+const username = currentUser.username
+const transactionContent = `NAP%20${username}`
 const isMenuOpen = ref(false)
 
 const toggleMenu = () => {
@@ -43,8 +48,8 @@ const toggleMenu = () => {
                             class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md">About</a>
                     </li>
                     <li>
-                        <a href="#"
-                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md">Services</a>
+                        <router-link :to="'/payment/'+transactionContent"
+                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md">Add Money</router-link>
                     </li>
                     <li>
                         <a href="#"

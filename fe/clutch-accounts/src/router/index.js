@@ -8,6 +8,7 @@ import Error404 from '@/components/Error404.vue'
 import AccSieuSale from '@/pages/AccSieuSale.vue'
 import AccRandomNFA from '@/pages/AccRandomNFA.vue'
 import AccRandomFA from '@/pages/AccRandomFA.vue'
+import Payment from '@/pages/Payment.vue'
 
 
 const routes = [
@@ -73,7 +74,7 @@ const routes = [
   {
     path: '/payment/:transaction_content',
     name: 'payment',
-    component: "hehe"
+    component: Payment
   }
 ]
 const router = createRouter({
