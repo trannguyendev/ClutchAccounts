@@ -11,6 +11,7 @@ import AccRandomFA from '@/pages/AccRandomFA.vue'
 import Payment from '@/pages/Payment.vue'
 
 
+
 const routes = [
   {
     path: '/',
@@ -45,7 +46,8 @@ const routes = [
   {
     path: '/accounts/acc-sieu-sale',
     name: 'acc-sieu-sale',
-    component: AccSieuSale
+    component: AccSieuSale,
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
   {
     path: '/accounts/acc-random-nfa',
@@ -74,7 +76,8 @@ const routes = [
   {
     path: '/payment/:transaction_content',
     name: 'payment',
-    component: Payment
+    component: Payment,
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
   }
 ]
 const router = createRouter({
