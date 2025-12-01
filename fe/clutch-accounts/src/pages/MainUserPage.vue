@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import { useUserStore } from '../stores/user'
 // const currentUser = ref([]); //this section for fetch user info from server <declare here for using later>
 import { RouterLink } from 'vue-router'
+import Navbar from '@/components/Navbar.vue'
+
 const user = useUserStore()
 const currentUser =
 {
@@ -33,6 +35,7 @@ const announcements = [
 ]
 </script>
 <template>
+  <Navbar></Navbar>
   <main class="min-h-screen main-background relative">
     <!-- Background Overlay for gradient and theme -->
     <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 opacity-50"></div>

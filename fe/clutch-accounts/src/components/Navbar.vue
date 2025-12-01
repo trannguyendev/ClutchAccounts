@@ -39,9 +39,9 @@ const toggleMenu = () => {
                 <ul
                     class="backdrop-blur-sm flex flex-col p-3 md:p-0 mt-3 md:mt-0 font-medium rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:border-0 bg-black/50 md:bg-transparent md:rounded-none space-y-2 md:space-y-0">
                     <li>
-                        <a href="#"
+                        <router-link :to="'/main'"
                             class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md"
-                            aria-current="page">Home</a>
+                            aria-current="page">Home</router-link>
                     </li>
                     <li>
                         <a href="#"

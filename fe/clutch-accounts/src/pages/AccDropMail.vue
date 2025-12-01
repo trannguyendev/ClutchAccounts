@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-
+import Navbar from '@/components/Navbar.vue'
 // const currentUser = ref([]); //this section for fetch user info from server <declare here for using later>
 const userTest =
 {
@@ -22,6 +22,7 @@ const userTest =
  ])
 </script>
 <template>
+      <Navbar></Navbar>
   <main class="min-h-screen main-background relative">
     <!-- Background Overlay for gradient and theme -->
     <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 opacity-50"></div>
