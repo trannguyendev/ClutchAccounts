@@ -243,7 +243,7 @@ const handleSignup = () => {
                         <div class="text-sm text-gray-400">
                             <label class="flex items-center">
                                 <input type="checkbox" class="mr-2 accent-amber-500" required>
-                                <span> I agree to the <a href="#" class=""> Terms of Service and Privacy Policy
+                                <span> I agree to the <a href="#" class="text-amber-500 transition-all delay-150 hover:underline"> Terms of Service and Privacy Policy
                                     </a></span>
                             </label>
                         </div>
