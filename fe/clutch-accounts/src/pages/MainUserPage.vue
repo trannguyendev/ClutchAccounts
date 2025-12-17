@@ -14,11 +14,20 @@ const currentUser =
   img: user.avatar
 }
 console.log(currentUser);
+
+// Color mapping for text based on gradient colors
+const colorMap = {
+  'from-yellow-500 to-orange-500': 'text-yellow-500',
+  'from-cyan-400 to-blue-500': 'text-cyan-400',
+  'from-pink-500 to-purple-500': 'text-pink-500',
+  'from-red-500 to-pink-500': 'text-red-500'
+}
+
 const categories = [
-  { id: 1, name: 'ACC VALORANT', subtitle: 'DROPMAIL', color: 'from-yellow-500 to-orange-500', img: '', link: '/accounts/acc-drop-mail' },
-  { id: 2, name: 'ACC VALORANT', subtitle: 'SUPER SALE', color: 'from-cyan-400 to-blue-500', img: '', link: '/accounts/acc-sieu-sale' },
-  { id: 3, name: 'ACC VALORANT', subtitle: 'RANDOM NFA', color: 'from-pink-500 to-purple-500', img: '', link: '/accounts/acc-random-nfa' },
-  { id: 4, name: 'ACC VALORANT', subtitle: 'RANDOM FA', color: 'from-red-500 to-pink-500', img: '', link: '/accounts/acc-random-fa' }
+  { id: 1, name: 'ACC VALORANT', subtitle: 'DROPMAIL', color: 'from-yellow-500 to-orange-500', textColor: 'text-yellow-500', img: '', link: '/accounts/acc-drop-mail' },
+  { id: 2, name: 'ACC VALORANT', subtitle: 'SUPER SALE', color: 'from-cyan-400 to-blue-500', textColor: 'text-cyan-400', img: '', link: '/accounts/acc-sieu-sale' },
+  { id: 3, name: 'ACC VALORANT', subtitle: 'RANDOM NFA', color: 'from-pink-500 to-purple-500', textColor: 'text-pink-500', img: '', link: '/accounts/acc-random-nfa' },
+  { id: 4, name: 'ACC VALORANT', subtitle: 'RANDOM FA', color: 'from-red-500 to-pink-500', textColor: 'text-red-500', img: '', link: '/accounts/acc-random-fa' }
 ]
 
 const otherProducts = [
@@ -144,8 +153,7 @@ const announcements = [
               </div>
               <h3 class="text-white font-black text-xl mb-2">{{ item.name }}</h3>
               <router-link :to="item.link">
-                <p
-                  :class="`text-lg font-bold ${item.color.split(' ')[1].replace('to-', 'text-').replace('-500', '-400').replace('-600', '-400')}`">
+                <p :class="`text-lg font-bold ${item.textColor}`">
                   {{ item.subtitle }}
                 </p>
               </router-link>
