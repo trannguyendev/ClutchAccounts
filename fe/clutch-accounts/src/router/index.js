@@ -84,16 +84,13 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
-// router.beforeEach( async (to, from, next) => {
-//   const isAuthenticated = true // placeholder for real auth check
-//   if (to.matched.some(record => record.meta.requiresAuth)) {
-//     if (!isAuthenticated) {
-//       next({ name: 'auth' })
-//     } else {
-//       next()
-//     }
-//   } else {
-//     next({name: 'denied'})
-//   }
-// })
+router.beforeEach( async (to, from, next) => {
+  const token = localStorage.getItem('token')
+
+  if (to.meta.requiresAuth && (!token || token.trim().length === 0)){
+    router.push("/auth")
+  } else {
+    next()
+  }
+})
 export default router

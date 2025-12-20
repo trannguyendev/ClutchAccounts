@@ -1,5 +1,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css';
+import axios from 'axios';
+
 // Form state
 const isLogin = ref(true)
 const isAnimating = ref(false)
@@ -93,9 +97,30 @@ const signupForm = ref({
     confirmPassword: ''
 })
 
-const handleLogin = () => {
-    // Handle login logic here
-    console.log('Login:', loginForm.value)
+const handleLogin = async () => {
+
+    if (loginForm.value.email.trim().length == 0 || loginForm.value.password.trim().length == 0){
+        toast.error("Please fill in all fields", {
+            multiple: false,
+        })
+        console.log("Login failed by: ", loginForm.value)
+    }
+    else{
+        // toast.success("Login successful!", {
+        //     multiple: false,
+        // })
+       await axios.post("/api/check", loginForm.value)
+        .then((res) => {
+            console.log(res.data);
+        })
+        .catch((err) => {
+            toast.error("Login failed! Please check your credentials.", {
+                multiple: false,
+            })
+            console.error(err);
+        });
+        console.log("Login by: ", loginForm.value)
+    }
 }
 
 const handleSignup = () => {

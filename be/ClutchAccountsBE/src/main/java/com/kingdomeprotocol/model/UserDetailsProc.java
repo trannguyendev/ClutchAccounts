@@ -1,0 +1,13 @@
+package com.kingdomeprotocol.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserDetailsProc {
+	private String email;
+	private String psw;
+}
