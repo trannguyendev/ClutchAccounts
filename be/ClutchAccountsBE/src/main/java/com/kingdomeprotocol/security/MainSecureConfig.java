@@ -5,6 +5,7 @@ import java.util.Collections;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,9 +13,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.kingdomeprotocol.model.UserModel;
 import com.kingdomeprotocol.repository.UserRepository;
+import com.kingdomeprotocol.utils.JwtAuthenticationFilter;
 
 @Configuration
 public class MainSecureConfig {
@@ -32,13 +35,17 @@ public UserDetailsService userDetails(UserRepository userRepo) {
 	};
 }
 
-//This config security below  only for testing "/test" route XD
+
 @Bean
-public SecurityFilterChain configSecure(HttpSecurity http) throws Exception {
+public SecurityFilterChain configSecure(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {
+	http.csrf(config -> config.disable());
+	http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 	http.authorizeHttpRequests(config -> {
-		config.requestMatchers("/api/test").permitAll();
+		config.requestMatchers("/api/test").permitAll(); //This config security below  only for testing "/test" route XD
 		config.requestMatchers("/api/check").permitAll();
+		config.requestMatchers("/api/register").permitAll();
 	});
+	http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 	return http.build();
 }
 }

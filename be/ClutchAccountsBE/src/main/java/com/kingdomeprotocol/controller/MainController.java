@@ -33,8 +33,8 @@ public class MainController {
 	@PostMapping("/check")
 	public ResponseEntity<?> checkLogin(@Valid @RequestBody UserDetailsProc loginDetails){
 		try {
-			userCheck userCheck = userService.login(loginDetails);
-			return ResponseEntity.ok(userCheck);
+			userCheck user = userService.login(loginDetails);
+			return ResponseEntity.ok(user);
 		}
 		catch(BadCredentialsException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Wrong password or email"));
@@ -43,10 +43,22 @@ public class MainController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
 		}
 		catch(Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "System system is not online"));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "System is not online"));
 		}
 }
-	
+	@PostMapping("/register")
+	public ResponseEntity<?> signUp(@Valid @RequestBody UserDetailsProc signUpDetails){
+		try {
+			UserModel userSignUp  = userService.signUp(signUpDetails.getEmail(), signUpDetails.getPsw());
+			return ResponseEntity.ok(userSignUp);
+		}
+		catch(RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Email already existed, pls contact to support team"));
+		}
+		catch(Exception e ) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+		}
+	}
 //Route for testing route only (may delete after test)
 	@GetMapping("/test")
 	public String testRoute() {
