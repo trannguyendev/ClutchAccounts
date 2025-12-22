@@ -9,11 +9,15 @@ const user = useUserStore()
 const currentUser =
 {
   id: user.id,
-  name: user.email,
+  name: user.username,
   balance: user.balance,
   img: user.avatar
 }
 console.log(currentUser);
+
+const handleLogout = () => {
+  user.logout()
+}
 
 // Color mapping for text based on gradient colors
 const colorMap = {
@@ -93,6 +97,11 @@ const announcements = [
                   currentUser.name }}</div>
               </div>
             </div>
+            <button @click="handleLogout"
+              class="mt-4 w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-red-600/50 hover:scale-105 active:scale-95 group">
+              <i class="fa fa-power-off transition-transform duration-300 group-hover:rotate-12" aria-hidden="true"></i>
+              Logout
+            </button>
           </div>
         </div>
       </div>
