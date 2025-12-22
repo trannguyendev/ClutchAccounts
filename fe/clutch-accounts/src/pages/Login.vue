@@ -3,7 +3,11 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css';
 import axios from 'axios';
+import { useUserStore } from '@/stores/user';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
+const userStore = useUserStore();
 // Form state
 const isLogin = ref(true)
 const isAnimating = ref(false)
@@ -91,41 +95,80 @@ const loginForm = ref({
 })
 
 const signupForm = ref({
-    username: '',
     email: '',
     password: '',
-    confirmPassword: ''
 })
 
+const redirectRout = (role) => {
+    switch(role){
+        case "user":
+            route.push("/main");
+            break;
+        case "admin":
+            route.push("/admin");
+            break;
+    }
+}
 const handleLogin = async () => {
 
     if (loginForm.value.email.trim().length == 0 || loginForm.value.password.trim().length == 0){
         toast.error("Please fill in all fields", {
             multiple: false,
         })
-        console.log("Login failed by: ", loginForm.value)
+        // console.log("Login failed by: ", loginForm.value)
     }
     else{
-        // toast.success("Login successful!", {
-        //     multiple: false,
-        // })
+        
        await axios.post("/api/check", loginForm.value)
         .then((res) => {
-            console.log(res.data);
+            toast.success("Login successful!", {
+            multiple: false,
         })
-        .catch((err) => {
-            toast.error("Login failed! Please check your credentials.", {
+            console.log(res.data);
+            userStore.login(res.data);
+            toast.info("Token has been created successfully!", {
                 multiple: false,
             })
-            console.error(err);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
+            // Redirect based on role after login
+            redirectRout(res.data.role);
+        })
+        .catch((err) => {
+            toast.error("Error: "+err.response.data.error, {
+                multiple: false,
+            })
+            errorLoginMessage.value = err.response.data.error || "An error occurred during login.";
+            // console.error(err);
         });
-        console.log("Login by: ", loginForm.value)
     }
 }
 
-const handleSignup = () => {
-    // Handle signup logic here
-    console.log('Signup:', signupForm.value)
+const handleSignup = async () => {
+    
+
+    if (signupForm.value.email.trim().length != 0 && signupForm.value.password.trim().length != 0){
+        await axios.post("/api/register", signupForm.value)
+        .then((res) => {
+            toast.success("Account created successfully! Pls login", {
+                multiple: false,
+            })
+            console.log(res.data);
+        })
+        .catch((err) => {
+            toast.error("Error: "+err, {
+                multiple: false,
+            })
+            errorSignupMessage.value = err.response.data.message || "An error occurred during signup.";
+            console.error(err);
+        });
+        console.log('Signup:', signupForm.value)
+    }
+    else{
+        toast.error("Please fill in all fields and DO NOT USE SPACE CHARACTER", {
+            multiple: false,
+        })
+        console.log("Signup failed by: ", signupForm.value)
+    }
 }
 </script>
 

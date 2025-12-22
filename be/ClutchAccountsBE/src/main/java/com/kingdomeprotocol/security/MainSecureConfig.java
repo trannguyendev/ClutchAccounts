@@ -4,6 +4,8 @@ import java.util.Collections;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,15 +28,22 @@ public class MainSecureConfig {
 public PasswordEncoder pswEncoder() {
 	return new BCryptPasswordEncoder();
 }
+
+
 @Bean
 public UserDetailsService userDetails(UserRepository userRepo) {
 	return email -> {
 		UserModel user = userRepo.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Not found user matched with "+email));
 		var authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_"+user.getRole().toUpperCase()));
-				return new User(user.getEmail(), user.getRole(), authorities);
+				return new User(user.getEmail(), user.getUser_psw(), authorities);
 	};
 }
 
+
+@Bean
+public AuthenticationManager authenticationManager(AuthenticationConfiguration authenConfig) throws Exception {
+	return authenConfig.getAuthenticationManager();
+}
 
 @Bean
 public SecurityFilterChain configSecure(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {

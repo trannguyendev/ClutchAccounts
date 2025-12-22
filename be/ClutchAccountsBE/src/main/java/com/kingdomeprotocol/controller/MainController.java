@@ -1,14 +1,11 @@
 package com.kingdomeprotocol.controller;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,14 +24,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class MainController {
-	
+
 	private final UserService userService;
-	
+
 	@PostMapping("/check")
 	public ResponseEntity<?> checkLogin(@Valid @RequestBody UserDetailsProc loginDetails){
 		try {
 			userCheck user = userService.login(loginDetails);
 			return ResponseEntity.ok(user);
+		}
+		catch(UsernameNotFoundException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "User not found"));
 		}
 		catch(BadCredentialsException e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Wrong password or email"));
@@ -64,6 +64,6 @@ public class MainController {
 	public String testRoute() {
 		return "It's worked LoL";
 	}
-	
+
 }
 

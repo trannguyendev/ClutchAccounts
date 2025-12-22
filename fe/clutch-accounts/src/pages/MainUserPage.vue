@@ -9,7 +9,7 @@ const user = useUserStore()
 const currentUser =
 {
   id: user.id,
-  name: user.username,
+  name: user.email,
   balance: user.balance,
   img: user.avatar
 }

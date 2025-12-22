@@ -9,6 +9,7 @@ import AccSieuSale from '@/pages/AccSieuSale.vue'
 import AccRandomNFA from '@/pages/AccRandomNFA.vue'
 import AccRandomFA from '@/pages/AccRandomFA.vue'
 import Payment from '@/pages/Payment.vue'
+import AdminDashBoard from '@/pages/AdminDashBoard.vue'
 
 
 
@@ -26,7 +27,7 @@ const routes = [
   {
     path: '/admin',
     name: 'admin',
-    component: "smth",
+    component: AdminDashBoard,
     meta: { requiresAuth: true , roles: ['admin']}
   },
   //path to main page for auth users
@@ -84,11 +85,16 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
-router.beforeEach( async (to, from, next) => {
+router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
+  const role = localStorage.getItem('role')
 
-  if (to.meta.requiresAuth && (!token || token.trim().length === 0)){
-    router.push("/auth")
+  if (to.meta.requiresAuth && (!token || token.trim().length === 0)) {
+    next('/auth')
+  } else if (to.meta.roles && to.meta.roles.includes(role) && token != null) {
+    next()
+  } else if (to.meta.requiresAuth) {
+    next('/denied')
   } else {
     next()
   }
