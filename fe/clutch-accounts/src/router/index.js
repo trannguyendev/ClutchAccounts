@@ -79,6 +79,11 @@ const routes = [
     name: 'payment',
     component: Payment,
     meta: { requiresAuth: true , roles: ['user', 'admin']},
+  },
+  //Catch-all route for some s2pid access paths which doesn't exist
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/not-found'
   }
 ]
 const router = createRouter({
@@ -86,12 +91,24 @@ const router = createRouter({
   routes,
 })
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
-  const role = localStorage.getItem('role')
+  let token = null
+  let role = null
+  
+  //Get data from currentuser object in localStorage
+  const currentUser = localStorage.getItem('currentuser')
+  if (currentUser) {
+    try {
+      const userData = JSON.parse(currentUser)
+      token = userData.token
+      role = userData.role
+    } catch (err) {
+      console.log("Errror: "+err)
+    }
+  }
 
   if (to.meta.requiresAuth && (!token || token.trim().length === 0)) {
-    next('/auth')
-  } else if (to.meta.roles && to.meta.roles.includes(role) && token != null) {
+    next('/denied')
+  } else if (to.meta.roles && role && to.meta.roles.includes(role) && token != null) {
     next()
   } else if (to.meta.requiresAuth) {
     next('/denied')

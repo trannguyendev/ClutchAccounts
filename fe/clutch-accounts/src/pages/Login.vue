@@ -4,9 +4,9 @@ import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css';
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
-import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
-const route = useRoute();
+const router = useRouter();
 const userStore = useUserStore();
 // Form state
 const isLogin = ref(true)
@@ -66,11 +66,16 @@ const handleMouseMove = (e) => {
     mouse.value = { x: e.clientX, y: e.clientY }
 }
 
-onMounted(() => {
+onMounted(async () => {
     initParticles()
     animate()
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('resize', initParticles)
+
+    //Test function getIP, getDeviceInfo, getCurrentTime
+    const ip = await getIP();
+    console.log("Test IP: " + ip + ", Device: " + getDeviceInfo() + ", Time: " + getCurrentTime());
+    autoLogin();
 })
 
 onUnmounted(() => {
@@ -87,6 +92,52 @@ const toggleForm = () => {
         isAnimating.value = false
     }, 600)
 }
+//Method check if token exists and auto login
+const autoLogin = async () => {
+    const token = userStore.token;
+
+    if (token){
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        await axios.get("/api/me")
+        .then((res) => {
+            userStore.login(res.data);
+            toast.success("Auto login successful!", {
+                multiple: false,
+            })
+            router.push("/main");
+        })
+        .catch((err) => {
+            console.log("Auto login error:", err);
+            localStorage.removeItem('currentuser');
+            delete axios.defaults.headers.common['Authorization'];
+            toast.error("Your token was expired, please login again.", {
+                multiple: false,
+            })
+        })
+    }
+    else{
+        return;
+    }
+}
+//Method to detect user's IP, device/platform, currentTime
+ const getIP = async () => {
+    try {
+        const res = await axios.get('https://api.ipify.org?format=json');
+        return res.data.ip;
+    } catch (err) {
+        console.error('Error fetching IP address:', err);
+        return null;
+    }
+}
+function getDeviceInfo() {
+    const userAgent = navigator.userAgent;
+    return userAgent;
+}
+function getCurrentTime() {
+    const currentTime = new Date().toISOString();
+    return currentTime;
+}
+
 
 // Form data
 const loginForm = ref({
@@ -99,13 +150,14 @@ const signupForm = ref({
     password: '',
 })
 
+
 const redirectRout = (role) => {
     switch(role){
         case "user":
-            route.push("/main");
+            router.push("/main")
             break;
         case "admin":
-            route.push("/admin");
+            router.push("/admin")
             break;
     }
 }
@@ -121,6 +173,7 @@ const handleLogin = async () => {
         
        await axios.post("/api/check", loginForm.value)
         .then((res) => {
+            console.log("Login response:", res.data);
             toast.success("Login successful!", {
             multiple: false,
         })
@@ -131,14 +184,15 @@ const handleLogin = async () => {
             })
             axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
             // Redirect based on role after login
+            console.log("Role from response:", res.data.role);
             redirectRout(res.data.role);
         })
         .catch((err) => {
-            toast.error("Error: "+err.response.data.error, {
+            console.error("Login error:", err);
+            toast.error("Error: "+err.response.data.error || err.message, {
                 multiple: false,
             })
             errorLoginMessage.value = err.response.data.error || "An error occurred during login.";
-            // console.error(err);
         });
     }
 }

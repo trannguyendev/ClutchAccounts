@@ -1,6 +1,7 @@
 package com.kingdomeprotocol.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,6 +49,9 @@ public class UserService {
 		return new userCheck(userChecking.getId(), jwtToken, userChecking.getRole().toLowerCase(), userChecking.getEmail(), userChecking.getBalance());
 	}
 	
+	public Optional<UserModel> loadUserByEmail(String email) {
+		return userRepo.findByEmail(email);
+	}
 	public void userLoggedHistory() {}
 	public record userCheck(int id, String token, String role, String email, int balance) {}
 }
