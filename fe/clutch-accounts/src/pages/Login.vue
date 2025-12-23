@@ -76,6 +76,7 @@ onMounted(async () => {
     const ip = await getIP();
     console.log("Test IP: " + ip + ", Device: " + getDeviceInfo() + ", Time: " + getCurrentTime());
     autoLogin();
+    console.log("Auto login checked.");
 })
 
 onUnmounted(() => {
@@ -91,33 +92,6 @@ const toggleForm = () => {
     setTimeout(() => {
         isAnimating.value = false
     }, 600)
-}
-//Method check if token exists and auto login
-const autoLogin = async () => {
-    const token = userStore.token;
-
-    if (token){
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        await axios.get("/api/me")
-        .then((res) => {
-            userStore.login(res.data);
-            toast.success("Auto login successful!", {
-                multiple: false,
-            })
-            router.push("/main");
-        })
-        .catch((err) => {
-            console.log("Auto login error:", err);
-            localStorage.removeItem('currentuser');
-            delete axios.defaults.headers.common['Authorization'];
-            toast.error("Your token was expired, please login again.", {
-                multiple: false,
-            })
-        })
-    }
-    else{
-        return;
-    }
 }
 //Method to detect user's IP, device/platform, currentTime
  const getIP = async () => {
@@ -161,6 +135,18 @@ const redirectRout = (role) => {
             break;
     }
 }
+
+const autoLogin = () => {
+    const token = userStore.token
+    const role = userStore.role
+    
+    if (token.trim().length > 0 || token != null){
+        redirectRout(role);
+    }
+    else{
+        return;
+    }
+}
 const handleLogin = async () => {
 
     if (loginForm.value.email.trim().length == 0 || loginForm.value.password.trim().length == 0){
@@ -171,7 +157,7 @@ const handleLogin = async () => {
     }
     else{
         
-       await axios.post("/api/check", loginForm.value)
+       await axios.post("/api/auth/check", loginForm.value)
         .then((res) => {
             console.log("Login response:", res.data);
             toast.success("Login successful!", {
@@ -179,9 +165,6 @@ const handleLogin = async () => {
         })
             console.log(res.data);
             userStore.login(res.data);
-            toast.info("Token has been created successfully!", {
-                multiple: false,
-            })
             axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
             // Redirect based on role after login
             console.log("Role from response:", res.data.role);
@@ -201,7 +184,7 @@ const handleSignup = async () => {
     
 
     if (signupForm.value.email.trim().length != 0 && signupForm.value.password.trim().length != 0){
-        await axios.post("/api/register", signupForm.value)
+        await axios.post("/api/auth/register", signupForm.value)
         .then((res) => {
             toast.success("Account created successfully! Pls login", {
                 multiple: false,

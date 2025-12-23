@@ -29,7 +29,7 @@ public class MainController {
 
 	private final UserService userService;
 
-	@PostMapping("/check")
+	@PostMapping("/auth/check")
 	public ResponseEntity<?> checkLogin(@Valid @RequestBody UserDetailsProc loginDetails){
 		try {
 			userCheck user = userService.login(loginDetails);
@@ -48,7 +48,7 @@ public class MainController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "System is not online"));
 		}
 }
-	@PostMapping("/register")
+	@PostMapping("/auth/register")
 	public ResponseEntity<?> signUp(@Valid @RequestBody UserDetailsProc signUpDetails){
 		try {
 			UserModel userSignUp  = userService.signUp(signUpDetails.getEmail(), signUpDetails.getPsw());
@@ -61,7 +61,7 @@ public class MainController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
 		}
 	}
-	@GetMapping("/me")
+	@GetMapping("/auth/me")
 	public ResponseEntity<?> getCurrentUser(Authentication authen){
 		String email = authen.getName();
 		try {

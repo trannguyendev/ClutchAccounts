@@ -14,5 +14,5 @@ const userStore = useUserStore()
 
 app.use(router)
 
-userStore.load()
+userStore.init();
 app.mount('#app')
