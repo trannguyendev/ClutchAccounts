@@ -5,18 +5,11 @@ import { useUserStore } from '../stores/user'
 import { RouterLink } from 'vue-router'
 import Navbar from '@/components/Navbar.vue'
 
-const user = useUserStore()
-const currentUser =
-{
-  id: user.id,
-  name: user.username,
-  balance: user.balance,
-  img: user.avatar
-}
-console.log(currentUser);
+
+let currentUser = useUserStore()
 
 const handleLogout = () => {
-  user.logout()
+  currentUser.logout()
 }
 
 // Color mapping for text based on gradient colors
@@ -94,7 +87,7 @@ const announcements = [
               <div class="font-medium text-heading">
                 <div class="text-purple-200 text-sm font-semibold mb-2">Have a good day!</div>
                 <div class="text-2xl font-black text-purple-300 drop-shadow-[0_3px_10px_rgba(168,85,247,0.3)]">{{
-                  currentUser.name }}</div>
+                  currentUser.username }}</div>
               </div>
             </div>
             <button @click="handleLogout"

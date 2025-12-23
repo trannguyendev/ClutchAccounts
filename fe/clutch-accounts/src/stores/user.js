@@ -13,13 +13,13 @@ export const useUserStore = defineStore("currentuser", {
     }),
     actions: {
         login(data) {
-            this.token = data.token;
-            this.id = data.id;
-            this.username = data.email;
+            this.token = data.token,
+            this.id = data.id,
+            this.username = data.email,
             this.avatar = data.avatar || 'https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg',
-                this.balance = data.balance,
-                this.isLoggedIn = true;
-            this.role = data.role;
+            this.balance = data.balance,
+            this.isLoggedIn = true,
+            this.role = data.role
 
             //set data to localStorage
             localStorage.setItem('currentuser', JSON.stringify(this.$state));
@@ -31,6 +31,7 @@ export const useUserStore = defineStore("currentuser", {
                 axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 axios.get("/api/auth/me")
                 .then((res) => {
+                    console.log("User data fetched during init:", res.data);
                     this.$patch({
                         token: token,
                         id: res.data.id,

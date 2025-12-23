@@ -71,12 +71,12 @@ onMounted(async () => {
     animate()
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('resize', initParticles)
-
-    //Test function getIP, getDeviceInfo, getCurrentTime
-    const ip = await getIP();
-    console.log("Test IP: " + ip + ", Device: " + getDeviceInfo() + ", Time: " + getCurrentTime());
-    autoLogin();
-    console.log("Auto login checked.");
+    try{
+        autoLogin();
+    }
+    catch(err){
+        console.error("Auto login error:", err);
+    }
 })
 
 onUnmounted(() => {
@@ -108,11 +108,29 @@ function getDeviceInfo() {
     return userAgent;
 }
 function getCurrentTime() {
-    const currentTime = new Date().toISOString();
+    const currentTime = new Date().toISOString().split("Z")[0];
     return currentTime;
 }
 
+const trackingLoginActivity = async () => {
+    const ip = await getIP();
+    const deviceInfo = getDeviceInfo();
+    const currentTime = getCurrentTime();
 
+    let loginDataInfo = {
+        logged_ip: ip,
+        logged_device: deviceInfo,
+        logged_time: currentTime
+    }
+
+    axios.post("/api/auth/tracking", loginDataInfo)
+    .then((res) => {
+        console.log("Login activity tracked:", res.data);
+    })
+    .catch((err) => {
+        console.error("Error tracking login activity:", err);
+    })
+};
 // Form data
 const loginForm = ref({
     email: '',
@@ -140,7 +158,8 @@ const autoLogin = () => {
     const token = userStore.token
     const role = userStore.role
     
-    if (token.trim().length > 0 || token != null){
+    if (token != null && token.trim().length > 0){
+        trackingLoginActivity();
         redirectRout(role);
     }
     else{
@@ -165,6 +184,7 @@ const handleLogin = async () => {
         })
             console.log(res.data);
             userStore.login(res.data);
+            trackingLoginActivity();
             axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
             // Redirect based on role after login
             console.log("Role from response:", res.data.role);
@@ -294,10 +314,6 @@ const handleSignup = async () => {
                         </div>
 
                         <div class="flex items-center justify-between text-sm">
-                            <label class="flex items-center text-gray-400">
-                                <input type="checkbox" class="mr-2 accent-amber-500">
-                                Remember me
-                            </label>
                             <a href="#" class="text-amber-400 hover:text-amber-300 transition-colors">Forgot
                                 Password?</a>
                         </div>
