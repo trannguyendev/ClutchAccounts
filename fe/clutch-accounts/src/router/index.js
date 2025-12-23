@@ -107,12 +107,20 @@ router.beforeEach((to, from, next) => {
   }
 
   if (to.meta.requiresAuth && (!token || token.trim().length === 0)) {
+    // No token and auth required
     next('/denied')
-  } else if (to.meta.roles && role && to.meta.roles.includes(role) && token != null) {
-    next()
+  } else if (to.meta.requiresAuth && to.meta.roles) {
+    // Auth required AND specific roles required
+    if (role && to.meta.roles.includes(role)) {
+      next()
+    } else {
+      next('/denied')
+    }
   } else if (to.meta.requiresAuth) {
-    next('/denied')
+    // Auth required but no specific roles
+    next()
   } else {
+    // No auth required
     next()
   }
 })
