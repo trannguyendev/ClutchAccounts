@@ -3,6 +3,8 @@ package com.kingdomeprotocol.controller;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.management.RuntimeErrorException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kingdomeprotocol.model.AuditLogModel;
+import com.kingdomeprotocol.model.DTOAuditLogRequest;
 import com.kingdomeprotocol.model.UserDetailsProc;
 import com.kingdomeprotocol.model.UserModel;
+import com.kingdomeprotocol.repository.AuditLogRepository;
 import com.kingdomeprotocol.service.UserService;
 import com.kingdomeprotocol.service.UserService.userCheck;
 
@@ -25,8 +30,8 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class MainController {
-
+public class AuthController {
+	private final AuditLogRepository auditRepo;
 	private final UserService userService;
 
 	@PostMapping("/auth/check")
@@ -70,6 +75,25 @@ public class MainController {
 		}
 		catch(Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+		}
+	}
+	@PostMapping("/auth/tracking")
+	public ResponseEntity<?> trackingUser(@RequestBody DTOAuditLogRequest auditReq, Authentication authen){
+		try {
+			String email = authen.getName();
+			UserModel user = userService.loadUserByEmail(email).orElseThrow();
+			
+			AuditLogModel auditLog = new AuditLogModel();
+			auditLog.setLogged_device(auditReq.getLogged_device());
+			auditLog.setLogged_ip(auditReq.getLogged_ip());
+			auditLog.setLogged_time(auditReq.getLogged_time());
+			auditLog.setAuditUser(user);
+			
+			auditRepo.save(auditLog);
+			return ResponseEntity.ok("Logged success");
+		}
+		catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
 		}
 	}
 //Route for testing route only (may delete after test)
