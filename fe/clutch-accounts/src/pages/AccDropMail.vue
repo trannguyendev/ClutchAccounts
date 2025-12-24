@@ -1,14 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 import Navbar from '@/components/Navbar.vue'
-// const currentUser = ref([]); //this section for fetch user info from server <declare here for using later>
-const userTest =
-{
-  id: 1,
-  name: "Erik Tran",
-  role: "USER",
-  balance: 90726
-}
+import { useUserStore } from '@/stores/user';
+
+const user = useUserStore();
 
  const accs = ref([
    {
@@ -41,7 +36,7 @@ const userTest =
           <div
             class="bg-gradient-to-br from-amber-400/10 to-orange-600/10 backdrop-blur-md border border-amber-500/30 rounded-2xl p-6 min-w-max">
             <p class="text-amber-200 text-sm font-semibold mb-2">YOUR BALANCE</p>
-            <p class="text-3xl font-black text-amber-300 drop-shadow-[0_3px_10px_rgba(255,184,28,0.3)]">{{userTest.balance}} VND</p>
+            <p class="text-3xl font-black text-amber-300 drop-shadow-[0_3px_10px_rgba(255,184,28,0.3)]">{{user.balance}} VND</p>
           </div>
           <!-- Level Card -->
           <div
@@ -53,7 +48,7 @@ const userTest =
               <div class="font-medium text-heading">
                 <div class="text-purple-200 text-sm font-semibold mb-2">Have a good day!</div>
                 <div class="text-2xl font-black text-purple-300 drop-shadow-[0_3px_10px_rgba(168,85,247,0.3)]">{{
-                  userTest.name }}</div>
+                  user.username }}</div>
               </div>
             </div>
           </div>
