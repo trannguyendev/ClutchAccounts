@@ -10,6 +10,7 @@ import AccRandomNFA from '@/pages/AccRandomNFA.vue'
 import AccRandomFA from '@/pages/AccRandomFA.vue'
 import Payment from '@/pages/Payment.vue'
 import AdminDashBoard from '@/pages/AdminDashBoard.vue'
+import UserInfo from '@/pages/UserInfo.vue'
 
 
 
@@ -78,6 +79,13 @@ const routes = [
     path: '/payment/:transaction_content',
     name: 'payment',
     component: Payment,
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
+  },
+  //Path to function of submenu page
+  {
+    path: '/user/profile',
+    name: 'user-profile',
+    component: UserInfo,
     meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
   //Catch-all route for some s2pid access paths which doesn't exist
