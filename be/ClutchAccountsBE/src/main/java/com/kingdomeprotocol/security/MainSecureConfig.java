@@ -52,6 +52,7 @@ public SecurityFilterChain configSecure(HttpSecurity http, JwtAuthenticationFilt
 	http.authorizeHttpRequests(config -> {
 		config.requestMatchers("/api/test").permitAll(); //This config security below  only for testing "/test" route XD
 		config.requestMatchers("/api/auth/**").permitAll();
+		config.requestMatchers("/api/user/**").authenticated();
 	});
 	http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 	return http.build();

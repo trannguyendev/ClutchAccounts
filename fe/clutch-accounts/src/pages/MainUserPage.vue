@@ -7,9 +7,19 @@ import Navbar from '@/components/Navbar.vue'
 
 
 let currentUser = useUserStore()
+const isMenuOpen = ref(false)
 
 const handleLogout = () => {
   currentUser.logout()
+  isMenuOpen.value = false
+}
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value
+}
+
+const closeMenu = () => {
+  isMenuOpen.value = false
 }
 
 // Color mapping for text based on gradient colors
@@ -80,10 +90,58 @@ const announcements = [
           <!-- Level Card -->
           <div
             class="bg-gradient-to-br from-purple-400/10 to-pink-600/10 backdrop-blur-md border border-purple-500/30 rounded-2xl p-6 min-w-max">
-            <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-2.5 relative">
               <img
-                class="w-10 h-10 rounded-full font-black text-purple-300 drop-shadow-[0_3px_10px_rgba(168,85,247,0.3)]"
-                :src="currentUser.img" alt="userAvt">
+                class="w-10 h-10 rounded-full font-black text-purple-300 drop-shadow-[0_3px_10px_rgba(168,85,247,0.3)] cursor-pointer hover:scale-110 transition-transform duration-200"
+                :src="currentUser.img" alt="userAvt"
+                @click="toggleMenu">
+              
+              <!-- User Avatar Dropdown Menu -->
+              <div v-if="isMenuOpen" class="absolute -top-32 -left-32 w-56 z-50">
+                <div class="bg-gradient-to-br from-slate-900 to-black backdrop-blur-md border border-amber-500/40 rounded-xl shadow-2xl shadow-amber-600/20 overflow-hidden">
+                  <!-- Menu Header -->
+                  <div class="bg-gradient-to-r from-amber-600/20 to-orange-600/20 border-b border-amber-500/30 px-6 py-4 flex items-center gap-3">
+                    <img :src="currentUser.img" alt="avatar" class="w-12 h-12 rounded-full border-2 border-amber-400/50">
+                    <div class="flex-1">
+                      <p class="text-amber-300 font-bold text-sm">{{ currentUser.username }}</p>
+                      <p class="text-slate-400 text-xs">Role: {{currentUser.role}}</p>
+                    </div>
+                  </div>
+
+                  <!-- Menu Items -->
+                  <div class="py-2">
+                    <!-- Profile -->
+                    <RouterLink to="/user/profile" class="w-full px-6 py-3 text-left text-slate-200 hover:bg-amber-500/10 hover:text-amber-300 transition-all duration-200 flex items-center gap-3 group border-b border-slate-800/50">
+                      <i class="fa fa-user text-amber-400 group-hover:scale-110 transition-transform"></i>
+                      <span class="font-medium">Profile</span>
+                      <span class="ml-auto text-amber-400/60 text-xs">→</span>
+                    </RouterLink>
+                    <!-- Transaction History -->
+                    <RouterLink to="/#" class="w-full px-6 py-3 text-left text-slate-200 hover:bg-amber-500/10 hover:text-amber-300 transition-all duration-200 flex items-center gap-3 group border-b border-slate-800/50">
+                      <i class="fa fa-magnifying-glass-dollar text-amber-400 group-hover:scale-110 transition-transform"></i>
+                      <span class="font-medium">Transactions</span>
+                      <span class="ml-auto text-amber-400/60 text-xs">→</span>
+                    </RouterLink>
+                    <!-- Help & Support -->
+                    <button class="w-full px-6 py-3 text-left text-slate-200 hover:bg-amber-500/10 hover:text-amber-300 transition-all duration-200 flex items-center gap-3 group border-b border-slate-800/50">
+                      <i class="fa fa-question-circle text-amber-400 group-hover:scale-110 transition-transform"></i>
+                      <span class="font-medium">Help & Support</span>
+                      <span class="ml-auto text-amber-400/60 text-xs">→</span>
+                    </button>
+
+                    <!-- Logout -->
+                    <button @click="handleLogout" class="w-full px-6 py-3 text-left text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 flex items-center gap-3 group">
+                      <i class="fa fa-sign-out text-red-500 group-hover:scale-110 transition-transform"></i>
+                      <span class="font-medium">Logout</span>
+                      <span class="ml-auto text-red-500/60 text-xs">→</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Click outside to close menu -->
+              <div v-if="isMenuOpen" @click="closeMenu" class="fixed inset-0 z-40"></div>
+              
               <div class="font-medium text-heading">
                 <div class="text-purple-200 text-sm font-semibold mb-2">Have a good day!</div>
                 <div class="text-2xl font-black text-purple-300 drop-shadow-[0_3px_10px_rgba(168,85,247,0.3)]">{{
