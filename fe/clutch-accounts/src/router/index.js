@@ -21,11 +21,6 @@ const routes = [
     component: Index
   },
   {
-    path: '/ok',
-    name: 'ok',
-    component: AccRandomFA
-  },
-  {
     path: '/auth',
     name: 'auth',
     component: Login
@@ -34,39 +29,39 @@ const routes = [
     path: '/admin',
     name: 'admin',
     component: AdminDashBoard,
-    meta: { requiresAuth: true, roles: ['admin'] }
+    meta: { requiresAuth: true , roles: ['admin']}
   },
   //path to main page for auth users
   {
     path: '/main',
     name: 'main',
     component: MainUserPage,
-    meta: { requiresAuth: true, roles: ['user', 'admin'] },
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
   //path to type of accounts
   {
     path: '/accounts/acc-drop-mail',
     name: 'acc-drop-mail',
     component: AccDropMail,
-    meta: { requiresAuth: true, roles: ['user', 'admin'] },
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
   {
     path: '/accounts/acc-sieu-sale',
     name: 'acc-sieu-sale',
     component: AccSieuSale,
-    meta: { requiresAuth: true, roles: ['user', 'admin'] },
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
   {
     path: '/accounts/acc-random-nfa',
     name: 'acc-random-nfa',
     component: AccRandomNFA,
-    meta: { requiresAuth: true, roles: ['user', 'admin'] },
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
   {
     path: '/accounts/acc-random-fa',
     name: 'acc-random-fa',
     component: AccRandomFA,
-    meta: { requiresAuth: true, roles: ['user', 'admin'] },
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
   //error path 
   {
@@ -84,14 +79,14 @@ const routes = [
     path: '/payment/:transaction_content',
     name: 'payment',
     component: Payment,
-    meta: { requiresAuth: true, roles: ['user', 'admin'] },
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
   //Path to function of submenu page
   {
     path: '/user/profile',
     name: 'user-profile',
     component: UserInfo,
-    meta: { requiresAuth: true, roles: ['user', 'admin'] },
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
   //Catch-all route for some s2pid access paths which doesn't exist
   {
@@ -106,7 +101,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   let token = null
   let role = null
-
+  
   //Get data from currentuser object in localStorage
   const currentUser = localStorage.getItem('currentuser')
   if (currentUser) {
@@ -115,7 +110,7 @@ router.beforeEach((to, from, next) => {
       token = userData.token
       role = userData.role
     } catch (err) {
-      console.log("Errror: " + err)
+      console.log("Errror: "+err)
     }
   }
 
