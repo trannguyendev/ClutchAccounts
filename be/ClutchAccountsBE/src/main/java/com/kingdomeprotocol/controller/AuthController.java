@@ -1,9 +1,6 @@
 package com.kingdomeprotocol.controller;
 
 import java.util.Map;
-import java.util.Optional;
-
-import javax.management.RuntimeErrorException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -83,13 +81,13 @@ public class AuthController {
 		try {
 			String email = authen.getName();
 			UserModel user = userService.loadUserByEmail(email).orElseThrow();
-			
+
 			AuditLogModel auditLog = new AuditLogModel();
 			auditLog.setLogged_device(auditReq.getLogged_device());
 			auditLog.setLogged_ip(auditReq.getLogged_ip());
 			auditLog.setLogged_time(auditReq.getLogged_time());
 			auditLog.setAuditUser(user);
-			
+
 			auditRepo.save(auditLog);
 			return ResponseEntity.ok("Logged success");
 		}
@@ -98,20 +96,21 @@ public class AuthController {
 		}
 	}
 //Forogt psw route
-	@PostMapping("/auth/sendOTP")
-	public ResponseEntity<?> sendOTP(@RequestBody String email){
+	@PostMapping("/auth/sendOTP/{email}")
+	public ResponseEntity<?> sendOTP(@PathVariable String email){
 		try {
 			userService.sentOTP(email);
 			return ResponseEntity.ok(Map.of("message", "Your OTP code has been sent to your email"));
 		}
 		catch(RuntimeException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "User not found"));
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
 		}
 		catch(Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(Map.of("error", e.getMessage()));
 		}
 	}
-	
+
 	@PostMapping("/auth/verifyOTP")
 	public ResponseEntity<?> verifyOTP(@RequestBody ForgotPassModel forgotModel){
 		try {
