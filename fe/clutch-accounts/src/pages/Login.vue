@@ -314,7 +314,7 @@ const handleSignup = async () => {
                         </div>
 
                         <div class="flex items-center justify-between text-sm">
-                            <a href="#" class="text-amber-400 hover:text-amber-300 transition-colors">Forgot
+                            <a href="/forgot" class="text-amber-400 hover:text-amber-300 transition-colors">Forgot
                                 Password?</a>
                         </div>
 

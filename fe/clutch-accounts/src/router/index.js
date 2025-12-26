@@ -11,6 +11,7 @@ import AccRandomFA from '@/pages/AccRandomFA.vue'
 import Payment from '@/pages/Payment.vue'
 import AdminDashBoard from '@/pages/AdminDashBoard.vue'
 import UserInfo from '@/pages/UserInfo.vue'
+import ForgotPass from '@/pages/ForgotPass.vue'
 
 
 
@@ -30,6 +31,11 @@ const routes = [
     name: 'admin',
     component: AdminDashBoard,
     meta: { requiresAuth: true , roles: ['admin']}
+  },
+  {
+    path: '/forgot',
+    name: 'forgot',
+    component: ForgotPass
   },
   //path to main page for auth users
   {
