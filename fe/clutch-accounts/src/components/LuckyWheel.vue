@@ -164,41 +164,31 @@ defineExpose({
 
             <!-- SVG Render -->
             <!-- ViewBox 0 0 100 100 để dễ scale theo % -->
-            <svg viewBox="0 0 100 100" class="w-full h-full transform drop-shadow-md">
+            <svg viewBox="0 0 100 100" class="w-full h-full transform drop-shadow-md"
+                :class="{ 'pointer-events-none': isSpinning }">
                 <!-- Render từng miếng (Slice) -->
-                <g v-for="(prize, index) in prizes" :key="prize.id">
-                    <!-- Đường path rẻ quạt -->
+                <g v-for="(prize, index) in prizes" :key="prize.id" class="group">
+                    <!-- Đường path rẻ quạt (Normal State) -->
                     <path :d="getSectorPath(index)" :fill="prize.color" stroke="#FDB931" stroke-width="0.5" />
 
-                    <!-- Text và Icon -->
-                    <!-- Dùng group g transform rotate để xoay text hướng tâm -->
-                    <!-- Text nằm ở giữa góc, bán kính khoảng 75% từ tâm ra -->
+                    <!-- Text và Icon (Normal) -->
                     <g :transform="getTextRotation(index)">
-                        <!-- 
-                            Logic SVG:
-                            - Tâm là (50, 50).
-                            - 0 độ (12h) là trục Y âm.
-                            - getTextRotation xoay trục Y âm trùng với slice center.
-                            - Tại đây, (50, 0) là rìa xa nhất (Rim). (50, 50) là tâm.
-                            - Ta đặt foreignObject dọc trục Y này.
-                        -->
-                        <!-- x=38 (centered 50-12), y=4 (padding from rim), width=24, height=42 (length towards center) -->
                         <foreignObject x="38" y="4" width="24" height="42">
                             <div
                                 class="flex flex-col items-center justify-start h-full w-full pt-1 pointer-events-none">
-                                <!-- Text Vertical -->
-                                <!-- writing-mode: vertical-rl xoay chữ 90 độ cw -->
                                 <div class="text-[0.22rem] md:text-[0.25rem] font-bold uppercase tracking-widest text-center leading-none shadow-sm pb-1"
                                     style="writing-mode: vertical-rl; text-orientation: mixed;"
-                                    :style="{ color: prize.text, textShadow: '0px 1px 2px rgba(0,0,0,0.8)' }">
+                                    :style="{ color: prize.text }">
                                     {{ prize.label }}
                                 </div>
-                                <!-- Icon Diamond (Optional) -->
                                 <div class="text-[0.3rem] mt-1 opacity-80" :style="{ color: prize.text }">♦</div>
                             </div>
                         </foreignObject>
                     </g>
                 </g>
+
+                <!-- Highlighted Slice (Rendered on TOP) -->
+
             </svg>
         </div>
 
@@ -230,7 +220,7 @@ defineExpose({
             <div class="absolute inset-[-6px] bg-yellow-400 rounded-full blur-md opacity-30 animate-pulse"></div>
 
             <button @click="$emit('spin-start')"
-                class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-yellow-300 via-yellow-500 to-yellow-700 shadow-[inset_0_2px_5px_rgba(255,255,255,0.4),0_4px_10px_rgba(0,0,0,0.5)] flex items-center justify-center border-4 border-yellow-900 group active:scale-95 transition-transform duration-200">
+                class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-yellow-300 via-yellow-500 to-yellow-700 shadow-[inset_0_2px_5px_rgba(255,255,255,0.4),0_4px_10px_rgba(0,0,0,0.5)] flex items-center justify-center border-4 border-yellow-900 group active:scale-95 hover:scale-110 hover:shadow-[0_0_20px_rgba(255,215,0,0.6)] transition-all duration-300 ease-out">
 
                 <span
                     class="font-serif font-bold text-yellow-950 text-sm md:text-base tracking-widest drop-shadow-sm group-hover:text-black transition-colors">
