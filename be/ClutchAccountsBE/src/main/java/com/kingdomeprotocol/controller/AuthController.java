@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.kingdomeprotocol.model.AuditLogModel;
 import com.kingdomeprotocol.model.DTOAuditLogRequest;
+import com.kingdomeprotocol.model.ForgotPassModel;
 import com.kingdomeprotocol.model.UserDetailsProc;
 import com.kingdomeprotocol.model.UserModel;
 import com.kingdomeprotocol.repository.AuditLogRepository;
@@ -96,11 +97,33 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
 		}
 	}
-//Route for testing route only (may delete after test)
-	@GetMapping("/test")
-	public String testRoute() {
-		return "It's worked LoL";
+//Forogt psw route
+	@PostMapping("/auth/sendOTP")
+	public ResponseEntity<?> sendOTP(@RequestBody String email){
+		try {
+			userService.sentOTP(email);
+			return ResponseEntity.ok(Map.of("message", "Your OTP code has been sent to your email"));
+		}
+		catch(RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "User not found"));
+		}
+		catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(Map.of("error", e.getMessage()));
+		}
 	}
-
+	
+	@PostMapping("/auth/verifyOTP")
+	public ResponseEntity<?> verifyOTP(@RequestBody ForgotPassModel forgotModel){
+		try {
+			userService.verifyOTP(forgotModel);
+			return ResponseEntity.ok("Password changed successfully");
+		}
+		catch(RuntimeException e ) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Wrong OTP"));
+		}
+		catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(Map.of("error", e.getMessage()));
+		}
+	}
 }
 
