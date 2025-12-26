@@ -77,7 +77,8 @@ public class UserService {
 
 	public void verifyOTP(ForgotPassModel forgot) {
 		String email = forgot.getEmail();
-		String secretOTP = redisTemp.opsForValue().get(email);
+		String key = "OTP:"+email;
+		String secretOTP = redisTemp.opsForValue().get(key);
 
 		if (secretOTP == null) {
 			throw new RuntimeException("OTP is not exist or expired");
