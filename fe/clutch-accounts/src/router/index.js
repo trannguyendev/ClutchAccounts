@@ -22,6 +22,11 @@ const routes = [
     component: Index
   },
   {
+    path: '/ok',
+    name: 'ok',
+    component: AccRandomFA
+  },
+  {
     path: '/auth',
     name: 'auth',
     component: Login
@@ -69,7 +74,7 @@ const routes = [
     component: AccRandomFA,
     meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
-  //error path 
+  //error path
   {
     path: '/denied',
     name: 'denied',
@@ -107,7 +112,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   let token = null
   let role = null
-  
+
   //Get data from currentuser object in localStorage
   const currentUser = localStorage.getItem('currentuser')
   if (currentUser) {
