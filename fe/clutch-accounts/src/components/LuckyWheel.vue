@@ -92,7 +92,6 @@ const spin = (targetIndex: number) => {
     }
 
     isSpinning.value = true;
-    emit('spin-start');
 
     // Tính toán góc cần đến
     // Mục tiêu: Đưa miếng targetIndex về vị trí kim (12h - góc 0 độ hoặc 360 độ)

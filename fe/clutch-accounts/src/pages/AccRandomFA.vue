@@ -16,8 +16,15 @@ const prizes = ref([
 ]);
 
 const wheelRef = ref(null);
+const showConfirmModal = ref(false);
 
 const onSpinStart = () => {
+        showConfirmModal.value = true;
+};
+
+const confirmSpin = () => {
+        showConfirmModal.value = false;
+
         // Random kết quả (index) giả lập từ API
         const winningIndex = Math.floor(Math.random() * prizes.value.length);
         console.log("Dự kiến trúng:", prizes.value[winningIndex].label);
@@ -36,6 +43,49 @@ const onSpinEnd = (prize) => {
 <template>
         <div
                 class="min-h-screen bg-black text-yellow-500 font-sans overflow-hidden relative selection:bg-yellow-500 selection:text-black">
+
+                <!-- Confirmation Modal -->
+                <transition enter-active-class="transition duration-200 ease-out"
+                        enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100"
+                        leave-active-class="transition duration-150 ease-in"
+                        leave-from-class="transform scale-100 opacity-100"
+                        leave-to-class="transform scale-95 opacity-0">
+                        <div v-if="showConfirmModal"
+                                class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+                                <div
+                                        class="bg-zinc-900 border-2 border-yellow-600/50 rounded-2xl p-6 md:p-8 max-w-sm w-full text-center shadow-[0_0_50px_rgba(234,179,8,0.15)] relative overflow-hidden">
+                                        <!-- Decorative glow -->
+                                        <div
+                                                class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,1)]">
+                                        </div>
+
+                                        <h3
+                                                class="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 to-yellow-600 mb-4 uppercase font-serif tracking-wide">
+                                                Xác nhận</h3>
+
+                                        <div class="space-y-4 mb-8">
+                                                <p class="text-gray-300">Bạn có chắc chắn muốn quay?</p>
+                                                <div
+                                                        class="inline-block px-4 py-2 bg-yellow-900/20 rounded-lg border border-yellow-500/20">
+                                                        Phí: <span
+                                                                class="text-yellow-400 font-bold text-lg">20.000đ</span>
+                                                </div>
+                                        </div>
+
+                                        <div class="flex gap-4 justify-center">
+                                                <button @click="showConfirmModal = false"
+                                                        class="px-6 py-2.5 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all font-medium">
+                                                        Để sau
+                                                </button>
+                                                <button @click="confirmSpin"
+                                                        class="px-8 py-2.5 rounded-xl bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-400 text-black font-bold hover:shadow-[0_0_20px_rgba(234,179,8,0.4)] hover:scale-105 transition-all transform uppercase tracking-wider text-sm">
+                                                        Quay Ngay
+                                                </button>
+                                        </div>
+                                </div>
+                        </div>
+                </transition>
+
                 <Navbar></Navbar>
 
                 <!-- Background Effects - Gold & Dark Ambience -->
@@ -77,7 +127,6 @@ const onSpinEnd = (prize) => {
 
                 </div>
         </div>
-        <Navbar></Navbar>
 </template>
 
 <style scoped>
@@ -96,4 +145,3 @@ const onSpinEnd = (prize) => {
         animation: spin-slow 10s linear infinite;
 }
 </style>
-<style scoped></style>
