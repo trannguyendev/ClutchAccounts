@@ -17,6 +17,8 @@ const prizes = ref([
 
 const wheelRef = ref(null);
 const showConfirmModal = ref(false);
+const showRewardModal = ref(false);
+const receivedPrize = ref(null);
 
 const onSpinStart = () => {
         showConfirmModal.value = true;
@@ -36,7 +38,8 @@ const confirmSpin = () => {
 };
 
 const onSpinEnd = (prize) => {
-        alert(`Chúc mừng bạn nhận được: ${prize.label}`);
+        receivedPrize.value = prize;
+        showRewardModal.value = true;
 };
 </script>
 
@@ -82,6 +85,54 @@ const onSpinEnd = (prize) => {
                                                         Quay Ngay
                                                 </button>
                                         </div>
+                                </div>
+                        </div>
+                </transition>
+
+                <!-- Reward Popup Modal -->
+                <transition enter-active-class="transition duration-500 cubic-bezier(0.19, 1, 0.22, 1)"
+                        enter-from-class="transform scale-50 opacity-0 translate-y-10"
+                        enter-to-class="transform scale-100 opacity-100 translate-y-0"
+                        leave-active-class="transition duration-200 ease-in"
+                        leave-from-class="transform scale-100 opacity-100"
+                        leave-to-class="transform scale-95 opacity-0">
+                        <div v-if="showRewardModal"
+                                class="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-md px-4"
+                                @click.self="showRewardModal = false">
+                                <div
+                                        class="bg-gradient-to-b from-zinc-800 to-black border border-yellow-500 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_0_100px_rgba(234,179,8,0.3)] relative overflow-visible">
+                                        <!-- Floating Badge/Icon -->
+                                        <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-32 h-32">
+                                                <!-- Simple CSS Gift Icon/Glow -->
+                                                <div
+                                                        class="absolute inset-0 bg-yellow-500/50 rounded-full blur-[40px] animate-pulse">
+                                                </div>
+                                                <div
+                                                        class="relative w-full h-full flex items-center justify-center text-7xl drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] animate-bounce">
+                                                        🎁
+                                                </div>
+                                        </div>
+
+                                        <div class="mt-12 space-y-2">
+                                                <h2
+                                                        class="text-3xl md:text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 via-yellow-500 to-yellow-200 uppercase tracking-widest drop-shadow-sm font-serif">
+                                                        CHÚC MỪNG
+                                                </h2>
+                                                <p class="text-yellow-100/60 text-sm font-medium tracking-wider">BẠN ĐÃ
+                                                        NHẬN ĐƯỢC</p>
+                                        </div>
+
+                                        <div class="my-8 py-4 bg-yellow-900/10 border-y border-yellow-500/20">
+                                                <h3
+                                                        class="text-2xl md:text-3xl font-bold text-yellow-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-2">
+                                                        {{ receivedPrize?.label || 'PHẦN QUÀ BÍ ẨN' }}
+                                                </h3>
+                                        </div>
+
+                                        <button @click="showRewardModal = false"
+                                                class="w-full px-8 py-3.5 rounded-xl bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-400 text-black text-lg font-bold hover:shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:-translate-y-1 transition-all transform uppercase tracking-widest shadow-lg">
+                                                NHẬN QUÀ NGAY
+                                        </button>
                                 </div>
                         </div>
                 </transition>
