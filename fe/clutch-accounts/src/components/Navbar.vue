@@ -20,7 +20,7 @@ const toggleMenu = () => {
         </div>
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-2 md:p-4">
                 <a href="/" class="flex items-center space-x-2 md:space-x-3 rtl:space-x-reverse py-2">
-                <img src="#" class="h-8 md:h-9" alt="Team Logo">
+                <img src="../img/Logo.png" class="h-8 md:h-9" alt="Team Logo">
                 <span class="self-center text-lg md:text-2xl font-extrabold tracking-tight text-amber-300 drop-shadow-[0_3px_10px_rgba(255,184,28,0.12)]">Team name</span>
             </a>
             <div class="flex md:order-2 space-x-2 md:space-x-3 rtl:space-x-reverse items-center">

@@ -9,18 +9,22 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import com.kingdomeprotocol.model.DTOChangePassLoggedIn;
 import com.kingdomeprotocol.model.ForgotPassModel;
 import com.kingdomeprotocol.model.UserDetailsProc;
 import com.kingdomeprotocol.model.UserModel;
 import com.kingdomeprotocol.repository.UserRepository;
 import com.kingdomeprotocol.utils.JwtUtils;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -94,6 +98,17 @@ public class UserService {
 		}
 	}
 
+	public void changePassLoggedIn(@Valid @RequestBody DTOChangePassLoggedIn data) {
+		Authentication authen = this.authenManager.authenticate(new UsernamePasswordAuthenticationToken(data.getEmail(), data.getOldPass()));
+		if (authen != null) {
+			UserModel user = loadUserByEmail(data.getEmail()).orElseThrow(() -> new RuntimeException("Error while getting data"));
+			user.setUser_psw(pswEncode.encode(data.getNewPass()));
+			userRepo.save(user);
+		}
+		else {
+			throw new BadCredentialsException("Current password is not matched");
+		}
+	}
 	public record userCheck(int id, String token, String role, String email, int balance) {}
 }
 
