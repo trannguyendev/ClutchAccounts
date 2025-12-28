@@ -103,9 +103,7 @@ onMounted(() => {
     <!-- Background Overlay -->
     <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 opacity-50"></div>
 
-    <!-- Main Container -->
     <div class="relative z-10 max-w-7xl mx-auto px-8 py-12">
-      <!-- Header -->
       <div class="mb-12">
         <h1 class="text-4xl font-black text-white mb-2 flex items-center gap-3">
           <i class="fa fa-user-circle text-amber-400"></i> User Information
@@ -116,7 +114,7 @@ onMounted(() => {
 
       <!-- Main Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <!-- Left: Personal Information -->
+        <!-- Personal Info -->
         <div class="bg-gradient-to-br from-slate-900 to-black backdrop-blur-md border border-amber-500/30 rounded-2xl p-8">
           <h2 class="text-2xl font-black text-white mb-8 flex items-center gap-3">
             <i class="fa fa-address-card text-amber-400"></i> Personal Information
@@ -181,7 +179,6 @@ onMounted(() => {
 
           <!-- Password Form -->
           <div class="space-y-4 mb-8">
-            <!-- Old Password -->
             <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700 hover:border-amber-400/50 transition-colors">
               <label class="text-amber-300/70 text-xs font-bold uppercase tracking-wider block mb-2">Old Password</label>
               <input 
@@ -190,8 +187,6 @@ onMounted(() => {
                 placeholder="••••••••" 
                 class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-slate-300 placeholder-slate-500 focus:border-amber-400 focus:outline-none transition-colors">
             </div>
-
-            <!-- New Password -->
             <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700 hover:border-amber-400/50 transition-colors">
               <label class="text-amber-300/70 text-xs font-bold uppercase tracking-wider block mb-2">New Password</label>
               <input 
@@ -200,8 +195,6 @@ onMounted(() => {
                 placeholder="••••••••" 
                 class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-slate-300 placeholder-slate-500 focus:border-amber-400 focus:outline-none transition-colors">
             </div>
-
-            <!-- Confirm Password -->
             <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700 hover:border-amber-400/50 transition-colors">
               <label class="text-amber-300/70 text-xs font-bold uppercase tracking-wider block mb-2">Confirm new password</label>
               <input 
@@ -211,8 +204,6 @@ onMounted(() => {
                 class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-slate-300 placeholder-slate-500 focus:border-amber-400 focus:outline-none transition-colors">
             </div>
           </div>
-
-          <!-- Change Password Button -->
           <button 
             @click="handleChangePassword"
             class="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-black text-lg py-3 px-6 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-600/50 active:scale-95">
@@ -227,7 +218,7 @@ onMounted(() => {
           <i class="fa fa-history text-amber-400"></i> Login History
         </h2>
 
-        <!-- Responsive Table -->
+        <!-- History Table -->
         <div class="overflow-x-auto">
           <table class="w-full">
             <thead>
