@@ -22,11 +22,6 @@ const routes = [
     component: Index
   },
   {
-    path: '/ok',
-    name: 'ok',
-    component: AccRandomFA
-  },
-  {
     path: '/auth',
     name: 'auth',
     component: Login
