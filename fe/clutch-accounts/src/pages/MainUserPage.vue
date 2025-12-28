@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue'
 import { useUserStore } from '../stores/user'
-// const currentUser = ref([]); //this section for fetch user info from server <declare here for using later>
 import { RouterLink } from 'vue-router'
 import Navbar from '@/components/Navbar.vue'
 
@@ -93,7 +92,7 @@ const announcements = [
             <div class="flex items-center gap-2.5 relative">
               <img
                 class="w-10 h-10 rounded-full font-black text-purple-300 drop-shadow-[0_3px_10px_rgba(168,85,247,0.3)] cursor-pointer hover:scale-110 transition-transform duration-200"
-                :src="currentUser.img" alt="userAvt"
+                :src="currentUser.avatar" alt="userAvt"
                 @click="toggleMenu">
               
               <!-- User Avatar Dropdown Menu -->
@@ -101,7 +100,7 @@ const announcements = [
                 <div class="bg-gradient-to-br from-slate-900 to-black backdrop-blur-md border border-amber-500/40 rounded-xl shadow-2xl shadow-amber-600/20 overflow-hidden">
                   <!-- Menu Header -->
                   <div class="bg-gradient-to-r from-amber-600/20 to-orange-600/20 border-b border-amber-500/30 px-6 py-4 flex items-center gap-3">
-                    <img :src="currentUser.img" alt="avatar" class="w-12 h-12 rounded-full border-2 border-amber-400/50">
+                    <img :src="currentUser.avatar" alt="avatar" class="w-12 h-12 rounded-full border-2 border-amber-400/50">
                     <div class="flex-1">
                       <p class="text-amber-300 font-bold text-sm">{{ currentUser.username }}</p>
                       <p class="text-slate-400 text-xs">Role: {{currentUser.role}}</p>
