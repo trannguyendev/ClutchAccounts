@@ -47,18 +47,33 @@ const handleChangePassword = () => {
     changePasswordMessage.value = 'New passwords do not match'
     return
   }
-  if (newPassword.value.length < 8) {
+  if (newPassword.value.trim().length < 8) {
     changePasswordMessage.value = 'Password must be at least 8 characters'
     return
   }
   
-  // Simulate password change
-  showChangeSuccess.value = true
-  changePasswordMessage.value = 'Password changed successfully!'
-  oldPassword.value = ''
-  newPassword.value = ''
-  confirmPassword.value = ''
   
+  
+  const dataSend = {
+    email: currentUser.username,
+    oldPassword: oldPassword.value,
+    newPassword: newPassword.value
+  }
+  console.log('Data to send for password change:', dataSend)
+axios.post('/api/user/change-psw', dataSend)
+    .then((response) => {
+      console.log('Password change response:', response.data)
+      showChangeSuccess.value = true
+      changePasswordMessage.value = 'Password changed successfully!'
+      oldPassword.value = ''
+      newPassword.value = ''
+      confirmPassword.value = ''
+    })
+    .catch((error) => {
+      console.error('Error changing password:', error)
+      changePasswordMessage.value = error.response.data.error
+      console.log('Error data:', error.response.data.error)
+    })
   setTimeout(() => {
     showChangeSuccess.value = false
   }, 3000)
@@ -115,9 +130,9 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- User Details -->
+            <!-- User Details Frame -->
             <div class="flex-1 space-y-4">
-              <!-- Name -->
+              <!-- Username -->
               <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
                 <label class="text-amber-300/70 text-xs font-bold uppercase tracking-wider block mb-1">Name</label>
                 <p class="text-white font-bold text-lg">{{ currentUser.username }}</p>
@@ -129,7 +144,7 @@ onMounted(() => {
                 <p class="text-amber-300 font-bold">{{ currentUser.id || '12345' }}</p>
               </div>
 
-              <!-- Points -->
+              <!-- Balance -->
               <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
                 <label class="text-amber-300/70 text-xs font-bold uppercase tracking-wider block mb-1">Balance</label>
                 <p class="text-amber-400 font-black text-xl">{{ currentUser.balance }} VND</p>
@@ -147,7 +162,7 @@ onMounted(() => {
         <!-- Right: Change Password -->
         <div class="bg-gradient-to-br from-slate-900 to-black backdrop-blur-md border border-amber-500/30 rounded-2xl p-8">
           <h2 class="text-2xl font-black text-white mb-8 flex items-center gap-3">
-            <i class="fa fa-lock text-amber-400"></i> ĐỔI MẬT KHẨU
+            <i class="fa fa-lock text-amber-400"></i> Change Password
           </h2>
 
           <!-- Success Message -->
@@ -168,7 +183,7 @@ onMounted(() => {
           <div class="space-y-4 mb-8">
             <!-- Old Password -->
             <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700 hover:border-amber-400/50 transition-colors">
-              <label class="text-amber-300/70 text-xs font-bold uppercase tracking-wider block mb-2">Mật khẩu cũ</label>
+              <label class="text-amber-300/70 text-xs font-bold uppercase tracking-wider block mb-2">Old Password</label>
               <input 
                 v-model="oldPassword"
                 type="password" 
@@ -178,7 +193,7 @@ onMounted(() => {
 
             <!-- New Password -->
             <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700 hover:border-amber-400/50 transition-colors">
-              <label class="text-amber-300/70 text-xs font-bold uppercase tracking-wider block mb-2">Mật khẩu mới</label>
+              <label class="text-amber-300/70 text-xs font-bold uppercase tracking-wider block mb-2">New Password</label>
               <input 
                 v-model="newPassword"
                 type="password" 
@@ -188,7 +203,7 @@ onMounted(() => {
 
             <!-- Confirm Password -->
             <div class="bg-slate-800/50 rounded-lg p-4 border border-slate-700 hover:border-amber-400/50 transition-colors">
-              <label class="text-amber-300/70 text-xs font-bold uppercase tracking-wider block mb-2">Nhập lại mật khẩu mới</label>
+              <label class="text-amber-300/70 text-xs font-bold uppercase tracking-wider block mb-2">Confirm new password</label>
               <input 
                 v-model="confirmPassword"
                 type="password" 
@@ -201,7 +216,7 @@ onMounted(() => {
           <button 
             @click="handleChangePassword"
             class="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-black text-lg py-3 px-6 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-600/50 active:scale-95">
-            <i class="fa fa-key mr-2"></i> ĐỔI MẬT KHẨU
+            <i class="fa fa-key mr-2"></i> Change Password
           </button>
         </div>
       </div>
@@ -209,7 +224,7 @@ onMounted(() => {
       <!-- Login History Section -->
       <div class="bg-gradient-to-br from-slate-900 to-black backdrop-blur-md border border-amber-500/30 rounded-2xl p-8">
         <h2 class="text-2xl font-black text-white mb-8 flex items-center gap-3">
-          <i class="fa fa-history text-amber-400"></i> NHẬT KÝ ĐĂNG NHẬP GẦN ĐÂY
+          <i class="fa fa-history text-amber-400"></i> Login History
         </h2>
 
         <!-- Responsive Table -->
@@ -243,7 +258,7 @@ onMounted(() => {
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-2">
-                    <span class="text-slate-300 font-semibold text-sm">{{ getBrowserInfo(log.logged_device) }} on Windows</span>
+                    <span class="text-slate-300 font-semibold text-sm">{{ getBrowserInfo(log.logged_device) }}</span>
                   </div>
                 </td>
               </tr>
