@@ -287,9 +287,9 @@ onUnmounted(() => {
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-300 mb-2" for="otp">OTP Code</label>
-                            <input v-model="otp" type="text"
+                            <input v-model="otp" type="number"
                                 class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors text-center tracking-widest"
-                                placeholder="000000" id="otp" maxlength="6" required>
+                                placeholder="XXXXXX" id="otp" maxlength="6" required>
                         </div>
 
                         <div>
