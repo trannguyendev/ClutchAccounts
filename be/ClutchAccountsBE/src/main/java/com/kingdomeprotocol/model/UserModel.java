@@ -46,4 +46,6 @@ String role = "USER";
 
 @OneToMany(mappedBy = "auditUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 List<AuditLogModel> auditList = new ArrayList<>();
+@OneToMany(mappedBy = "transactionUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+List<TransactionsModel> transactionList = new ArrayList<>();
 }
