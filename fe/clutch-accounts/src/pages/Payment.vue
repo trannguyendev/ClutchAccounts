@@ -1,8 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import axios from 'axios'
 import mainBackground from '@/img/main-background.jpg'
 import { useUserStore } from '@/stores/user'
+import { toast } from 'vue3-toastify/index'
+import 'vue3-toastify/dist/index.css'
 
 const userDeposit = useUserStore()
 const route = useRoute()
@@ -11,6 +14,7 @@ const transactionContent = route.params.transaction_content
 
 const amount = ref(0)
 const loading = ref(false)
+const requestLoading = ref(false)
 const qrVisible = ref(false)
 const qrSrc = ref('')
 const error = ref('')
@@ -58,14 +62,33 @@ const confirmPayment = async () => {
         loading.value = false
     }
 }
-const checkPaymentStatus = () => {
+const checkPaymentStatus = async () => {
+    requestLoading.value = true
     let dataPayLoad = {
-        email: userDeposit.username,
-        amount: amount.value,
-        descrp: transactionContent
+            email: userDeposit.username,
+            amount: amount.value,
+            descrp: transactionContent
     }
-
     console.log("Data PayLoad: ", dataPayLoad)
+    await axios.post("/api/payment/request-deposit", dataPayLoad)
+    .then((res) => {
+        console.log("Response: ", res)
+        toast.success("Your payment has been successfully confirmed, pls waiting for admin to verify!", {
+            position: "top-right",
+            closeOnClick: true,
+            pauseOnHover: false,
+        });
+    })
+    .catch((err) => {
+        console.error('Error submitting payment:', err)
+        error.value = 'Failed to submit payment. Please try again.'
+        requestLoading.value = false
+    })
+    .finally(() => {
+        requestLoading.value = false
+    })
+        
+    
 }
 const hideQr = () => {
     qrVisible.value = false
@@ -116,7 +139,7 @@ const goBack = () => {
                                 aria-hidden="true"></i></button>
                     </div>
                     <div class="bg-black/80 p-4 rounded-lg">
-                        <!-- Loading skeleton -->
+                        <!-- Loading frame -->
                         <div v-if="loading" class="w-64 h-64 flex items-center justify-center">
                             <div class="space-y-4 w-full px-4">
                                 <div class="flex justify-center">
@@ -129,14 +152,17 @@ const goBack = () => {
                         </div>
                         <!-- QR image -->
                         <img v-else-if="qrSrc" :src="qrSrc" alt="QR code" class="w-64 h-64 object-contain" />
-                        <!-- Fallback -->
                         <div v-else class="w-64 h-64 flex items-center justify-center text-amber-400">
                             <i class="fa fa-exclamation-circle" aria-hidden="true"></i>Unable to load QR
                         </div>
                     </div>
-                    <button @click="checkPaymentStatus"
-                        class="mt-4 w-full px-4 py-3 rounded-md bg-amber-600 hover:bg-amber-700 text-black font-semibold transition">
-                        Check Payment
+                    <button @click="checkPaymentStatus" :disabled="requestLoading"
+                        class="mt-4 w-full px-4 py-3 rounded-md bg-amber-600 hover:bg-amber-700 text-black font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed">
+                        <span v-if="!requestLoading">Check Payment</span>
+                        <span v-else class="inline-flex items-center gap-2">
+                            <div class="animate-spin rounded-full h-4 w-4 border-2 border-black border-t-amber-300"></div>
+                            Processing...
+                        </span>
                     </button>
                 </div>
 
@@ -149,10 +175,6 @@ const goBack = () => {
                 </button>
             </div>
         </div>
-        <!-- Back Button -->
-
-
-        <!-- Important Notes Board -->
         <div
             class="ml-4 relative w-full max-w-4xl rounded-2xl p-8 bg-gradient-to-br from-red-950/70 to-red-900/60 border border-red-700/30 backdrop-blur-md shadow-xl mt-6 hover:border-red-700/60 hover:shadow-2xl transition duration-300">
             <div class="flex items-center gap-3 mb-6">
