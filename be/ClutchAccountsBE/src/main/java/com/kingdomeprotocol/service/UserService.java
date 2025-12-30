@@ -24,6 +24,7 @@ import com.kingdomeprotocol.model.UserModel;
 import com.kingdomeprotocol.repository.UserRepository;
 import com.kingdomeprotocol.utils.JwtUtils;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -65,6 +66,7 @@ public class UserService {
 	public Optional<UserModel> loadUserByEmail(String email) {
 		return userRepo.findByEmail(email);
 	}
+	@Transactional
 	public void sentOTP(String email) {
 		UserModel user = loadUserByEmail(email).orElseThrow(() -> new RuntimeException("Not found user: "+email));
 		String OTP = String.valueOf(ThreadLocalRandom.current().nextInt(100000, 999999));
@@ -75,7 +77,7 @@ public class UserService {
 		sendTool.setFrom("clutch-accounts@support.com");
 		sendTool.setTo(user.getEmail());
 		sendTool.setSubject("OTP verify change password");
-		sendTool.setText("Your OTP code is: "+OTP+" | "+" This code will expire in 15 mins | DON'T SHARE WITH ANYONE");
+		sendTool.setText("Your OTP code is: <<< "+OTP+" >>> | "+" This code will expire in 15 mins | DON'T SHARE WITH ANYONE");
 		javaMailSender.send(sendTool);
 	}
 
