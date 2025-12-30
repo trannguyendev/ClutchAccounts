@@ -10,6 +10,10 @@ import AccRandomNFA from '@/pages/AccRandomNFA.vue'
 import AccRandomFA from '@/pages/AccRandomFA.vue'
 import Payment from '@/pages/Payment.vue'
 import AdminDashBoard from '@/pages/AdminDashBoard.vue'
+import AdminTransaction from '@/components/AdminTransaction.vue'
+import AdminAccount from '@/components/AdminAccount.vue'
+import AdminNews from '@/components/AdminNews.vue'
+import AdminVLRAccount from '@/components/AdminVLRAccount.vue'
 import UserInfo from '@/pages/UserInfo.vue'
 import ForgotPass from '@/pages/ForgotPass.vue'
 
@@ -30,6 +34,30 @@ const routes = [
     path: '/admin',
     name: 'admin',
     component: AdminDashBoard,
+    meta: { requiresAuth: true , roles: ['admin']}
+  },
+  {
+    path: '/admin/transaction',
+    name: 'admin-transaction',
+    component: AdminTransaction,
+    meta: { requiresAuth: true , roles: ['admin']}
+  },
+  {
+    path: '/admin/account',
+    name: 'admin-account',
+    component: AdminAccount,
+    meta: { requiresAuth: true , roles: ['admin']}
+  },
+  {
+    path: '/admin/news',
+    name: 'admin-news',
+    component: AdminNews,
+    meta: { requiresAuth: true , roles: ['admin']}
+  },
+  {
+    path: '/admin/vlr_account',
+    name: 'admin-vlr_account',
+    component: AdminVLRAccount,
     meta: { requiresAuth: true , roles: ['admin']}
   },
   {

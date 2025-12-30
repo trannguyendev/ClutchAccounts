@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import mainBackground from '@/img/main-background.jpg'
 import { useUserStore } from '@/stores/user'
-import { toast } from 'vue3-toastify/index'
+import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
 
 const userDeposit = useUserStore()
