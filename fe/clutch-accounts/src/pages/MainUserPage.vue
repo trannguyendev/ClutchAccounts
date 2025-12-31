@@ -7,10 +7,19 @@ import Navbar from '@/components/Navbar.vue'
 
 let currentUser = useUserStore()
 const isMenuOpen = ref(false)
+const videoRef = ref(null)
+const isAudioMuted = ref(true)
 
 const handleLogout = () => {
   currentUser.logout()
   isMenuOpen.value = false
+}
+
+const toggleAudio = () => {
+  isAudioMuted.value = !isAudioMuted.value
+  if (videoRef.value) {
+    videoRef.value.muted = isAudioMuted.value
+  }
 }
 
 const toggleMenu = () => {
@@ -58,9 +67,16 @@ const announcements = [
     <!-- Hero Banner Section -->
     <section class="relative z-10 w-full h-96 overflow-hidden">
       <!-- Background Video -->
-      <video src="../assets/Videos/video-main.mp4" autoplay muted loop
+      <video ref="videoRef" src="../assets/Videos/video-main.mp4" autoplay muted loop
         class="absolute inset-0 w-full h-full object-cover">
       </video>
+
+      <!-- Volume Control Button -->
+      <button @click="toggleAudio"
+        class="absolute top-4 right-4 z-20 bg-amber-600/80 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-600/50 flex items-center gap-2">
+        <i :class="isAudioMuted ? 'fa fa-volume-mute' : 'fa fa-volume-high'"></i>
+        <span class="text-sm">{{ isAudioMuted ? 'Unmute' : 'Mute' }}</span>
+      </button>
 
       <!-- Video Overlay for better text contrast -->
       <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/70"></div>
@@ -77,7 +93,7 @@ const announcements = [
           <p class="text-xl text-amber-300 font-semibold drop-shadow-md">Step into the game with top-tier Valorant accounts — variety, quality, and trust in one place</p>
         </div>
 
-        <div class="flex gap-6">
+        <div class="flex gap-6 mt-12">
           <!-- Balance Card -->
           <div
             class="bg-gradient-to-br from-amber-400/10 to-orange-600/10 backdrop-blur-md border border-amber-500/30 rounded-2xl p-6 min-w-max">

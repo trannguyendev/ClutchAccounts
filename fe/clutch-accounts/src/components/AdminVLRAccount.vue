@@ -5,7 +5,7 @@
 
     <!-- Main Content -->
     <div class="flex-1 p-6">
-      <h1 class="text-2xl font-bold mb-6 text-amber-300">⚙️ Valorant Account Management</h1>
+      <h1 class="text-2xl font-bold mb-6 text-amber-300"><i class="fa-solid fa-gamepad"></i> Valorant Account Management</h1>
 
       <div class="rounded-xl border border-amber-900/50 p-6 bg-[#141414]">
         <p class="text-amber-200">Valorant account management page content goes here.</p>
