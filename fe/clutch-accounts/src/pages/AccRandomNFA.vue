@@ -3,11 +3,11 @@ import Navbar from '@/components/Navbar.vue';
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-const items = [
-  { id: 1, name: 'ACC VALORANT', subtitle: '67.000 đ', color: 'from-yellow-500 to-orange-500', textColor: 'text-yellow-500', img: 'fe\clutch-accounts\src\img\backGround + Logo.png' },
-  { id: 2, name: 'ACC VALORANT', subtitle: '67.000 đ', color: 'from-yellow-500 to-orange-500', textColor: 'text-yellow-500', img: './' },
-  { id: 3, name: 'ACC VALORANT', subtitle: '67.000 đ', color: 'from-yellow-500 to-orange-500', textColor: 'text-yellow-500', img: './' },
-  { id: 4, name: 'ACC VALORANT', subtitle: '67.000 đ', color: 'from-yellow-500 to-orange-500', textColor: 'text-yellow-500', img: './' }
+const products = [
+  { id: 1, name: 'ACC VALORANT', description: 'Acc random NFA', price: '20.000 đ', username: 'valorant_user_1', password: 'pass_1' },
+  { id: 2, name: 'ACC VALORANT', description: 'Acc random NFA', price: '20.000 đ', username: 'valorant_user_2', password: 'pass_2' },
+  { id: 3, name: 'ACC VALORANT', description: 'Acc random NFA', price: '20.000 đ', username: 'valorant_user_3', password: 'pass_3' },
+  { id: 4, name: 'ACC VALORANT', description: 'Acc random NFA', price: '20.000 đ', username: 'valorant_user_4', password: 'pass_4' }
 ]
 //toast
 const router = useRouter()
@@ -20,7 +20,30 @@ const openToast = (item) => {
   showToast.value = true
 }
 
+// flip state for click-to-flip behavior
+const flippedId = ref(null)
+const toggleFlip = (item) => {
+  flippedId.value = flippedId.value === item.id ? null : item.id
+}
+
 const showSuccess = ref(false)
+const showCredentials = ref(false)
+const copiedField = ref('')
+
+const copyToClipboard = async (text, field) => {
+  try {
+    await navigator.clipboard.writeText(text || '')
+    copiedField.value = field
+    setTimeout(() => (copiedField.value = ''), 1500)
+  } catch (err) {
+    console.error('Copy failed', err)
+  }
+}
+
+const closeCredentials = () => {
+  showCredentials.value = false
+  selectedItem.value = null
+}
 
 const confirmBuy = () => {
   showToast.value = false
@@ -29,9 +52,12 @@ const confirmBuy = () => {
   // giả lập xử lý (1.5s)
   setTimeout(() => {
     showSuccess.value = false
-    router.push(selectedItem.value.link)
+    // show credentials modal after purchase is processed
+    showCredentials.value = true
+    // ensure card flips back
+    flippedId.value = null
   }, 1500)
-}
+} 
 
 const showReject = ref(false)
 
@@ -62,39 +88,49 @@ const closeToast = () => {
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div v-for="item in items" :key="item.id"
-            class="group relative bg-gradient-to-br from-black/80 to-slate-950/80 backdrop-blur-md border border-amber-900/50 rounded-2xl overflow-hidden hover:border-amber-500/70 transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-amber-600/40">
+          <div v-for="product in products" :key="product.id"
+            @click="toggleFlip(product)"
+            class="group relative bg-gradient-to-br from-black/80 to-slate-950/80 backdrop-blur-md border border-amber-900/50 ring-2 ring-amber-500/25 rounded-2xl overflow-hidden hover:border-amber-500/70 group-hover:ring-4 group-hover:ring-amber-500/40 transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-amber-600/40">
 
             <!-- Background Gradient -->
             <div
-              :class="`absolute inset-0 opacity-0 group-hover:opacity-20 bg-gradient-to-br ${item.color} transition-opacity duration-300`">
+              class="absolute inset-0 opacity-0 group-hover:opacity-20 bg-gradient-to-br from-yellow-500 to-orange-500 transition-opacity duration-300">
             </div>
 
-            <!-- Content -->
-            <div class="relative z-10 p-8 flex flex-col items-center justify-center h-64 text-center">
-              <div>
-                <img
-                    :src="item.img"
+            <!-- Flip Card (front: image, back: description + price + buy) -->
+            <div class="relative z-10 h-96 w-full flip-card">
+              <div :class="['flip-card-inner', { 'is-flipped': flippedId === product.id }]">
+                <!-- Front -->
+                <div class="flip-card-front">
+                  <img
+                    src="../img/GunCard.png"
                     alt=""
-                    class="w-24 h-16 object-contain mb-4"
-                />
+                    class="w-full h-full object-cover"
+                  />
+                  <div class="absolute inset-0 bg-black/10 transition-all"></div>
+                </div>
+
+                <!-- Back -->
+                <div class="flip-card-back">
+                  <div class="p-4 text-center">
+                    <p class="text-lg text-slate-200 mb-4 font-bold">
+                      {{ product.description }}
+                    </p>
+                    <p class="text-lg text-amber-400 mb-4 font-bold">
+                      {{ product.price }}
+                    </p>
+                    <button
+                      @click.stop="openToast(product)"
+                      class="px-4 py-2 rounded-lg bg-amber-400 text-black font-bold shadow-md hover:scale-105 transition">
+                      MUA NGAY
+                    </button>
+                  </div>
+                </div>
               </div>
-              <h3 class="text-white font-black text-xl mb-2">{{ item.name }}</h3>
-                <p :class="`text-lg font-bold ${item.textColor}`">
-                  {{ item.subtitle }}
-                </p>
-            <button
-                @click.stop="openToast(item)"
-                class="px-6 py-2 rounded-xl font-bold
-                    bg-gradient-to-r from-amber-400 to-yellow-500
-                    text-black hover:scale-105 transition-all
-                    shadow-lg shadow-amber-500/40">
-                MUA NGAY
-            </button>
             </div>
             <!-- Border Glow -->
             <div
-              class="absolute inset-0 rounded-2xl pointer-events-none border border-gradient-to-r from-amber-400/0 via-amber-400/0 to-amber-400/0 group-hover:from-amber-600/40 group-hover:via-amber-500/60 group-hover:to-amber-600/40 transition-all duration-300">
+              class="absolute inset-0 rounded-2xl pointer-events-none border-2 border-transparent group-hover:border-amber-500/40 transition-all duration-300">
             </div>
 
           </div>
@@ -163,7 +199,7 @@ const closeToast = () => {
     </h3>
 
     <p class="text-slate-300 mb-4">
-      M đã bị scam ahahahaha
+      Loading...
     </p>
 
     <!-- LOADING -->
@@ -173,6 +209,46 @@ const closeToast = () => {
 
   </div>
 </div>
+
+<!-- CREDENTIALS MODAL -->
+<div
+  v-if="showCredentials"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+
+  <div
+    class="w-[420px] bg-slate-900 border border-amber-500/50
+        rounded-2xl p-6 shadow-2xl animate-scale-in">
+
+    <h3 class="text-white font-black text-xl mb-3 text-center">🔐 Thông tin tài khoản</h3>
+
+    <div class="space-y-4">
+      <div>
+        <div class="text-xs text-slate-400">Username</div>
+        <div class="flex items-center justify-between mt-1">
+          <div class="font-mono text-amber-300 text-lg">{{ selectedItem?.username }}</div>
+          <button @click="copyToClipboard(selectedItem?.username, 'username')" class="ml-4 px-3 py-1 rounded bg-slate-700 text-white">Copy</button>
+        </div>
+        <div v-if="copiedField === 'username'" class="text-xs text-emerald-400 mt-1">Đã copy username</div>
+      </div>
+
+      <div>
+        <div class="text-xs text-slate-400">Password</div>
+        <div class="flex items-center justify-between mt-1">
+          <div class="font-mono text-amber-300 text-lg">{{ selectedItem?.password }}</div>
+          <button @click="copyToClipboard(selectedItem?.password, 'password')" class="ml-4 px-3 py-1 rounded bg-slate-700 text-white">Copy</button>
+        </div>
+        <div v-if="copiedField === 'password'" class="text-xs text-emerald-400 mt-1">Đã copy password</div>
+      </div>
+    </div>
+
+    <div class="flex gap-4 mt-6">
+      <button @click="closeCredentials" class="flex-1 py-3 rounded-xl font-bold bg-slate-700 text-white hover:scale-105 transition">Đóng</button>
+    </div>
+
+  </div>
+
+</div>
+
 <!-- REJECT SCREEN -->
 <div
   v-if="showReject"
@@ -269,5 +345,46 @@ const closeToast = () => {
 .card-hover:hover {
   transform: translateY(-8px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Flip card (3D) */
+.flip-card {
+  perspective: 1000px;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s ease;
+  transform-style: preserve-3d;
+}
+
+/* rotate when the .is-flipped class is applied */
+.flip-card-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  inset: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(15,23,42,0.85), rgba(15,23,42,0.95));
+}
+
+/* Make the content on back readable */
+.flip-card-back p {
+  line-height: 1.4;
 }
 </style>
