@@ -3,9 +3,11 @@ import { ref, computed } from 'vue'
 import { useUserStore } from '../stores/user'
 import Navbar from '@/components/Navbar.vue'
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 
 
+const router = useRouter()
 const currentUser = useUserStore()
 const oldPassword = ref('')
 const newPassword = ref('')
@@ -92,6 +94,11 @@ const goToPage = (page) => {
     currentPage.value = page
   }
 }
+
+const goToAdminDashboard = () => {
+  router.push('/admin')
+}
+
 onMounted(() => {
   loadAudit()
 })
@@ -110,6 +117,11 @@ onMounted(() => {
           <div class="flex-1 h-1 bg-gradient-to-r from-amber-400 to-transparent ml-4"></div>
         </h1>
         <p class="text-slate-400">Manage your account information and security</p>
+        <button
+          @click="goToAdminDashboard"
+          class="mt-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-purple-600/50 active:scale-95 inline-flex items-center gap-2">
+          <i class="fa fa-shield-alt"></i> If you are admin, click here to go to admin dashboard
+        </button>
       </div>
 
       <!-- Main Content Grid -->
