@@ -65,6 +65,19 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
 		}
 	}
+	@PostMapping("/auth/register-admin")
+	public ResponseEntity<?> signUpAdmin(@Valid @RequestBody UserDetailsProc signUpDetails){
+		try {
+			UserModel userSignUp  = userService.signUpAdmin(signUpDetails.getEmail(), signUpDetails.getPsw());
+			return ResponseEntity.ok(userSignUp);
+		}
+		catch(RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Email already existed, pls contact to support team"));
+		}
+		catch(Exception e ) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+		}
+	}
 	@GetMapping("/auth/me")
 	public ResponseEntity<?> getCurrentUser(Authentication authen){
 		String email = authen.getName();
