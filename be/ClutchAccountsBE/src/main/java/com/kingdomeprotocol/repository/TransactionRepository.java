@@ -13,6 +13,10 @@ public interface TransactionRepository extends JpaRepository<TransactionsModel, 
 
 	@Query(value = "select * from Transactions where user_id = :id", nativeQuery = true)
 	List<paymentLog> getSelfPaymentLog(@Param("id") int id);
+	@Query(value = "select * from Transactions where status = 'PENDING'", nativeQuery = true)
+	List<paymentLog> getPendingTransaction();
+	@Query(value = "select * from Transactions", nativeQuery = true)
+	List<paymentLog> getAllTransaction();
 	interface paymentLog{
 		Integer getId();
 		Integer getUser_id();
@@ -20,5 +24,6 @@ public interface TransactionRepository extends JpaRepository<TransactionsModel, 
 		String getType();
 		String getDescrp();
 		LocalDateTime getCreated_at();
+		String getStatus();
 	}
 }
