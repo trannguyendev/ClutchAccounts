@@ -1,11 +1,11 @@
 <script setup>
     /* ===== Sidebar.vue ===== */
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-
+import axios from 'axios';
 const router = useRouter();
 const activeLi = ref(0);
-
+let pollingInterval = null;
 const sidebarItems = [
   { name: 'Dashboard', icon: '📊', route: '/admin' },
   { name: 'Transaction', icon: '💳', route: '/admin/transaction' },
@@ -62,8 +62,8 @@ const chartData = [
 const maxChart = computed(() => Math.max(...chartData.map(c => c.value)) || 1);
 
 // SVG layout for bar chart
-const svgW = 220;
-const svgH = 64;
+const svgW = 100;
+const svgH = 50;
 const pad = { left: 8, right: 8, top: 6, bottom: 10 };
 
 const bars = computed(() => {
@@ -80,21 +80,18 @@ const bars = computed(() => {
 });
 
 // Recent deposits (sample data) and pagination
-const recentDeposits = ref([
-  { id: 1, name: 'Nguyen Van A', amount: '$120', time: '2m ago', status: 'pending' },
-  { id: 2, name: 'Tran Thi B', amount: '$250', time: '5m ago', status: 'pending' },
-  { id: 3, name: 'Le Van C', amount: '$15', time: '12m ago', status: 'pending' },
-  { id: 4, name: 'Pham D', amount: '$500', time: '30m ago', status: 'pending' },
-  { id: 5, name: 'Hoang E', amount: '$80', time: '1h ago', status: 'pending' },
-  { id: 6, name: 'Vu F', amount: '$200', time: '2h ago', status: 'pending' },
-  { id: 7, name: 'Bui G', amount: '$60', time: '3h ago', status: 'pending' },
-  { id: 8, name: 'Do H', amount: '$40', time: '5h ago', status: 'pending' },
-  { id: 9, name: 'Ngo I', amount: '$300', time: '1d ago', status: 'pending' },
-  { id: 10, name: 'Trinh J', amount: '$22', time: '2d ago', status: 'pending' },
-  { id: 11, name: 'Ly K', amount: '$75', time: '3d ago', status: 'pending' },
-  { id: 12, name: 'Dao L', amount: '$110', time: '4d ago', status: 'pending' }
-]);
+const recentDeposits = ref([]);
 
+const fetchRecentDeposit = async () => {
+  await axios.get("/api/payment/transactions-all")
+  .then((res) => {
+    recentDeposits.value = res.data
+    console.log(res.data)
+  })
+  .catch((err) => {
+    console.error(err)
+  })
+}
 // status update functions removed — statuses are read-only in UI
 
 const page = ref(1);
@@ -115,6 +112,19 @@ function goToPage(n) {
 
 function prevPage() { if (page.value > 1) page.value -= 1; }
 function nextPage() { if (page.value < totalPages.value) page.value += 1; }
+
+onMounted(() => {
+  // Fetch recent deposits on mount
+  fetchRecentDeposit();
+
+  pollingInterval = setInterval(() => {
+    fetchRecentDeposit();
+  }, 10000); 
+})
+
+onUnmounted(() => {
+  clearInterval(pollingInterval);
+});
 </script>
 <template>
     <div class="flex min-h-screen bg-[#0A0A0A] text-amber-100">
@@ -123,7 +133,7 @@ function nextPage() { if (page.value < totalPages.value) page.value += 1; }
     <aside class="w-64 border-r-2 border-amber-900/60">
       <div class="p-6 flex items-center justify-between gap-4">
         <div class="text-lg font-semibold text-amber-400">
-          Gemini Admin
+          Admin Dashboard
         </div>
         <div class="w-12 h-12 rounded-lg bg-amber-900/40 border border-amber-600/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
           <img src="../img/Logo.png" alt="Logo" class="w-full h-full object-cover" />
@@ -170,15 +180,15 @@ function nextPage() { if (page.value < totalPages.value) page.value += 1; }
         </div>
       </div>
 
-      <!-- Clean bar chart: left-aligned, occupies 2/3 width on md+ screens -->
+      <!-- Clean bar chart: left-aligned, occupies 1/3 width on md+ screens -->
       <div class="mt-6">
         <div class="w-full flex flex-col md:flex-row gap-4">
           <!-- Chart (left) -->
-          <div class="w-full md:w-2/3">
+          <div class="w-full md:w-1/3">
             <div class="rounded-xl border border-amber-900/50 p-4 bg-[#141414] h-full">
               <div class="mb-2">
                 <h2 class="text-lg font-semibold text-amber-300">Biểu đồ</h2>
-                <div class="text-sm text-amber-200/60">biểu đồ</div>
+                <div class="text-sm text-amber-200/60">Success/ Fail rate</div>
               </div>
 
               <div class="w-full overflow-hidden">
@@ -219,35 +229,41 @@ function nextPage() { if (page.value < totalPages.value) page.value += 1; }
           </div>
 
           <!-- Recent deposits table (right) -->
-          <div class="w-full md:w-1/3">
+          <div class="w-full md:w-2/3">
             <div class="rounded-xl border border-amber-900/50 p-4 bg-[#141414] h-full flex flex-col">
               <div class="mb-2">
-                <h3 class="text-lg font-semibold text-amber-300">Người vừa nạp</h3>
-                <div class="text-sm text-amber-200/60">Danh sách giao dịch gần đây</div>
+                <h3 class="text-lg font-semibold text-amber-300">Recently request deposit</h3>
+                <div class="text-sm text-amber-200/60">List of deposit</div>
               </div>
 
-              <div class="flex-1 overflow-auto">
+              <div class="flex-1 overflow-hidden">
                 <table class="w-full text-left table-auto text-sm">
                   <thead>
                     <tr class="text-amber-200/70">
-                      <th class="pb-2">Người dùng</th>
-                      <th class="pb-2">Số tiền</th>
-                      <th class="pb-2">Thời gian</th>
-                      <th class="pb-2">Trạng thái</th>
+                      <th class="pb-2 break-words">ID</th>
+                      <th class="pb-2 break-words">Username</th>
+                      <th class="pb-2 break-words">Deposit Amount</th>
+                      <th class="pb-2 break-words">Request at</th>
+                      <th class="pb-2 break-words">Status</th>
+                      <th class="pb-2 break-words">Type</th>
+                      <th class="pb-2 break-words">Description</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="d in pagedDeposits" :key="d.id" class="border-t border-amber-900/20">
-                      <td class="py-2">{{ d.name }}</td>
-                      <td class="py-2">{{ d.amount }}</td>
-                      <td class="py-2 text-amber-200/60">{{ d.time }}</td>
-                      <td class="py-2">
+                      <td class="py-2 truncate cell-limit">{{ d.id }}</td>
+                      <td class="py-2 truncate cell-limit">{{ d.descrp.substring(4) }}</td>
+                      <td class="py-2 truncate cell-limit">{{ d.amount }}</td>
+                      <td class="py-2 text-amber-200/60 truncate cell-limit">{{ d.created_at }}</td>
+                      <td class="py-2 truncate cell-limit">
                         <div class="w-28">
-                          <span v-if="d.status==='success'" class="inline-block w-full text-center px-2 py-0.5 rounded text-xs bg-emerald-500 text-black">Success</span>
-                          <span v-else-if="d.status==='failure'" class="inline-block w-full text-center px-2 py-0.5 rounded text-xs bg-red-500 text-white">Failure</span>
-                          <span v-else class="inline-block w-full text-center px-2 py-0.5 rounded text-xs bg-amber-900/20 text-amber-200">Pending</span>
+                          <span v-if="d.status==='APPROVED'" class="inline-block w-full text-center px-2 py-0.5 rounded text-xs bg-emerald-500 text-black truncate">APPROVED</span>
+                          <span v-else-if="d.status==='FAILED'" class="inline-block w-full text-center px-2 py-0.5 rounded text-xs bg-red-500 text-white truncate">FAILED</span>
+                          <span v-else class="inline-block w-full text-center px-2 py-0.5 rounded text-xs bg-amber-900/20 text-amber-200 truncate">PENDING</span>
                         </div>
                       </td>
+                      <td class="py-2 truncate cell-limit">{{ d.type }}</td>
+                      <td class="py-2 truncate cell-limit">{{ d.descrp }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -273,6 +289,12 @@ function nextPage() { if (page.value < totalPages.value) page.value += 1; }
   </div>
 </template>
 <style scoped>
+/* Limit cell content to 18 characters width */
+.cell-limit {
+  max-width: 144px;
+  white-space: nowrap;
+}
+
 /* Smooth hover transitions */
 div {
   transition: all 0.3s ease;
