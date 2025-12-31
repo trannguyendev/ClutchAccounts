@@ -6,7 +6,7 @@
     <!-- Main Content -->
     <div class="flex-1 p-6">
       <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-amber-300">🌐 Account Management</h1>
+        <h1 class="text-2xl font-bold text-amber-300"><i class="fa-solid fa-people-roof"></i> Account Management</h1>
         <button @click="showAddModal = true" class="px-4 py-2 bg-amber-600 text-black rounded-lg font-semibold hover:bg-amber-500 transition-all">
           + Thêm Account
         </button>

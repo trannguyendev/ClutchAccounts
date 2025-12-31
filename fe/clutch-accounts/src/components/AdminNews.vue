@@ -3,7 +3,7 @@
     <AdminSidebar :activeLi="activeLi" @navigate="handleNavigation" />
 
     <div class="flex-1 p-6">
-      <h1 class="text-2xl font-bold mb-6 text-amber-300">📰 Admin - Tin tức & Quảng cáo</h1>
+      <h1 class="text-2xl font-bold mb-6 text-amber-300"><i class="fa-solid fa-newspaper"></i> Admin - News & Promotion</h1>
 
       <div class="rounded-xl border border-amber-900/50 p-4 bg-[#141414]">
         <div class="flex items-center justify-between mb-4">

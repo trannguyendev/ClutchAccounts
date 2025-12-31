@@ -7,11 +7,11 @@ const router = useRouter();
 const activeLi = ref(0);
 let pollingInterval = null;
 const sidebarItems = [
-  { name: 'Dashboard', icon: '📊', route: '/admin' },
-  { name: 'Transaction', icon: '💳', route: '/admin/transaction' },
-  { name: 'Account Management', icon: '🌐', route: '/admin/account' },
-  { name: 'News', icon: '📰', route: '/admin/news' },
-  { name: 'Valorant Account Management', icon: '⚙️', route: '/admin/vlr_account' }
+  { name: 'Dashboard', icon: '<i class="fa-solid fa-chart-line"></i>', route: '/admin' },
+  { name: 'Transaction', icon: '<i class="fa-solid fa-money-bill-transfer"></i>', route: '/admin/transaction' },
+  { name: 'Account Management', icon: '<i class="fa-solid fa-people-roof"></i>', route: '/admin/account' },
+  { name: 'News', icon: '<i class="fa-solid fa-newspaper"></i>', route: '/admin/news' },
+  { name: 'Valorant Account Management', icon: '<i class="fa-solid fa-gamepad"></i>', route: '/admin/vlr_account' }
 ];
 
 const handleNavigation = (item, index) => {
@@ -135,7 +135,7 @@ onUnmounted(() => {
         <div class="text-lg font-semibold text-amber-400">
           Admin Dashboard
         </div>
-        <div class="w-12 h-12 rounded-lg bg-amber-900/40 border border-amber-600/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+        <div class="w-12 h-12 rounded-lg bg-amber-900/40 border border-amber-600/50 flex items-center justify-center flex-shrink-0 overflow-hidden hover:cursor-pointer" @click="router.push('/main')">
           <img src="../img/Logo.png" alt="Logo" class="w-full h-full object-cover" />
         </div>
       </div>
@@ -152,7 +152,8 @@ onUnmounted(() => {
               : 'hover:bg-amber-900/20 hover:border hover:border-amber-600/30 text-amber-200 hover:text-amber-300'
           ]"
         >
-          <span class="text-xl">{{ item.icon }}</span>
+          <span v-if="item.icon.includes('<')" v-html="item.icon" class="text-xl"></span>
+          <span v-else class="text-xl">{{ item.icon }}</span>
           <span>{{ item.name }}</span>
         </div>
       </div>
