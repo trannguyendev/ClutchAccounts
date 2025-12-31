@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +44,7 @@ public class PaymentController {
 	}
 	
 	@PostMapping("/approve/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> approveTrans(@PathVariable int id){
 		try {
 			payServ.approveTransaction(id);
@@ -57,6 +59,7 @@ public class PaymentController {
 	}
 	
 	@PostMapping("/reject/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> rejectTrans(@PathVariable("id") int id){
 		try {
 			payServ.rejectTransaction(id);
@@ -78,6 +81,27 @@ public class PaymentController {
 			return ResponseEntity.ok(transRepo.getSelfPaymentLog(user_id));
 		}
 		catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+		}
+	}
+	
+	@GetMapping("/transaction-pending")
+	public ResponseEntity<?> getPendingTransaction(){
+		try {
+			return ResponseEntity.ok(transRepo.getPendingTransaction());
+		}
+		catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+		}
+	}
+	
+	@GetMapping("/transactions-all")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> getAllTransaction(){
+		try {
+			return ResponseEntity.ok(transRepo.getAllTransaction());
+		}
+		catch(Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
 		}
 	}
