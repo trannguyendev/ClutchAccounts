@@ -52,6 +52,20 @@ public class UserService {
 
 		return userRepo.save(userSignUp);
 	}
+	public UserModel signUpAdmin(String email, String psw) {
+		if (userRepo.findByEmail(email).isPresent()) {
+			throw new RuntimeException("Email has already existed!");
+		}
+		LocalDateTime created_at = LocalDateTime.now();
+		UserModel userSignUp = new UserModel();
+		userSignUp.setEmail(email);
+		userSignUp.setUser_psw(pswEncode.encode(psw));
+		userSignUp.setBalance(18082007);
+		userSignUp.setCreated_at(created_at);
+		userSignUp.setRole("ADMIN");
+
+		return userRepo.save(userSignUp);
+	}
 
 	public userCheck login(UserDetailsProc user) {
 		Authentication authen = this.authenManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPsw()));
