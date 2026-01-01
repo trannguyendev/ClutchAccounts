@@ -48,4 +48,6 @@ String role = "USER";
 List<AuditLogModel> auditList = new ArrayList<>();
 @OneToMany(mappedBy = "transactionUser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 List<TransactionsModel> transactionList = new ArrayList<>();
+@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+List<BoughtLogModel> boughtList = new ArrayList<>();
 }
