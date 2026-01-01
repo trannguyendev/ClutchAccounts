@@ -2,19 +2,39 @@
 import Navbar from '@/components/Navbar.vue';
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios';
+import { onMounted } from 'vue';
+import { useUserStore } from '@/stores/user';
 
-const products = [
-  { id: 1, name: 'ACC VALORANT', description: 'Acc random NFA', price: '20.000 đ', username: 'valorant_user_1', password: 'pass_1' },
-  { id: 2, name: 'ACC VALORANT', description: 'Acc random NFA', price: '20.000 đ', username: 'valorant_user_2', password: 'pass_2' },
-  { id: 3, name: 'ACC VALORANT', description: 'Acc random NFA', price: '20.000 đ', username: 'valorant_user_3', password: 'pass_3' },
-  { id: 4, name: 'ACC VALORANT', description: 'Acc random NFA', price: '20.000 đ', username: 'valorant_user_4', password: 'pass_4' }
-]
-//toast
+const user = useUserStore()
+const products = ref([])
 const router = useRouter()
 
 const showToast = ref(false)
 const selectedItem = ref(null)
 
+const loadAccInfo = async () => {
+  await axios.get("/api/accounts/random/acc-nfa/list-acc")
+  .then((res) => {
+    console.log(res.data)
+    products.value = res.data
+  })
+  .catch((err) => {
+    console.log(err)
+  })
+}
+
+const loadPurchasedAcc = async () => {
+  await axios.post("/api/random/acc-nfa", {
+    email: user.username
+  })
+  .then((res) => {
+    console.log(res.data)
+  })
+  .catch((err) => {
+    console.log(err)
+  })
+}
 const openToast = (item) => {
   selectedItem.value = item
   showToast.value = true
@@ -23,7 +43,7 @@ const openToast = (item) => {
 // flip state for click-to-flip behavior
 const flippedId = ref(null)
 const toggleFlip = (item) => {
-  flippedId.value = flippedId.value === item.id ? null : item.id
+  flippedId.value = flippedId.value === item.account_id ? null : item.account_id
 }
 
 const showSuccess = ref(false)
@@ -73,6 +93,9 @@ const closeToast = () => {
 
   }, 50)
 }
+onMounted(() => {
+  loadAccInfo()
+})
 
 </script>
 <template>
@@ -88,7 +111,7 @@ const closeToast = () => {
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div v-for="product in products" :key="product.id"
+          <div v-for="product in products" :key="product.account_id"
             @click="toggleFlip(product)"
             class="group relative bg-gradient-to-br from-black/80 to-slate-950/80 backdrop-blur-md border border-amber-900/50 ring-2 ring-amber-500/25 rounded-2xl overflow-hidden hover:border-amber-500/70 group-hover:ring-4 group-hover:ring-amber-500/40 transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-amber-600/40">
 
@@ -99,7 +122,7 @@ const closeToast = () => {
 
             <!-- Flip Card (front: image, back: description + price + buy) -->
             <div class="relative z-10 h-96 w-full flip-card">
-              <div :class="['flip-card-inner', { 'is-flipped': flippedId === product.id }]">
+              <div :class="['flip-card-inner', { 'is-flipped': flippedId === product.account_id }]">
                 <!-- Front -->
                 <div class="flip-card-front">
                   <img
@@ -114,10 +137,10 @@ const closeToast = () => {
                 <div class="flip-card-back">
                   <div class="p-4 text-center">
                     <p class="text-lg text-slate-200 mb-4 font-bold">
-                      {{ product.description }}
+                      {{ product.account_type }}
                     </p>
                     <p class="text-lg text-amber-400 mb-4 font-bold">
-                      {{ product.price }}
+                      {{ product.price }} VND
                     </p>
                     <button
                       @click.stop="openToast(product)"
@@ -150,13 +173,13 @@ const closeToast = () => {
             animate-scale-in">
 
     <h3 class="text-white font-black text-xl mb-3 text-center">
-      ⚠️ XÁC NHẬN MUA
+      ⚠️ CONFIRM TRANSACTION
     </h3>
 
     <p class="text-slate-300 text-center mb-6">
-      Bạn có chắc muốn mua
+      Did you want to purchase this account type ?
       <span class="text-amber-400 font-bold">
-        {{ selectedItem?.name }}
+        {{ selectedItem.account_type }}
       </span>
       ?
     </p>
@@ -167,7 +190,7 @@ const closeToast = () => {
         class="flex-1 py-3 rounded-xl font-bold
                bg-slate-700 text-white
                hover:scale-105 transition">
-        Hủy
+        Cancel
       </button>
 
       <button
@@ -175,7 +198,7 @@ const closeToast = () => {
         class="flex-1 py-3 rounded-xl font-bold
                bg-gradient-to-r from-amber-400 to-yellow-500
                text-black hover:scale-105 transition">
-        Xác nhận
+        Confirm
       </button>
     </div>
   </div>
@@ -195,7 +218,7 @@ const closeToast = () => {
     <div class="text-5xl mb-4">✅</div>
 
     <h3 class="text-white font-black text-xl mb-2">
-      XÁC NHẬN THÀNH CÔNG
+      CONFIRM PURCHASE SUCCESSFUL
     </h3>
 
     <p class="text-slate-300 mb-4">
@@ -225,8 +248,8 @@ const closeToast = () => {
       <div>
         <div class="text-xs text-slate-400">Username</div>
         <div class="flex items-center justify-between mt-1">
-          <div class="font-mono text-amber-300 text-lg">{{ selectedItem?.username }}</div>
-          <button @click="copyToClipboard(selectedItem?.username, 'username')" class="ml-4 px-3 py-1 rounded bg-slate-700 text-white">Copy</button>
+          <div class="font-mono text-amber-300 text-lg">{{ selectedItem.username }}</div>
+          <button @click="copyToClipboard(selectedItem.username, 'username')" class="ml-4 px-3 py-1 rounded bg-slate-700 text-white">Copy</button>
         </div>
         <div v-if="copiedField === 'username'" class="text-xs text-emerald-400 mt-1">Đã copy username</div>
       </div>
@@ -234,7 +257,7 @@ const closeToast = () => {
       <div>
         <div class="text-xs text-slate-400">Password</div>
         <div class="flex items-center justify-between mt-1">
-          <div class="font-mono text-amber-300 text-lg">{{ selectedItem?.password }}</div>
+          <div class="font-mono text-amber-300 text-lg">{{ selectedItem.password }}</div>
           <button @click="copyToClipboard(selectedItem?.password, 'password')" class="ml-4 px-3 py-1 rounded bg-slate-700 text-white">Copy</button>
         </div>
         <div v-if="copiedField === 'password'" class="text-xs text-emerald-400 mt-1">Đã copy password</div>
