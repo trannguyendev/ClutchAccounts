@@ -56,6 +56,7 @@ public SecurityFilterChain configSecure(HttpSecurity http, JwtAuthenticationFilt
 		config.requestMatchers("/api/auth/**").permitAll();
 		config.requestMatchers("/api/user/**").authenticated();
 		config.requestMatchers("/api/payment/**").authenticated();
+		config.requestMatchers("/api/accounts/**").authenticated();
 	});
 	http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 	return http.build();
