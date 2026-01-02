@@ -58,7 +58,7 @@ public BuyRes buyAcc(String email, int idAcc) {
 	
 	transRepo.save(tx);
 	
-	return new BuyRes(acc.getUsername(), acc.getAccount_psw(), "Purchased successfully");
+	return new BuyRes(acc.getUsername(), acc.getEmail(), acc.getAccount_psw());
 }
 
 @Transactional
@@ -103,7 +103,7 @@ public BuyRes buyRandomAcc(String email, String type) {
 	tx.setStatus("APPROVED");
 	
 	transRepo.save(tx);
-	return new BuyRes(acc.getUsername(), acc.getAccount_psw(), "Purchased successfully");
+	return new BuyRes(acc.getUsername(), acc.getEmail(), acc.getAccount_psw());
 }
 public record BuyRes(String username, String email, String password) {}
 }
