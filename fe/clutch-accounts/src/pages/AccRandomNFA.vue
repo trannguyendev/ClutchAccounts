@@ -1,14 +1,27 @@
 <script setup>
 import Navbar from '@/components/Navbar.vue';
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios';
 import { onMounted } from 'vue';
 import { useUserStore } from '@/stores/user';
+import toast from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 const user = useUserStore()
 const products = ref([])
 const router = useRouter()
+let username = ref('')
+let password = ref('')
+let emailAcc = ref('')
+// Pagination
+const currentPage = ref(1)
+const pageSize = 8
+const totalPages = computed(() => Math.ceil(products.value.length / pageSize) || 0)
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return products.value.slice(start, start + pageSize)
+})
 
 const showToast = ref(false)
 const selectedItem = ref(null)
@@ -18,6 +31,7 @@ const loadAccInfo = async () => {
   .then((res) => {
     console.log(res.data)
     products.value = res.data
+    currentPage.value = 1
   })
   .catch((err) => {
     console.log(err)
@@ -25,14 +39,18 @@ const loadAccInfo = async () => {
 }
 
 const loadPurchasedAcc = async () => {
-  await axios.post("/api/random/acc-nfa", {
+  await axios.post("/api/accounts/random/acc-nfa", {
     email: user.username
   })
   .then((res) => {
     console.log(res.data)
+    username.value = res.data.username
+    password.value = res.data.account_psw
+    emailAcc.value = res.data.email
   })
   .catch((err) => {
     console.log(err)
+    toast.error("Error loading purchased account info")
   })
 }
 const openToast = (item) => {
@@ -44,6 +62,15 @@ const openToast = (item) => {
 const flippedId = ref(null)
 const toggleFlip = (item) => {
   flippedId.value = flippedId.value === item.account_id ? null : item.account_id
+}
+
+const setPage = (page) => {
+  if (totalPages.value === 0) return
+  if (page < 1) page = 1
+  if (page > totalPages.value) page = totalPages.value
+  currentPage.value = page
+  // reset flip state when changing pages
+  flippedId.value = null
 }
 
 const showSuccess = ref(false)
@@ -77,6 +104,8 @@ const confirmBuy = () => {
     // ensure card flips back
     flippedId.value = null
   }, 1500)
+
+  loadPurchasedAcc();
 } 
 
 const showReject = ref(false)
@@ -111,7 +140,7 @@ onMounted(() => {
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div v-for="product in products" :key="product.account_id"
+          <div v-for="product in paginatedProducts" :key="product.account_id"
             @click="toggleFlip(product)"
             class="group relative bg-gradient-to-br from-black/80 to-slate-950/80 backdrop-blur-md border border-amber-900/50 ring-2 ring-amber-500/25 rounded-2xl overflow-hidden hover:border-amber-500/70 group-hover:ring-4 group-hover:ring-amber-500/40 transition-all duration-300 cursor-pointer hover:shadow-2xl hover:shadow-amber-600/40">
 
@@ -157,6 +186,15 @@ onMounted(() => {
             </div>
 
           </div>
+        </div>
+
+        <!-- Pagination -->
+        <div v-if="totalPages > 1" class="flex items-center justify-center gap-3 mt-6">
+          <button @click="setPage(1)" :disabled="currentPage === 1" class="px-2 py-1 rounded bg-slate-700 text-white disabled:opacity-40">«</button>
+          <button @click="setPage(currentPage - 1)" :disabled="currentPage === 1" class="px-3 py-1 rounded bg-slate-700 text-white disabled:opacity-40">‹</button>
+          <div class="px-3 py-1 rounded bg-slate-800 text-white">Trang {{ currentPage }} / {{ totalPages }}</div>
+          <button @click="setPage(currentPage + 1)" :disabled="currentPage === totalPages" class="px-3 py-1 rounded bg-slate-700 text-white disabled:opacity-40">›</button>
+          <button @click="setPage(totalPages)" :disabled="currentPage === totalPages" class="px-2 py-1 rounded bg-slate-700 text-white disabled:opacity-40">»</button>
         </div>
       </div>
     </section>
@@ -248,8 +286,8 @@ onMounted(() => {
       <div>
         <div class="text-xs text-slate-400">Username</div>
         <div class="flex items-center justify-between mt-1">
-          <div class="font-mono text-amber-300 text-lg">{{ selectedItem.username }}</div>
-          <button @click="copyToClipboard(selectedItem.username, 'username')" class="ml-4 px-3 py-1 rounded bg-slate-700 text-white">Copy</button>
+          <div class="font-mono text-amber-300 text-lg">{{ username.value }}</div>
+          <button @click="copyToClipboard(username.value, 'username')" class="ml-4 px-3 py-1 rounded bg-slate-700 text-white">Copy</button>
         </div>
         <div v-if="copiedField === 'username'" class="text-xs text-emerald-400 mt-1">Đã copy username</div>
       </div>
@@ -257,8 +295,8 @@ onMounted(() => {
       <div>
         <div class="text-xs text-slate-400">Password</div>
         <div class="flex items-center justify-between mt-1">
-          <div class="font-mono text-amber-300 text-lg">{{ selectedItem.password }}</div>
-          <button @click="copyToClipboard(selectedItem?.password, 'password')" class="ml-4 px-3 py-1 rounded bg-slate-700 text-white">Copy</button>
+          <div class="font-mono text-amber-300 text-lg">{{ password.value }}</div>
+          <button @click="copyToClipboard(password.value, 'account_psw')" class="ml-4 px-3 py-1 rounded bg-slate-700 text-white">Copy</button>
         </div>
         <div v-if="copiedField === 'password'" class="text-xs text-emerald-400 mt-1">Đã copy password</div>
       </div>
