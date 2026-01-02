@@ -132,7 +132,7 @@ const announcements = [
                       <span class="ml-auto text-amber-400/60 text-xs">→</span>
                     </RouterLink>
                     <!-- Transaction History -->
-                    <RouterLink to="/#" class="w-full px-6 py-3 text-left text-slate-200 hover:bg-amber-500/10 hover:text-amber-300 transition-all duration-200 flex items-center gap-3 group border-b border-slate-800/50">
+                    <RouterLink to="/user/purchase-history" class="w-full px-6 py-3 text-left text-slate-200 hover:bg-amber-500/10 hover:text-amber-300 transition-all duration-200 flex items-center gap-3 group border-b border-slate-800/50">
                       <i class="fa fa-magnifying-glass-dollar text-amber-400 group-hover:scale-110 transition-transform"></i>
                       <span class="font-medium">Transactions</span>
                       <span class="ml-auto text-amber-400/60 text-xs">→</span>

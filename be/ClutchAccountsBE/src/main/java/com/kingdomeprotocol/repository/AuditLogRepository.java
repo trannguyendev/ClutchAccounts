@@ -11,7 +11,7 @@ import com.kingdomeprotocol.model.AuditLogModel;
 
 public interface AuditLogRepository extends JpaRepository<AuditLogModel, Integer>{
 
-	@Query(value = "select logged_ip, logged_device, logged_time from AuditLog where user_id = :id", nativeQuery = true)
+	@Query(value = "select logged_ip, logged_device, logged_time from AuditLog where user_id = :id order by id desc", nativeQuery = true)
 	List<AuditLogRes> loadAuditById(@Param("id") int id);
 	interface AuditLogRes{
 		String getLogged_ip();

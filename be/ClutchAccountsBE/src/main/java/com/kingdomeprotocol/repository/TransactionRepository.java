@@ -11,7 +11,7 @@ import com.kingdomeprotocol.model.TransactionsModel;
 
 public interface TransactionRepository extends JpaRepository<TransactionsModel, Integer>{
 
-	@Query(value = "select * from Transactions where user_id = :id", nativeQuery = true)
+	@Query(value = "select * from Transactions where user_id = :id order by id desc", nativeQuery = true)
 	List<paymentLog> getSelfPaymentLog(@Param("id") int id);
 	@Query(value = "select * from Transactions where status = 'PENDING'", nativeQuery = true)
 	List<paymentLog> getPendingTransaction();
