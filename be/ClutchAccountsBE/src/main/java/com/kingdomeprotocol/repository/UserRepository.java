@@ -16,6 +16,6 @@ public interface UserRepository extends JpaRepository<UserModel, Integer>{
 Optional<UserModel> findByEmail(String email);
 //Lock pessimistic user
 @Lock(LockModeType.PESSIMISTIC_WRITE)
-@Query(value = "select user from Users user where user.email = :email")
+@Query(value = "select user from UserModel user where user.email = :email")
 Optional<UserModel> findUser4Upd(@Param("email") String email);
 }
