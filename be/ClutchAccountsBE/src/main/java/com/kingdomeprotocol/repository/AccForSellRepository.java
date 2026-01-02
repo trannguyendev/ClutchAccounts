@@ -14,7 +14,7 @@ import jakarta.persistence.LockModeType;
 
 public interface AccForSellRepository extends JpaRepository<AccForSellModel, Integer>{
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	@Query(value = "select * from AccForSell where account_id = :id", nativeQuery = true)
+	@Query(value = "select acc from AccForSell acc where acc.account_id = :id")
 	Optional<AccForSellModel> findAccbyId4Lock(@Param("id") int id);
 	
 	@Query(value = "select count(*) from AccForSell where account_type = :acc_type and isSold = 0", nativeQuery = true)
