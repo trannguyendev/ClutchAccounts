@@ -16,6 +16,7 @@ import AdminNews from '@/components/AdminNews.vue'
 import AdminVLRAccount from '@/components/AdminVLRAccount.vue'
 import UserInfo from '@/pages/UserInfo.vue'
 import ForgotPass from '@/pages/ForgotPass.vue'
+import UserTransactionAndBoughtLog from '@/pages/UserTransactionAndBoughtLog.vue'
 
 
 
@@ -120,6 +121,12 @@ const routes = [
     path: '/user/profile',
     name: 'user-profile',
     component: UserInfo,
+    meta: { requiresAuth: true , roles: ['user', 'admin']},
+  },
+  {
+    path: '/user/purchase-history',
+    name: 'purchase-history',
+    component: UserTransactionAndBoughtLog,
     meta: { requiresAuth: true , roles: ['user', 'admin']},
   },
   //Catch-all route for some s2pid access paths which doesn't exist
