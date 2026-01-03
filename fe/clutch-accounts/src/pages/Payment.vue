@@ -11,7 +11,6 @@ const userDeposit = useUserStore()
 const route = useRoute()
 const router = useRouter()
 const transactionContent = route.params.transaction_content
-
 const amount = ref(0)
 const loading = ref(false)
 const requestLoading = ref(false)

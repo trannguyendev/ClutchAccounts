@@ -2,26 +2,38 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import mainBackground from '@/img/main-background.jpg'
+import { onMounted } from 'vue'
+import axios from 'axios'
 
 const router = useRouter()
 
 // Mock data - replace with actual API calls
-const transactionLogs = ref([
-  { id: 1, date: '2026-01-02', amount: '50,000', type: 'Deposit', status: 'Success', description: 'Add Money' },
-  { id: 2, date: '2026-01-01', amount: '100,000', type: 'Withdrawal', status: 'Pending', description: 'Withdraw' },
-  { id: 3, date: '2025-12-31', amount: '25,000', type: 'Deposit', status: 'Success', description: 'Add Money' },
-  { id: 4, date: '2025-12-30', amount: '75,000', type: 'Purchase', status: 'Cancelled', description: 'Account Purchase' },
-  { id: 5, date: '2025-12-29', amount: '150,000', type: 'Deposit', status: 'Success', description: 'Add Money' },
-])
+const transactionLogs = ref([])
 
-const boughtLogs = ref([
-  { id: 1, date: '2026-01-02', accountType: 'Acc Drop Mail', amount: '150,000', status: 'Completed', seller: 'Admin' },
-  { id: 2, date: '2026-01-01', accountType: 'Acc Sieu Sale', amount: '200,000', status: 'Completed', seller: 'Admin' },
-  { id: 3, date: '2025-12-30', accountType: 'Acc Random FA', amount: '100,000', status: 'Pending', seller: 'Admin' },
-  { id: 4, date: '2025-12-28', accountType: 'Acc Random NFA', amount: '75,000', status: 'Completed', seller: 'Admin' },
-  { id: 5, date: '2025-12-25', accountType: 'Acc Drop Mail', amount: '125,000', status: 'Completed', seller: 'Admin' },
-])
+const boughtLogs = ref([])
 
+const loadTransaction = async () => {
+  await axios.get("/api/payment/transaction-log")
+  .then((res) => {
+    console.log(res.data);
+    transactionLogs.value = res.data || [];
+  })
+  .catch(err => {
+    console.log(err);
+    transactionLogs.value = [];
+  });
+}
+
+const loadBoughtLogs = async () => {
+  await axios.get("/api/accounts/bought-log/me")
+  .then((res) => {
+    console.log(res.data);
+    boughtLogs.value = res.data || [];
+  })
+  .catch(err => {
+    console.log(err);
+  })
+}
 // Filter states
 const transactionFilterType = ref('all')
 const transactionFilterStatus = ref('all')
@@ -36,22 +48,22 @@ const boughtItemsPerPage = ref(5)
 
 // Get unique values for dropdown filters
 const transactionTypes = computed(() => {
-  const types = new Set(transactionLogs.value.map(log => log.type))
+  const types = new Set((transactionLogs.value || []).map(log => log.type))
   return Array.from(types).sort()
 })
 
 const transactionStatuses = computed(() => {
-  const statuses = new Set(transactionLogs.value.map(log => log.status))
+  const statuses = new Set((transactionLogs.value || []).map(log => log.status))
   return Array.from(statuses).sort()
 })
 
 const boughtAccountTypes = computed(() => {
-  const types = new Set(boughtLogs.value.map(log => log.accountType))
+  const types = new Set((boughtLogs.value || []).map(log => log.type_acc))
   return Array.from(types).sort()
 })
 
-const boughtStatuses = computed(() => {
-  const statuses = new Set(boughtLogs.value.map(log => log.status))
+const boughtPrice = computed(() => {
+  const statuses = new Set((boughtLogs.value || []).map(log => log.price))
   return Array.from(statuses).sort()
 })
 
@@ -79,8 +91,8 @@ const transactionTotalPages = computed(() => {
 // Filter bought logs
 const filteredBoughtLogs = computed(() => {
   return boughtLogs.value.filter(log => {
-    const typeMatch = boughtFilterType.value === 'all' || log.accountType === boughtFilterType.value
-    const statusMatch = boughtFilterStatus.value === 'all' || log.status === boughtFilterStatus.value
+    const typeMatch = boughtFilterType.value === 'all' || log.type_acc === boughtFilterType.value
+    const statusMatch = boughtFilterStatus.value === 'all' || log.price === boughtFilterStatus.value
     return typeMatch && statusMatch
   })
 })
@@ -104,11 +116,12 @@ const goBack = () => {
 
 const refreshTransactionLogs = () => {
   // TODO: Fetch from API
+  loadTransaction();
   console.log('Refreshing transaction logs...')
 }
 
 const refreshBoughtLogs = () => {
-  // TODO: Fetch from API
+  loadBoughtLogs();
   console.log('Refreshing bought logs...')
 }
 
@@ -122,12 +135,11 @@ const resetBoughtPagination = () => {
 
 const getStatusClass = (status) => {
   switch(status) {
-    case 'Success':
-    case 'Completed':
+    case 'APPROVED':
       return 'text-green-400 bg-green-500/10 px-3 py-1 rounded-full text-xs font-semibold'
-    case 'Pending':
+    case 'PENDING':
       return 'text-yellow-400 bg-yellow-500/10 px-3 py-1 rounded-full text-xs font-semibold'
-    case 'Cancelled':
+    case 'FAILED':
       return 'text-red-400 bg-red-500/10 px-3 py-1 rounded-full text-xs font-semibold'
     default:
       return 'text-amber-300 bg-amber-500/10 px-3 py-1 rounded-full text-xs font-semibold'
@@ -146,6 +158,11 @@ const getTypeClass = (type) => {
       return 'text-amber-300'
   }
 }
+
+onMounted(() => {
+  loadTransaction();
+  loadBoughtLogs();
+});
 </script>
 
 <template>
@@ -228,15 +245,15 @@ const getTypeClass = (type) => {
                 </tr>
                 <tr v-for="log in paginatedTransactionLogs" :key="log.id" 
                   class="border-b border-amber-700/10 hover:bg-amber-700/5 transition duration-200">
-                  <td class="py-4 px-4 text-amber-100">{{ log.date }}</td>
-                  <td class="py-4 px-4 text-amber-100 font-semibold">{{ log.amount }}</td>
+                  <td class="py-4 px-4 text-amber-100"><code>{{ log.created_at }}</code></td>
+                  <td class="py-4 px-4 text-amber-100 font-semibold"><code>{{ log.amount }}</code></td>
                   <td class="py-4 px-4">
-                    <span :class="getTypeClass(log.type)" class="font-semibold">{{ log.type }}</span>
+                    <code><span :class="getTypeClass(log.type)" class="font-semibold">{{ log.type }}</span></code>
                   </td>
                   <td class="py-4 px-4">
-                    <span :class="getStatusClass(log.status)">{{ log.status }}</span>
+                    <code><span :class="getStatusClass(log.status)">{{ log.status }}</span></code>
                   </td>
-                  <td class="py-4 px-4 text-amber-100/80">{{ log.description }}</td>
+                  <td class="py-4 px-4 text-amber-100/80"><code>{{ log.descrp }}</code></td>
                 </tr>
               </tbody>
             </table>
@@ -306,8 +323,8 @@ const getTypeClass = (type) => {
               <div class="flex items-center gap-2">
                 <select v-model="boughtFilterStatus" @change="resetBoughtPagination"
                   class="px-4 py-2 rounded-lg bg-black/40 border border-amber-700/30 text-amber-100 font-semibold hover:border-amber-700/60 hover:bg-black/50 focus:outline-none focus:ring-2 focus:ring-amber-500 transition cursor-pointer">
-                  <option value="all">All Status</option>
-                  <option v-for="status in boughtStatuses" :key="status" :value="status">
+                  <option value="all">All Price</option>
+                  <option v-for="status in boughtPrice" :key="status" :value="status">
                     {{ status }}
                   </option>
                 </select>
@@ -331,9 +348,10 @@ const getTypeClass = (type) => {
                 <tr class="border-b border-amber-700/20">
                   <th class="text-left py-4 px-4 text-amber-300 font-semibold">Date</th>
                   <th class="text-left py-4 px-4 text-amber-300 font-semibold">Account Type</th>
-                  <th class="text-left py-4 px-4 text-amber-300 font-semibold">Amount</th>
-                  <th class="text-left py-4 px-4 text-amber-300 font-semibold">Status</th>
-                  <th class="text-left py-4 px-4 text-amber-300 font-semibold">Seller</th>
+                  <th class="text-left py-4 px-4 text-amber-300 font-semibold">Username</th>
+                  <th class="text-left py-4 px-4 text-amber-300 font-semibold">Email</th>
+                  <th class="text-left py-4 px-4 text-amber-300 font-semibold">Password</th>
+                  <th class="text-left py-4 px-4 text-amber-300 font-semibold">Price</th>
                 </tr>
               </thead>
               <tbody>
@@ -344,13 +362,12 @@ const getTypeClass = (type) => {
                 </tr>
                 <tr v-for="log in paginatedBoughtLogs" :key="log.id" 
                   class="border-b border-amber-700/10 hover:bg-amber-700/5 transition duration-200">
-                  <td class="py-4 px-4 text-amber-100">{{ log.date }}</td>
-                  <td class="py-4 px-4 text-amber-100 font-semibold">{{ log.accountType }}</td>
-                  <td class="py-4 px-4 text-amber-100 font-semibold">{{ log.amount }}</td>
-                  <td class="py-4 px-4">
-                    <span :class="getStatusClass(log.status)">{{ log.status }}</span>
-                  </td>
-                  <td class="py-4 px-4 text-amber-100/80">{{ log.seller }}</td>
+                  <td class="py-4 px-4 text-amber-100"><code>{{ log.bought_time }}</code></td>
+                  <td class="py-4 px-4 text-amber-100 font-semibold"><code>{{ log.type_acc }}</code></td>
+                  <td class="py-4 px-4 text-amber-100 font-semibold"><code>{{ log.username_acc }}</code></td>
+                  <td class="py-4 px-4 text-amber-100 font-semibold"><code>{{ log.email_acc }}</code></td>
+                  <td class="py-4 px-4 text-amber-100 font-semibold"><code>{{ log.psw_acc }}</code></td>
+                  <td class="py-4 px-4 text-amber-100/80"><code>{{ log.price }} VND</code></td>
                 </tr>
               </tbody>
             </table>

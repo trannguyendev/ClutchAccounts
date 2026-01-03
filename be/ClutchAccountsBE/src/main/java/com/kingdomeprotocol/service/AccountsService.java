@@ -52,7 +52,7 @@ public BuyRes buyAcc(String email, int idAcc) {
 	TransactionsModel tx = new TransactionsModel();
 	tx.setTransactionUser(user);
 	tx.setAmount(-acc.getPrice());
-	tx.setType("BUY_ACC_+"+acc.getAccount_type());
+	tx.setType("BUY_ACC_"+acc.getAccount_type());
 	tx.setDescrp("Buy account type: "+acc.getAccount_type());
 	tx.setStatus("APPROVED");
 	
@@ -98,7 +98,7 @@ public BuyRes buyRandomAcc(String email, String type) {
 	TransactionsModel tx = new TransactionsModel();
 	tx.setTransactionUser(user);
 	tx.setAmount(-acc.getPrice());
-	tx.setType("BUY_ACC_+"+acc.getAccount_type());
+	tx.setType("BUY_ACC_"+acc.getAccount_type());
 	tx.setDescrp("Buy account type: "+acc.getAccount_type());
 	tx.setStatus("APPROVED");
 	

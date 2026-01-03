@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -73,10 +74,10 @@ public class PaymentController {
 		}
 	}
 	
-	@GetMapping("/transaction-log/{username}")
-	public ResponseEntity<?> getLogTransaction(@PathVariable("username") String email){
+	@GetMapping("/transaction-log")
+	public ResponseEntity<?> getLogTransaction(Authentication authen){
 		try {
-			UserModel user = userServ.loadUserByEmail(email).orElseThrow(() -> new RuntimeException("Not found user"));
+			UserModel user = userServ.loadUserByEmail(authen.getName()).orElseThrow(() -> new RuntimeException("Not found user"));
 			int user_id = user.getId();
 			return ResponseEntity.ok(transRepo.getSelfPaymentLog(user_id));
 		}
