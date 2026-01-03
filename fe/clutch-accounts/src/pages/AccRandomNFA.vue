@@ -39,20 +39,21 @@ const loadAccInfo = async () => {
 }
 
 const loadPurchasedAcc = async () => {
-  await axios.post("/api/accounts/random/acc-nfa", {
-    email: user.username
-  })
-  .then((res) => {
+  try {
+    const res = await axios.post("/api/accounts/random/acc-nfa", {
+      email: user.username
+    })
     console.log(res.data)
     username.value = res.data.username
     password.value = res.data.account_psw
     emailAcc.value = res.data.email
-  })
-  .catch((err) => {
+    return res.data
+  } catch (err) {
     console.log(err)
-    toast.error("Error loading purchased account info")
-  })
-}
+    // Re-throw so caller can handle (e.g., insufficient balance)
+    throw err
+  }
+} 
 const openToast = (item) => {
   selectedItem.value = item
   showToast.value = true
@@ -92,20 +93,40 @@ const closeCredentials = () => {
   selectedItem.value = null
 }
 
-const confirmBuy = () => {
+const showInsufficient = ref(false)
+
+const closeInsufficient = () => {
+  showInsufficient.value = false
+  selectedItem.value = null
+} 
+
+const confirmBuy = async () => {
   showToast.value = false
   showSuccess.value = true
+  const start = Date.now()
 
-  // giả lập xử lý (1.5s)
-  setTimeout(() => {
+  try {
+    await loadPurchasedAcc()
+    const elapsed = Date.now() - start
+    console.log("elapsed", elapsed)
+    // ensure loading UI shows for at least 0.8s
+    await new Promise(r => setTimeout(r, Math.max(0, 800 - elapsed)))
+
     showSuccess.value = false
     // show credentials modal after purchase is processed
     showCredentials.value = true
     // ensure card flips back
     flippedId.value = null
-  }, 1500)
+  } catch (err) {
+    const elapsed = Date.now() - start
+    await new Promise(r => setTimeout(r, Math.max(0, 800 - elapsed)))
 
-  loadPurchasedAcc();
+    showSuccess.value = false
+    // show insufficient balance modal
+    showInsufficient.value = true
+    // ensure card flips back
+    flippedId.value = null
+  }
 } 
 
 const showReject = ref(false)
@@ -252,20 +273,20 @@ onMounted(() => {
             text-center shadow-2xl
             animate-scale-in">
 
-    <!-- ICON -->
-    <div class="text-5xl mb-4">✅</div>
+    <!-- ICON (processing) -->
+    <div class="text-5xl mb-4">⏳</div>
 
     <h3 class="text-white font-black text-xl mb-2">
-      CONFIRM PURCHASE SUCCESSFUL
+      PROCESSING PURCHASE
     </h3>
 
     <p class="text-slate-300 mb-4">
-      Loading...
+      Đang xử lý...
     </p>
 
     <!-- LOADING -->
     <div class="w-full h-2 rounded-full bg-slate-700 overflow-hidden">
-      <div class="h-full bg-gradient-to-r from-emerald-400 to-green-500 animate-loading"></div>
+      <div class="h-full bg-gradient-to-r from-amber-400 to-yellow-500 animate-loading"></div>
     </div>
 
   </div>
@@ -335,6 +356,36 @@ onMounted(() => {
 
   </div>
 </div>
+
+<!-- INSUFFICIENT FUNDS MODAL -->
+<div
+  v-if="showInsufficient"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md">
+
+  <div
+    class="w-[340px] bg-slate-900 rounded-2xl p-6
+           border border-yellow-500/50
+           text-center shadow-2xl
+           animate-scale-in">
+
+    <!-- ICON -->
+    <div class="text-5xl mb-4">⚠️</div>
+
+    <h3 class="text-white font-black text-xl mb-2">
+      THIẾU SỐ DƯ
+    </h3>
+
+    <p class="text-slate-300">
+      Bạn không có đủ số dư để mua acc này.
+    </p>
+
+    <div class="flex gap-4 mt-6">
+      <button @click="closeInsufficient" class="flex-1 py-3 rounded-xl font-bold bg-slate-700 text-white hover:scale-105 transition">Đóng</button>
+    </div>
+
+  </div>
+
+</div>
 </main>
 </template>
 <style scoped>
@@ -370,7 +421,7 @@ onMounted(() => {
 }
 
 .animate-loading {
-  animation: loading 1.5s linear forwards;
+  animation: loading 0.8s linear forwards;
 }
 /* Shimmer animation for premium feel */
 @keyframes shimmer {
