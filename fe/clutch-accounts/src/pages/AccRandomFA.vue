@@ -1,299 +1,148 @@
 <script setup>
 import Navbar from '@/components/Navbar.vue';
-import LuckyWheel from '@/components/LuckyWheel.vue';
-import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { onMounted } from 'vue';
+import { ref } from 'vue';
+import { useUserStore } from '@/stores/user';
 
-// State cho thông báo (Toast)
-const toast = ref({
-        show: false,
-        message: '',
-        type: 'success'
-});
-
-const showToast = (message, type = 'success') => {
-        toast.value = { show: true, message, type };
-        setTimeout(() => {
-                toast.value.show = false;
-        }, 3000);
-};
-
-// User State
-const userBalance = ref(0);
-const SPIN_COST = 20000;
-
-const formatCurrency = (value) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
-};
-
-// Fetch User Balance from API
-const fetchUserBalance = async () => {
-        const currentUserStr = localStorage.getItem('currentuser');
-        if (currentUserStr) {
-                try {
-                        const currentUser = JSON.parse(currentUserStr);
-                        const token = currentUser.token;
-
-                        if (token) {
-                                const res = await axios.get('/api/auth/me', {
-                                        headers: {
-                                                Authorization: `Bearer ${token}`
-                                        }
-                                });
-                                userBalance.value = res.data.balance;
-                        }
-                } catch (err) {
-                        console.error("Failed to fetch user balance:", err);
-                        // Optional: Redirect to login or show warning
-                        if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-                                showToast('Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.', 'error');
-                        }
-                }
-        } else {
-                showToast('Bạn chưa đăng nhập!', 'error');
-        }
-};
-
-// Mock Data cho phần thưởng - Black & Gold Theme
-// Thêm account/password cho các giải thưởng là nick game
-const prizes = ref([
-        { id: 1, label: 'AccRandom', color: '#1a1a1a', text: '#FFD700', value: '10_skin', account: 'acc10skin_vip', password: 'password123' },
-        { id: 2, label: 'AccRandom', color: '#C5A009', text: '#000000', value: '20_skin', account: 'acc20skin_pro', password: 'superpass789' },
-        { id: 3, label: 'AccRandom', color: '#333333', text: '#F0E68C', value: 'trang', account: 'empty_acc_01', password: 'nopassword' },
-        { id: 4, label: 'AccRandom', color: '#B8860B', text: '#000000', value: 'miss' },
-        { id: 5, label: 'AccRandom', color: '#000000', text: '#FFD700', value: 'vip', account: 'vip_accord_99', password: 'goldenvip!!!' },
-        { id: 6, label: 'AccRandom', color: '#D4AF37', text: '#000000', value: 'voucher' },
-        { id: 7, label: 'AccRandom', color: '#2C2C2C', text: '#F0E68C', value: 'cui', account: 'bacon_hair_123', password: '123456abc' },
-        { id: 8, label: 'AccRandom', color: '#DAA520', text: '#000000', value: 'miss_2' },
-]);
-
-const wheelRef = ref(null);
+let isSpinning = ref(false);
+const currentRotation = ref(0);
+// Configuration
+let prizes = ref([]);
+let size = 400;
+let duration = 3; // 3s for spin animation
+let borderWidth = 8;
+const user = useUserStore();
 const showConfirmModal = ref(false);
-const showRewardModal = ref(false);
-const receivedPrize = ref(null);
+const showErrorModal = ref(false);
+const showResultModal = ref(false);
+let errorMessage = ref('');
+let resultPrize = ref({});
+const SVG_SIZE = 100;
+const CENTER = SVG_SIZE / 2;
+const RADIUS = SVG_SIZE / 2;
 
+const fetchData = async () => {
+    try {
+        const res = await axios.get("/api/accounts/random/acc-fa/list-acc");
+        prizes.value = res.data;
+        console.log("Prizes fetched:", prizes.value);
+    } catch (err) {
+        console.error("Error fetching prizes:", err);
+    }
+};
+
+//Calculate segment angle
+const getSegmentAngle = () => {
+    return prizes.value.length > 0 ? 360 / prizes.value.length : 0;
+}
+
+// Calculate SVG path for sector
+const getSectorPath = (index) => {
+    const segmentAngle = getSegmentAngle();
+    const startAngle = index * segmentAngle;
+    const endAngle = (index + 1) * segmentAngle;
+    const startRad = (startAngle - 90) * (Math.PI / 180);
+    const endRad = (endAngle - 90) * (Math.PI / 180);
+    const x1 = CENTER + RADIUS * Math.cos(startRad);
+    const y1 = CENTER + RADIUS * Math.sin(startRad);
+    const x2 = CENTER + RADIUS * Math.cos(endRad);
+    const y2 = CENTER + RADIUS * Math.sin(endRad);
+    const largeArcFlag = segmentAngle > 180 ? 1 : 0;
+
+    return `M ${CENTER} ${CENTER} L ${x1} ${y1} A ${RADIUS} ${RADIUS} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+}
+
+// Calculate text rotation to center of segment
+const getTextRotation = (index) => {
+    const segmentAngle = getSegmentAngle();
+    const angle = (index * segmentAngle) + (segmentAngle / 2);
+    return `rotate(${angle}, ${CENTER}, ${CENTER})`;
+}
+
+//Spin animation
+const spin = (targetIndex) => {
+    if (isSpinning.value) return;
+    isSpinning.value = true;
+
+    const segmentAngle = 360 / prizes.value.length;
+    const targetAngle = targetIndex * segmentAngle + segmentAngle / 2;
+
+    const MIN_SPINS = 5;
+    const current = currentRotation.value % 360;
+
+    let delta = 360 - targetAngle - current;
+    if (delta < 0) delta += 360;
+
+    currentRotation.value += MIN_SPINS * 360 + delta;
+
+    setTimeout(() => {
+        isSpinning.value = false;
+        showResultModal.value = true;
+    }, duration * 1000);
+};
+
+// Step 1: Show confirmation modal
+const onSpinButtonClick = () => {
+    if (isSpinning.value) {
+        console.warn("Wheel is already spinning...");
+        console.log("State isSpin: ", isSpinning.value);
+        return;
+    }
+    
+    if (prizes.value.length === 0) {
+        errorMessage.value = "No prizes available";
+        showErrorModal.value = true;
+        return;
+    }
+
+    showConfirmModal.value = true;
+}
+
+const cancelSpin = () => {
+    showConfirmModal.value = false;
+}
+
+// Step 3: Confirm and fetch from API
+const confirmSpin = async () => {
+    showConfirmModal.value = false;
+    try {
+        console.log("Calling API to get random prize...");
+        // Call backend API to get random result
+        const response = await axios.post("/api/accounts/random/acc-fa", {
+            email: user.username
+        });
+        spin(3);
+        resultPrize.value = response.data;
+        console.log("Backend returned prize:", resultPrize.value);
+        
+    } catch (error) {
+        console.error("Error fetching random prize:", error);
+        errorMessage.value = error.response.data.error;
+        showErrorModal.value = true;
+    }
+}
+
+// Close error modal
+function closeErrorModal() {
+    showErrorModal.value = false;
+}
+
+// Close result modal
+function closeResultModal() {
+    showResultModal.value = false;
+    resultPrize.value = null;
+}
+
+// Initialize on component mount
 onMounted(() => {
-        fetchUserBalance();
+    fetchData();
 });
 
-const onSpinStart = () => {
-        showConfirmModal.value = true;
-};
-
-const confirmSpin = () => {
-        // 1. Kiểm tra số dư
-        if (userBalance.value < SPIN_COST) {
-                showToast('Số dư không đủ để quay! Vui lòng nạp thêm.', 'error');
-                showConfirmModal.value = false;
-                return;
-        }
-
-        // 2. Trừ tiền (Tạm thời trừ ở Client để demo, thực tế cần API Spin)
-        userBalance.value -= SPIN_COST;
-        showConfirmModal.value = false;
-
-        // 3. Random kết quả (index) giả lập từ API
-        const winningIndex = Math.floor(Math.random() * prizes.value.length);
-        console.log("Dự kiến trúng:", prizes.value[winningIndex].label);
-
-        // 4. Gọi method spin của component con
-        if (wheelRef.value) {
-                wheelRef.value.spin(winningIndex);
-        }
-};
-
-const onSpinEnd = (prize) => {
-        receivedPrize.value = prize;
-        showRewardModal.value = true;
-
-        // Nếu trúng giải có account, có thể tự động copy hoặc thông báo
-        if (prize.account) {
-                // Optional: showToast('Chúc mừng đã trúng Acc!', 'success');
-        }
-};
-
-const copyCredentials = async () => {
-        if (receivedPrize.value && receivedPrize.value.account) {
-                const textToCopy = `${receivedPrize.value.account}|${receivedPrize.value.password}`;
-                try {
-                        await navigator.clipboard.writeText(textToCopy);
-                        showToast('Đã sao chép Tài khoản | Mật khẩu!', 'success');
-                } catch (err) {
-                        console.error('Failed to copy: ', err);
-                        showToast('Không thể sao chép, vui lòng thử lại.', 'error');
-                }
-        }
-};
 </script>
 
 <template>
-        <div
-                class="min-h-screen bg-black text-yellow-500 font-sans overflow-hidden relative selection:bg-yellow-500 selection:text-black">
-
-                <!-- Toast Notification (Top Center) -->
-                <transition enter-active-class="transform ease-out duration-300 transition"
-                        enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
-                        enter-to-class="translate-y-0 opacity-100 sm:translate-x-0"
-                        leave-active-class="transition ease-in duration-100" leave-from-class="opacity-100"
-                        leave-to-class="opacity-0">
-                        <div v-if="toast.show"
-                                class="fixed top-4 left-1/2 -translate-x-1/2 z-[120] flex items-center w-full max-w-xs p-4 rounded-lg shadow dark:text-gray-400 dark:bg-gray-800"
-                                :class="toast.type === 'error' ? 'bg-red-900/90 text-red-200 border border-red-500' : 'bg-green-900/90 text-green-200 border border-green-500'"
-                                role="alert">
-                                <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg">
-                                        <span v-if="toast.type === 'error'">⚠️</span>
-                                        <span v-else>✅</span>
-                                </div>
-                                <div class="ml-3 text-sm font-normal">{{ toast.message }}</div>
-                                <button type="button"
-                                        class="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 p-1.5 inline-flex h-8 w-8 hover:bg-opacity-20 hover:bg-white"
-                                        @click="toast.show = false">
-                                        <span class="sr-only">Close</span>
-                                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                                fill="none" viewBox="0 0 14 14">
-                                                <path stroke="currentColor" stroke-linecap="round"
-                                                        stroke-linejoin="round" stroke-width="2"
-                                                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                                        </svg>
-                                </button>
-                        </div>
-                </transition>
-
-
-                <!-- Confirmation Modal -->
-                <transition enter-active-class="transition duration-200 ease-out"
-                        enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100"
-                        leave-active-class="transition duration-150 ease-in"
-                        leave-from-class="transform scale-100 opacity-100"
-                        leave-to-class="transform scale-95 opacity-0">
-                        <div v-if="showConfirmModal"
-                                class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
-                                <div
-                                        class="bg-zinc-900 border-2 border-yellow-600/50 rounded-2xl p-6 md:p-8 max-w-sm w-full text-center shadow-[0_0_50px_rgba(234,179,8,0.15)] relative overflow-hidden">
-                                        <!-- Decorative glow -->
-                                        <div
-                                                class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,1)]">
-                                        </div>
-
-                                        <h3
-                                                class="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 to-yellow-600 mb-4 uppercase font-serif tracking-wide">
-                                                Xác nhận</h3>
-
-                                        <div class="space-y-4 mb-8">
-                                                <p class="text-gray-300">Bạn có chắc chắn muốn quay?</p>
-                                                <div
-                                                        class="inline-block px-4 py-2 bg-yellow-900/20 rounded-lg border border-yellow-500/20">
-                                                        Phí: <span
-                                                                class="text-yellow-400 font-bold text-lg">20.000đ</span>
-                                                </div>
-                                                <div class="text-sm text-gray-400">
-                                                        Số dư hiện tại: <span
-                                                                :class="userBalance < 20000 ? 'text-red-500' : 'text-green-500'"
-                                                                class="font-bold">{{ formatCurrency(userBalance)
-                                                                }}</span>
-                                                </div>
-                                        </div>
-
-                                        <div class="flex gap-4 justify-center">
-                                                <button @click="showConfirmModal = false"
-                                                        class="px-6 py-2.5 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all font-medium">
-                                                        Để sau
-                                                </button>
-                                                <button @click="confirmSpin"
-                                                        class="px-8 py-2.5 rounded-xl bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-400 text-black font-bold hover:shadow-[0_0_20px_rgba(234,179,8,0.4)] hover:scale-105 transition-all transform uppercase tracking-wider text-sm">
-                                                        Quay Ngay
-                                                </button>
-                                        </div>
-                                </div>
-                        </div>
-                </transition>
-
-                <!-- Reward Popup Modal -->
-                <transition enter-active-class="transition duration-500 cubic-bezier(0.19, 1, 0.22, 1)"
-                        enter-from-class="transform scale-50 opacity-0 translate-y-10"
-                        enter-to-class="transform scale-100 opacity-100 translate-y-0"
-                        leave-active-class="transition duration-200 ease-in"
-                        leave-from-class="transform scale-100 opacity-100"
-                        leave-to-class="transform scale-95 opacity-0">
-                        <div v-if="showRewardModal"
-                                class="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-md px-4"
-                                @click.self="showRewardModal = false">
-                                <div
-                                        class="bg-gradient-to-b from-zinc-800 to-black border border-yellow-500 rounded-2xl p-8 max-w-md w-full text-center shadow-[0_0_100px_rgba(234,179,8,0.3)] relative overflow-visible">
-                                        <!-- Floating Badge/Icon -->
-                                        <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-32 h-32">
-                                                <!-- Simple CSS Gift Icon/Glow -->
-                                                <div
-                                                        class="absolute inset-0 bg-yellow-500/50 rounded-full blur-[40px] animate-pulse">
-                                                </div>
-                                                <div
-                                                        class="relative w-full h-full flex items-center justify-center text-7xl drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] animate-bounce">
-                                                        🎁
-                                                </div>
-                                        </div>
-
-                                        <div class="mt-12 space-y-2">
-                                                <h2
-                                                        class="text-3xl md:text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 via-yellow-500 to-yellow-200 uppercase tracking-widest drop-shadow-sm font-serif">
-                                                        CHÚC MỪNG
-                                                </h2>
-                                                <p class="text-yellow-100/60 text-sm font-medium tracking-wider">BẠN ĐÃ
-                                                        NHẬN ĐƯỢC</p>
-                                        </div>
-
-                                        <div class="my-6 py-4 bg-yellow-900/10 border-y border-yellow-500/20">
-                                                <h3
-                                                        class="text-2xl md:text-3xl font-bold text-yellow-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-2">
-                                                        {{ receivedPrize?.label || 'PHẦN QUÀ BÍ ẨN' }}
-                                                </h3>
-                                        </div>
-
-                                        <!-- Credentials Info Section -->
-                                        <div v-if="receivedPrize?.account"
-                                                class="mb-6 p-4 bg-zinc-900/80 rounded-xl border border-zinc-700">
-                                                <div class="text-left space-y-3">
-                                                        <div>
-                                                                <span
-                                                                        class="text-xs uppercase text-zinc-500 font-bold block mb-1">Tài
-                                                                        khoản</span>
-                                                                <div
-                                                                        class="font-mono text-yellow-100 bg-zinc-800 p-2 rounded border border-zinc-700/50 select-all truncate">
-                                                                        {{ receivedPrize.account }}
-                                                                </div>
-                                                        </div>
-                                                        <div>
-                                                                <span
-                                                                        class="text-xs uppercase text-zinc-500 font-bold block mb-1">Mật
-                                                                        khẩu</span>
-                                                                <div class="relative group">
-                                                                        <div
-                                                                                class="font-mono text-yellow-100 bg-zinc-800 p-2 rounded border border-zinc-700/50 select-all truncate">
-                                                                                {{ receivedPrize.password }}
-                                                                        </div>
-                                                                </div>
-                                                        </div>
-                                                </div>
-
-                                                <button @click="copyCredentials"
-                                                        class="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded-lg transition-colors text-sm text-zinc-300 font-bold uppercase tracking-wide">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
-                                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2"
-                                                                        d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                                                        </svg>
-                                                        Copy Tài Khoản | Mật Khẩu
-                                                </button>
-                                        </div>
-
-                                        <button @click="showRewardModal = false"
-                                                class="w-full px-8 py-3.5 rounded-xl bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-400 text-black text-lg font-bold hover:shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:-translate-y-1 transition-all transform uppercase tracking-widest shadow-lg">
-                                                NHẬN QUÀ NGAY
-                                        </button>
-                                </div>
-                        </div>
-                </transition>
-
+        <div class="min-h-screen bg-black text-yellow-500 font-sans overflow-hidden relative selection:bg-yellow-500 selection:text-black">
                 <Navbar></Navbar>
 
                 <!-- Background Effects - Gold & Dark Ambience -->
@@ -321,22 +170,217 @@ const copyCredentials = async () => {
 
                         <h1
                                 class="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-yellow-300 via-yellow-500 to-yellow-700 mb-8 drop-shadow-[0_2px_10px_rgba(234,179,8,0.3)] text-center uppercase tracking-[0.2em] pb-2 leading-relaxed font-serif">
-                                FA Account Random
+                                LUCKY WHEEL
                         </h1>
 
-                        <!-- Sử dụng Component LuckyWheel -->
-                        <LuckyWheel ref="wheelRef" :prizes="prizes" size="500px" @spin-start="onSpinStart"
-                                @spin-end="onSpinEnd" />
+                        <!-- Lucky Wheel UI -->
+                        <div class="relative flex items-center justify-center font-sans select-none"
+                            :style="{ width: typeof size === 'number' ? `${size}px` : size, height: typeof size === 'number' ? `${size}px` : size }">
+
+                            <!-- 1. Vòng quay chính (Wheel) -->
+                            <div ref="wheelRef" class="w-full h-full rounded-full relative z-10 overflow-hidden shadow-2xl transition-transform duration-[4000ms] ease-out" :style="{
+                                transform: `rotate(${currentRotation}deg)`                            }">
+
+                                <!-- SVG Render -->
+                                <!-- ViewBox 0 0 100 100 để dễ scale theo % -->
+                                <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md"
+                                    :class="{ 'pointer-events-none': isSpinning }">
+                                    <!-- Render từng miếng (Slice) -->
+                                    <g v-for="(prize, index) in prizes" :key="prize.id" class="group">
+                                        <!-- Đường path rẻ quạt (Normal State) -->
+                                        <path :d="getSectorPath(index)" stroke="#FDB931" stroke-width="0.5" class="hover:bg-amber-400"/>
+
+                                        <!-- Text và Icon (Normal) -->
+                                        <g :transform="getTextRotation(index)">
+                                            <foreignObject x="38" y="4" width="24" height="42">
+                                                <div class="flex flex-col items-center justify-start h-full w-full pt-1 pointer-events-none">
+                                                    <div class="text-[0.22rem] md:text-[0.25rem] font-bold uppercase tracking-widest text-center leading-none shadow-sm pb-1"
+                                                        style="writing-mode: vertical-rl; text-orientation: mixed;">
+                                                        {{ prize.account_type }}
+                                                    </div>
+                                                    <div class="text-[0.3rem] mt-1 opacity-80">♦</div>
+                                                </div>
+                                            </foreignObject>
+                                        </g>
+                                    </g>
+
+                                    <!-- Highlighted Slice (Rendered on TOP) -->
+
+                                </svg>
+                            </div>
+
+                            <!-- 2. Viền ngoài (Outer Border Ring) - Hiệu ứng Glow -->
+                            <div class="absolute inset-0 rounded-full border-solid border-yellow-600 z-20 pointer-events-none shadow-[0_0_20px_rgba(234,179,8,0.5)]"
+                                :style="{ borderWidth: `${borderWidth}px` }">
+                                <!-- Gradient overlay cho border -->
+                                <div class="absolute inset-[-10px] rounded-full border-[4px] border-yellow-300 opacity-50"></div>
+                            </div>
+
+                            <!-- 3. Kim chỉ thị (Pointer) - Luôn ở vị trí 12h -->
+                            <div class="absolute top-[-10px] left-1/2 -translate-x-1/2 z-30 drop-shadow-lg">
+                                <svg width="40" height="50" viewBox="0 0 40 55" fill="none">
+                                    <path d="M20 55L4 10C2 5 5 0 10 0H30C35 0 38 5 36 10L20 55Z" fill="url(#pointerGradient)"
+                                        stroke="#5B420C" stroke-width="2" />
+                                    <defs>
+                                        <linearGradient id="pointerGradient" x1="20" y1="0" x2="20" y2="55" gradientUnits="userSpaceOnUse">
+                                            <stop stop-color="#FFD700" />
+                                            <stop offset="0.5" stop-color="#FDB931" />
+                                            <stop offset="1" stop-color="#BF953F" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+
+                            <!-- 4. Nút Quay ở giữa (Center Button) -->
+                            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40">
+                                <!-- Vòng sáng animate -->
+                                <div class="absolute inset-[-6px] bg-yellow-400 rounded-full blur-md opacity-30 animate-pulse"></div>
+
+                                <button @click="onSpinButtonClick()"
+                                    class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-yellow-300 via-yellow-500 to-yellow-700 shadow-[inset_0_2px_5px_rgba(255,255,255,0.4),0_4px_10px_rgba(0,0,0,0.5)] flex items-center justify-center border-4 border-yellow-900 group active:scale-95 hover:scale-110 hover:shadow-[0_0_20px_rgba(255,215,0,0.6)] transition-all duration-300 ease-out" :disabled="isSpinning.value">
+
+                                    <span
+                                        class="font-serif font-bold text-yellow-950 text-sm md:text-base tracking-widest drop-shadow-sm group-hover:text-black transition-colors">
+                                        ROLL NOW
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
 
                         <div class="mt-12 text-center text-slate-400 text-sm">
-                                <p>Số dư của bạn: <span class="text-yellow-400 font-bold text-lg">{{
-                                        formatCurrency(userBalance) }}</span></p>
-                                <p>Mỗi lượt quay tốn <span class="text-yellow-400 font-bold">20.000đ</span></p>
-                                <p class="mt-2 text-xs opacity-60">Chúc bạn may mắn!</p>
+                                <p>Each spin costs <span class="text-yellow-400 font-bold">20.000đ</span></p>
+                                <p>Good luck!</p>
                         </div>
 
                 </div>
         </div>
+
+        <!-- Confirmation Modal -->
+        <transition enter-active-class="transition duration-200 ease-out"
+                enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100"
+                leave-active-class="transition duration-150 ease-in"
+                leave-from-class="transform scale-100 opacity-100"
+                leave-to-class="transform scale-95 opacity-0">
+                <div v-if="showConfirmModal"
+                        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+                        <div
+                                class="bg-zinc-900 border-2 border-yellow-600/50 rounded-2xl p-6 md:p-8 max-w-sm w-full text-center shadow-[0_0_50px_rgba(234,179,8,0.15)] relative overflow-hidden">
+                                <div
+                                        class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-yellow-500 shadow-[0_0_20px_rgba(234,179,8,1)]">
+                                </div>
+
+                                <h3
+                                        class="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-yellow-300 to-yellow-600 mb-4 uppercase font-serif tracking-wide">
+                                        Confirm Spin</h3>
+
+                                <div class="space-y-4 mb-8">
+                                        <p class="text-gray-300">Are you sure you want to spin?</p>
+                                        <div
+                                                class="inline-block px-4 py-2 bg-yellow-900/20 rounded-lg border border-yellow-500/20">
+                                               <span
+                                                        class="text-yellow-400 font-bold text-lg">Cost: 20.000 VND</span>
+                                        </div>
+                                </div>
+
+                                <div class="flex gap-4 justify-center">
+                                        <button @click="cancelSpin()"
+                                                class="px-6 py-2.5 rounded-xl border border-zinc-700 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all font-medium">
+                                                Cancel
+                                        </button>
+                                        <button @click="confirmSpin()"
+                                                class="px-8 py-2.5 rounded-xl bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-400 text-black font-bold hover:shadow-[0_0_20px_rgba(234,179,8,0.4)] hover:scale-105 transition-all transform uppercase tracking-wider text-sm">
+                                                Spin Now
+                                        </button>
+                                </div>
+                        </div>
+                </div>
+        </transition>
+
+        <!-- Error Modal -->
+        <transition enter-active-class="transition duration-200 ease-out"
+                enter-from-class="transform scale-95 opacity-0" enter-to-class="transform scale-100 opacity-100"
+                leave-active-class="transition duration-150 ease-in"
+                leave-from-class="transform scale-100 opacity-100"
+                leave-to-class="transform scale-95 opacity-0">
+                <div v-if="showErrorModal"
+                        class="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+                        <div
+                                class="bg-zinc-900 border-2 border-red-600/50 rounded-2xl p-6 md:p-8 max-w-sm w-full text-center shadow-[0_0_50px_rgba(239,68,68,0.15)] relative overflow-hidden">
+                                <div
+                                        class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-red-500 shadow-[0_0_20px_rgba(239,68,68,1)]">
+                                </div>
+
+                                <h3
+                                        class="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-red-300 to-red-600 mb-4 uppercase font-serif tracking-wide">
+                                        Error</h3>
+
+                                <div class="space-y-4 mb-8">
+                                        <p class="text-gray-300">{{ errorMessage }}</p>
+                                </div>
+
+                                <button @click="closeErrorModal()"
+                                        class="w-full px-8 py-2.5 rounded-xl bg-gradient-to-r from-red-600 via-red-500 to-red-400 text-white font-bold hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] hover:scale-105 transition-all transform uppercase tracking-wider text-sm">
+                                        Close
+                                </button>
+                        </div>
+                </div>
+        </transition>
+
+        <!-- Result Modal -->
+        <transition enter-active-class="transition duration-500 cubic-bezier(0.19, 1, 0.22, 1)"
+                enter-from-class="transform scale-50 opacity-0 translate-y-10"
+                enter-to-class="transform scale-100 opacity-100 translate-y-0"
+                leave-active-class="transition duration-200 ease-in"
+                leave-from-class="transform scale-100 opacity-100"
+                leave-to-class="transform scale-95 opacity-0">
+                <div v-if="showResultModal"
+                        class="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-md px-4"
+                        @click.self="closeResultModal()">
+                        <div
+                                class="bg-gradient-to-b from-zinc-800 to-black border border-yellow-500 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_0_100px_rgba(234,179,8,0.3)] relative overflow-visible">
+                                <div class="absolute -top-16 left-1/2 -translate-x-1/2 w-32 h-32">
+                                        <div
+                                                class="absolute inset-0 bg-yellow-500/50 rounded-full blur-[40px] animate-pulse">
+                                        </div>
+                                        <div
+                                                class="relative w-full h-full flex items-center justify-center text-7xl drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] animate-bounce">
+                                                🎁
+                                        </div>
+                                </div>
+
+                                <div class="mt-12 space-y-2">
+                                        <h2
+                                                class="text-xl md:text-lg font-black bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 via-yellow-500 to-yellow-200 uppercase tracking-widest drop-shadow-sm font-serif">
+                                                CONGRATULATIONS!
+                                        </h2>
+                                        <p class="text-yellow-100/60 text-sm font-medium tracking-wider">YOU HAVE RECEIVED</p>
+                                </div>
+
+                                <div class="my-8 py-4 bg-yellow-900/10 border-y border-yellow-500/20">
+                                        <h3 v-if="resultPrize"
+                                                class="text-2xl md:text-3xl font-bold text-yellow-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-2 mb-2">
+                                                {{ resultPrize.username }}
+                                        </h3>
+                                        <div v-if="resultPrize.username" class="space-y-2">
+                                                <p class="text-lg text-yellow-300">
+                                                        <span class="font-semibold">Username:</span> <code class="bg-slate-900">{{ resultPrize.username }}</code>
+                                                </p>
+                                                <p v-if="resultPrize.password" class="text-lg text-yellow-300">
+                                                        <span class="font-semibold">Password:</span> <code class="bg-slate-900">{{ resultPrize.password }}</code> 
+                                                </p>
+                                                <p v-if="resultPrize.email" class="text-lg text-yellow-300">
+                                                        <span class="font-semibold">Email:</span> <code class="bg-slate-900">{{ resultPrize.email }}</code>
+                                                </p>
+                                        </div>
+                                </div>
+
+                                <button @click="closeResultModal()"
+                                        class="w-full px-8 py-3.5 rounded-xl bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-400 text-black text-lg font-bold hover:shadow-[0_0_30px_rgba(234,179,8,0.6)] hover:-translate-y-1 transition-all transform uppercase tracking-widest shadow-lg">
+                                        Close
+                                </button>
+                        </div>
+                </div>
+        </transition>
 </template>
 
 <style scoped>
