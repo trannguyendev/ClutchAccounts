@@ -65,7 +65,7 @@ public class AccountsController {
 	@GetMapping("/random/acc-fa/list-acc")
 	public ResponseEntity<?> getInfoAccRandFA(){
 		try {
-			return ResponseEntity.ok(accRepo.getInfoAcc("RANDOM_FA"));
+			return ResponseEntity.ok(accServ.getList5RandomFA());
 		}
 		catch(RuntimeException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));

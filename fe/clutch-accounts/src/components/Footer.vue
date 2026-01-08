@@ -22,7 +22,7 @@
                   <h2 class="mb-6 text-sm font-semibold uppercase text-amber-400">Resources</h2>
                   <ul class="text-gray-400 font-medium">
                       <li class="mb-4">
-                          <a href="/">Clutch Account</a>
+                          <a href="/main">Clutch Account</a>
                       </li>
                   </ul>
               </div>
