@@ -1,5 +1,8 @@
 package com.kingdomeprotocol.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,6 +107,16 @@ public BuyRes buyRandomAcc(String email, String type) {
 	
 	transRepo.save(tx);
 	return new BuyRes(acc.getUsername(), acc.getEmail(), acc.getAccount_psw());
+}
+
+//Get 5 acc for random spin:)
+public List<?> getList5RandomFA(){
+	List<?> accRandomFA = new ArrayList<>();
+	accRandomFA = accRepo.get5InfoAccFA("RANDOM_FA");
+	if (accRandomFA.isEmpty()) {
+		throw new RuntimeException("This kind of account has been sold out");
+	}
+	return accRandomFA;
 }
 public record BuyRes(String username, String email, String password) {}
 }
