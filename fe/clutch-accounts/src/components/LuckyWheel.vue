@@ -1,44 +1,45 @@
-<script setup lang="ts">
-import { ref, computed} from 'vue';
-
-// --------------------------------------------------------------------------
-// 1. Interfaces & Types
-// --------------------------------------------------------------------------
-export interface Prize {
-    id: number | string;
-    label: string;
-    color: string; // Background color của slice
-    text: string;  // Text color
-    value?: any;
-}
-
-interface Props {
-    prizes: Prize[];          // Danh sách phần thưởng
-    size?: number | string;   // Kích thước vòng quay (px hoặc rem)
-    duration?: number;        // Thời gian quay (giây)
-    borderWidth?: number;     // Độ dày viền (px)
-}
+<script setup>
+import { ref, computed } from 'vue';
 
 // --------------------------------------------------------------------------
 // 2. Props & Emits
 // --------------------------------------------------------------------------
-const props = withDefaults(defineProps<Props>(), {
-    size: 500, // Default size 500px
-    duration: 6,
-    borderWidth: 10
+const props = defineProps({
+    prizes: {
+        type: Array,
+        required: true,
+        // Dạng của mỗi phần tử trong mảng prizes (tham khảo):
+        // {
+        //     id: number | string,
+        //     label: string,
+        //     color: string,
+        //     text: string,
+        //     image?: string,
+        //     value?: any
+        // }
+    },
+    size: {
+        type: [Number, String],
+        default: 500
+    },
+    duration: {
+        type: Number,
+        default: 6
+    },
+    borderWidth: {
+        type: Number,
+        default: 10
+    }
 });
 
-const emit = defineEmits<{
-    (e: 'spin-end', prize: Prize): void;
-    (e: 'spin-start'): void;
-}>();
+const emit = defineEmits(['spin-end', 'spin-start']);
 
 // --------------------------------------------------------------------------
 // 3. State Management
 // --------------------------------------------------------------------------
 const isSpinning = ref(false);
 const currentRotation = ref(0); // Tổng số độ đã quay
-const wheelRef = ref<HTMLElement | null>(null);
+const wheelRef = ref(null);
 
 // --------------------------------------------------------------------------
 // 4. Computed Logic (SVG Calculation)
@@ -52,7 +53,7 @@ const CENTER = SVG_SIZE / 2;
 const RADIUS = SVG_SIZE / 2;
 
 // Hàm tính đường dẫn SVG (d hình rẻ quạt) cho miếng thứ i
-const getSectorPath = (index: number) => {
+const getSectorPath = (index) => {
     const startAngle = index * segmentAngle.value;
     const endAngle = (index + 1) * segmentAngle.value;
 
@@ -74,7 +75,7 @@ const getSectorPath = (index: number) => {
 };
 
 // Hàm tính rotation cho text để nó nằm giữa miếng và hướng về tâm
-const getTextRotation = (index: number) => {
+const getTextRotation = (index) => {
     // Góc giữa của miếng
     const angle = (index * segmentAngle.value) + (segmentAngle.value / 2);
     // Text rotation: xoay theo góc slice
@@ -84,7 +85,7 @@ const getTextRotation = (index: number) => {
 // --------------------------------------------------------------------------
 // 5. Spin Logic (Core Feature)
 // --------------------------------------------------------------------------
-const spin = (targetIndex: number) => {
+const spin = (targetIndex) => {
     if (isSpinning.value) return;
     if (targetIndex < 0 || targetIndex >= totalPrizes.value) {
         console.warn("Invalid target index");
@@ -98,12 +99,6 @@ const spin = (targetIndex: number) => {
     // Góc tâm của miếng target:
     const targetSegmentAngle = (targetIndex * segmentAngle.value) + (segmentAngle.value / 2);
 
-    // Để đưa targetSegmentAngle về 0 (top), ta cần quay ngược chiều (hoặc quay đĩa thuận chiều sao cho góc này trùng kim).
-    // Vì CSS rotate quay thuận chiều kim đồng hồ (+), nên:
-    // Vị trí hiện tại trên vòng tròn (mod 360): (currentRotation % 360)
-    // Ta muốn vị trí MỚI sao cho: (NewRotation + targetSegmentAngle) % 360 == 0 (tức là trùng vị trí 12h ban đầu sau khi xoay) -> SAI.
-
-    // Đúng hơn:
     // Kim cố định ở 12h.
     // Miếng số 0 bắt đầu từ 12h (do logic vẽ SVG start -90 radian).
     // Miếng i nằm ở góc (i * angle).
@@ -171,23 +166,30 @@ defineExpose({
                     <!-- Đường path rẻ quạt (Normal State) -->
                     <path :d="getSectorPath(index)" :fill="prize.color" stroke="#FDB931" stroke-width="0.5" />
 
-                    <!-- Text và Icon (Normal) -->
+                    <!-- Text và Icon (Normal) - Adjusted for compatibility with Images -->
                     <g :transform="getTextRotation(index)">
                         <foreignObject x="38" y="4" width="24" height="42">
                             <div
-                                class="flex flex-col items-center justify-start h-full w-full pt-1 pointer-events-none">
+                                class="flex flex-col items-center justify-start h-full w-full pt-2 pointer-events-none">
+                                <!-- Image (if exists) -->
+                                <img v-if="prize.image" :src="prize.image"
+                                    class="w-4 h-4 object-contain mb-1 drop-shadow-sm" alt="prize-icon" />
+
+                                <!-- Label -->
                                 <div class="text-[0.22rem] md:text-[0.25rem] font-bold uppercase tracking-widest text-center leading-none shadow-sm pb-1"
                                     style="writing-mode: vertical-rl; text-orientation: mixed;"
                                     :style="{ color: prize.text }">
                                     {{ prize.label }}
                                 </div>
-                                <div class="text-[0.3rem] mt-1 opacity-80" :style="{ color: prize.text }">♦</div>
+
+                                <!-- Decorative Icon (only if no image) -->
+                                <div v-if="!prize.image" class="text-[0.3rem] mt-1 opacity-80"
+                                    :style="{ color: prize.text }">♦</div>
                             </div>
                         </foreignObject>
                     </g>
                 </g>
 
-                <!-- Highlighted Slice (Rendered on TOP) -->
 
             </svg>
         </div>
