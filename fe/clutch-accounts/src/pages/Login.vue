@@ -300,7 +300,7 @@ const handleSignup = async () => {
                                 <div class="relative">
                                     <input v-model="loginForm.password" :type="isShowingPswLogin ? 'text' : 'password'"
                                         class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 pr-12 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
-                                        placeholder="Enter your password" id="psw-login" required>
+                                        placeholder="Enter your password" id="psw-login" required autocomplete="on">
                                     <button type="button" @click="togglePswVisibility"
                                         class="absolute right-3 top-1/2 transform -translate-y-1/2 text-amber-200">
                                         <i :class="isShowingPswLogin ? 'fa fa-eye' : 'fa fa-eye-slash'"
@@ -338,7 +338,7 @@ const handleSignup = async () => {
                                 <label class="block text-sm font-medium text-gray-300 mb-2" for="email">Email</label>
                                 <input v-model="signupForm.email" type="email"
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
-                                    placeholder="Enter your email" id="email" required>
+                                    placeholder="Enter your email" id="email" required autocomplete="on">
                                 <button>
 
                                 </button>
@@ -348,7 +348,7 @@ const handleSignup = async () => {
                                     for="pw-reg">Password</label>
                                 <input v-model="signupForm.password" :type="isShowingPswSignup ? 'text' : 'password'"
                                     class="w-full bg-black/50 border border-amber-900/30 rounded-lg px-4 py-3 pr-12 text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
-                                    placeholder="Create a password" id="pw-reg" required>
+                                    placeholder="Create a password" id="pw-reg" required autocomplete="current-password">
                                 <button type="button" @click="togglePswVisibilitySignup"
                                     class="absolute right-3 top-1/2 transform translate-y-[0.5] text-amber-200">
                                     <i :class="isShowingPswSignup ? 'fa fa-eye' : 'fa fa-eye-slash'"
@@ -363,7 +363,7 @@ const handleSignup = async () => {
 
                         <div class="text-sm text-gray-400">
                             <label class="flex items-center">
-                                <input type="checkbox" class="mr-2 accent-amber-500" required>
+                                <input type="checkbox" class="mr-2 accent-amber-500" required id="checkbox-license">
                                 <span> I agree to the <a href="#" class="text-amber-500 transition-all delay-150 hover:underline"> Terms of Service and Privacy Policy
                                     </a></span>
                             </label>
