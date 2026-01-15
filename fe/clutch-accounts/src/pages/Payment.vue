@@ -6,7 +6,6 @@ import mainBackground from '@/img/main-background.jpg'
 import { useUserStore } from '@/stores/user'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
-
 const userDeposit = useUserStore()
 const route = useRoute()
 const router = useRouter()
@@ -17,10 +16,9 @@ const requestLoading = ref(false)
 const qrVisible = ref(false)
 const qrSrc = ref('')
 const error = ref('')
-
+const orderCode = ref(null)
 // Methods
 const confirmPayment = async () => {
-    error.value = ''
     // basic validation
     const num = parseFloat(amount.value)
     if (!num || num < 10000) {
@@ -34,25 +32,20 @@ const confirmPayment = async () => {
 
     try {
         // Construct QR URL
-        const qrUrl = `https://api.vietqr.io/image/970422-0867514526-bbP8BGH.jpg?accountName=TRAN%20DO%20KHOI%20NGUYEN&amount=${amount.value}&addInfo=${transactionContent}`
-
-        // Fetch and validate image loads properly
-        await new Promise((resolve, reject) => {
-            const img = new Image()
-            img.onload = () => {
-                qrSrc.value = qrUrl
-                loading.value = false
-                resolve()
-            }
-            img.onerror = () => {
-                loading.value = false
-                error.value = 'Failed to load QR code. Please try again.'
-                qrVisible.value = false
-                reject(new Error('Image load failed'))
-            }
-            img.src = qrUrl
+        await axios.post("/api/payment/request-deposit", {
+            email: userDeposit.username,
+            amount: amount.value,
+            descrp: transactionContent
         })
-
+        .then((res) => {
+            console.log(res)
+            qrSrc.value = res.data.checkoutUrl;
+            console.log("QR URL: ", qrSrc.value);
+            console.log("length of QR: ", qrSrc.value.length)
+            orderCode.value = res.data.orderCode;
+        })
+        .catch(err => console.log(err))
+        loading.value = false
         console.log("QR SRC: ", qrSrc.value)
     } catch (err) {
         console.error('Error generating QR:', err)
@@ -93,6 +86,8 @@ const hideQr = () => {
     qrVisible.value = false
     qrSrc.value = ''
     loading.value = false
+    axios.put(`/api/payment/cancel/${orderCode.value}`)
+    .then(console.log("Cancelled order: ", orderCode.value))
 }
 const goBack = () => {
     router.back()
@@ -112,7 +107,7 @@ const goBack = () => {
                 <label class="block">
                     <span class="text-amber-200 text-sm font-semibold">Amount</span>
                     <div class="mt-2 flex items-center gap-3">
-                        <input v-model="amount" type="number" min="10000" step="10000"
+                            <input v-model="amount" type="number" min="10000" step="10000"
                             placeholder="Enter amount greater than 10000"
                             class="w-full bg-black/40 border border-amber-700/30 rounded-md px-4 py-3 text-amber-100 placeholder-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 hover:border-amber-700/60 hover:bg-black/50 transition" />
                         <button @click="confirmPayment" :disabled="loading"
@@ -150,10 +145,8 @@ const goBack = () => {
                             </div>
                         </div>
                         <!-- QR image -->
-                        <img v-else-if="qrSrc" :src="qrSrc" alt="QR code" class="w-64 h-64 object-contain" />
-                        <div v-else class="w-64 h-64 flex items-center justify-center text-amber-400">
-                            <i class="fa fa-exclamation-circle" aria-hidden="true"></i>Unable to load QR
-                        </div>
+                        <iframe v-else-if="qrSrc" :src="qrSrc" width="400" height="400" frameborder="0"
+                            class="mx-auto"></iframe>
                     </div>
                     <button @click="checkPaymentStatus" :disabled="requestLoading"
                         class="mt-4 w-full px-4 py-3 rounded-md bg-amber-600 hover:bg-amber-700 text-black font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed">

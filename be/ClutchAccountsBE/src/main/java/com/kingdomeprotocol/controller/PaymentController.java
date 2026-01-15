@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,34 +17,58 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kingdomeprotocol.model.DTODepositModel;
 import com.kingdomeprotocol.model.UserModel;
 import com.kingdomeprotocol.repository.TransactionRepository;
+import com.kingdomeprotocol.service.PayOsService;
 import com.kingdomeprotocol.service.PaymentService;
 import com.kingdomeprotocol.service.UserService;
-
+import com.kingdomeprotocol.utils.PayOsConfig;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import vn.payos.PayOS;
+import vn.payos.model.v2.paymentRequests.PaymentLink;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/payment")
 public class PaymentController {
 
+    private final PayOsService payOsService;
 	private final TransactionRepository transRepo;
 	private final PaymentService payServ;
 	private final UserService userServ;
+	private final PayOS payOs;
+//	@PostMapping("/request-deposit")
+//	public ResponseEntity<?> depositUser(@Valid @RequestBody DTODepositModel depositData){
+//		try {
+//			payServ.addTransactionReq(depositData);
+//			return ResponseEntity.ok(Map.of("message", "Waiting for admin approve"));
+//		}
+//		catch(RuntimeException e) {
+//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Not found user"));
+//		}
+//		catch (Exception e) {
+//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+//		}
+//	}
 	@PostMapping("/request-deposit")
-	public ResponseEntity<?> depositUser(@Valid @RequestBody DTODepositModel depositData){
+	public ResponseEntity<?> createPayment(@Valid @RequestBody DTODepositModel depositData){
 		try {
-			payServ.addTransactionReq(depositData);
-			return ResponseEntity.ok(Map.of("message", "Waiting for admin approve"));
+			return ResponseEntity.ok(payOsService.createQR(depositData.getEmail(), depositData.getAmount(), depositData.getDescrp()));
 		}
-		catch(RuntimeException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Not found user"));
-		}
-		catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+		catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
 		}
 	}
-	
+	@PutMapping("/cancel/{orderCode}")
+	public ResponseEntity<?> cancelPayment(@PathVariable("orderCode") long orderCode){
+		try {
+			PaymentLink order = payOs.paymentRequests().cancel(orderCode, "User cancel payment");
+			return ResponseEntity.ok(order);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+		}
+	}
 	@PostMapping("/approve/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> approveTrans(@PathVariable int id){
