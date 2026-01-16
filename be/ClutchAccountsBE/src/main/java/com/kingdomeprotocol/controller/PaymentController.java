@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.kingdomeprotocol.model.DTODepositModel;
 import com.kingdomeprotocol.model.UserModel;
 import com.kingdomeprotocol.repository.TransactionRepository;
@@ -25,6 +26,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import vn.payos.PayOS;
 import vn.payos.model.v2.paymentRequests.PaymentLink;
+import vn.payos.model.webhooks.ConfirmWebhookResponse;
+import vn.payos.model.webhooks.WebhookData;
 
 @RestController
 @RequiredArgsConstructor
@@ -68,6 +71,24 @@ public class PaymentController {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
 		}
+	}
+	@PostMapping("/callback")
+	public ResponseEntity<?> callBackFunc (@RequestBody Object body) throws JsonProcessingException, IllegalArgumentException{
+		try {
+			WebhookData webhookRes = (WebhookData) payOs.webhooks().verify(body);
+			return ResponseEntity.ok(webhookRes);
+		}
+		catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+		}
+	}
+	@PostMapping("/create/success-log")
+	public void createSuccess(@RequestBody DTODepositModel data) {
+		payServ.addSuccessTransaction(data);
+	}
+	@PostMapping("/create/cancelled-log")
+	public void createCancelled(@RequestBody DTODepositModel data) {
+		payServ.addCancelledTransaction(data);
 	}
 	@PostMapping("/approve/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
