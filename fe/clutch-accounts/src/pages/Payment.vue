@@ -87,7 +87,17 @@ const hideQr = () => {
     qrSrc.value = ''
     loading.value = false
     axios.put(`/api/payment/cancel/${orderCode.value}`)
-    .then(console.log("Cancelled order: ", orderCode.value))
+    .then(() => {
+        axios.post("/api/payment/create/cancelled-log", {
+            email: userDeposit.username,
+            amount: amount.value,
+            descrp: transactionContent,
+        })
+    })
+    .catch(err => {
+        console.error('Error cancelling order:', err)
+        return;
+    })
 }
 const goBack = () => {
     router.back()
