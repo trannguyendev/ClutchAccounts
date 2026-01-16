@@ -33,11 +33,11 @@ public class PayOsService {
 	private String cancelUrl;
 	@Value("${payos.checksum-key}")
 	private String checkSum;
-	//generate QR for FE:)
+	//generate pay form for embed in  FE:)
 	public Map<String, Object> createQR(String email, int amount, String descrp){
 		UserModel user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("Not found user"));
 		
-		long transactionCode =System.currentTimeMillis() / 1000;
+		long transactionCode =(System.currentTimeMillis() / 1000)+user.getId();
 		CreatePaymentLinkRequest payData = CreatePaymentLinkRequest.builder().orderCode(transactionCode).amount(Long.parseLong(String.valueOf(amount))).description(descrp).cancelUrl(cancelUrl).returnUrl(returnUrl).build();
 		CreatePaymentLinkResponse resPayment = payOs.paymentRequests().create(payData);
 		
@@ -45,7 +45,6 @@ public class PayOsService {
 		resData.put("orderCode", resPayment.getOrderCode());
 		resData.put("qrUrl", resPayment.getQrCode());
 		resData.put("checkoutUrl", resPayment.getCheckoutUrl());
-		
 		return resData;
 	}
 }
