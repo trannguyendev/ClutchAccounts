@@ -13,7 +13,7 @@
         <div class="md:flex md:justify-between">
           <div class="mb-6 md:mb-0">
               <a href="#" class="flex items-center">
-                  <img src="../img/logo.png" class="h-8 me-3" alt="Team Logo" />
+                  <img src="../img/Logo.png" class="h-8 me-3" alt="Team Logo" />
                   <span class="self-center text-2xl font-semibold whitespace-nowrap text-amber-400">Erik Tran</span>
               </a>
           </div>
