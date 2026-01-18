@@ -22,11 +22,16 @@ import com.kingdomeprotocol.service.PayOsService;
 import com.kingdomeprotocol.service.PaymentService;
 import com.kingdomeprotocol.service.UserService;
 import com.kingdomeprotocol.utils.PayOsConfig;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import vn.payos.PayOS;
+import vn.payos.model.v1.payouts.Payout;
 import vn.payos.model.v2.paymentRequests.PaymentLink;
 import vn.payos.model.webhooks.ConfirmWebhookResponse;
+import vn.payos.model.webhooks.Webhook;
 import vn.payos.model.webhooks.WebhookData;
 
 @RestController
@@ -55,14 +60,15 @@ public class PaymentController {
 	@PostMapping("/request-deposit")
 	public ResponseEntity<?> createPayment(@Valid @RequestBody DTODepositModel depositData){
 		try {
-			return ResponseEntity.ok(payOsService.createQR(depositData.getEmail(), depositData.getAmount(), depositData.getDescrp()));
+			String baseUrl = "https://xfnmcvk7-5173.asse.devtunnels.ms";
+			return ResponseEntity.ok(payOsService.createQR(baseUrl, depositData.getEmail(), depositData.getAmount(), depositData.getDescrp()));
 		}
 		catch(Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
 		}
 	}
 	@PutMapping("/cancel/{orderCode}")
-	public ResponseEntity<?> cancelPayment(@PathVariable("orderCode") long orderCode){
+	public ResponseEntity<?> cancelPayment(@PathVariable long orderCode){
 		try {
 			PaymentLink order = payOs.paymentRequests().cancel(orderCode, "User cancel payment");
 			return ResponseEntity.ok(order);
@@ -73,18 +79,21 @@ public class PaymentController {
 		}
 	}
 	@PostMapping("/callback")
-	public ResponseEntity<?> callBackFunc (@RequestBody Object body) throws JsonProcessingException, IllegalArgumentException{
+	public ResponseEntity<?> callBackFunc (@RequestBody Webhook webhook) throws JsonProcessingException, IllegalArgumentException{
 		try {
-			WebhookData webhookRes = (WebhookData) payOs.webhooks().verify(body);
-			return ResponseEntity.ok(webhookRes);
+			WebhookData webhookRes = (WebhookData) payOs.webhooks().verify(webhook);
+			String desc = webhookRes.getDescription();
+			String amountStr = String.valueOf(webhookRes.getAmount());
+			int amount = Integer.parseInt(amountStr);
+			Integer id = Integer.parseInt(desc.split(" ")[1]);
+			if (id != null ) {
+				payServ.addSuccessAndDepositTransaction(id, desc, amount);
+			}
+			return ResponseEntity.ok("Successfully deposit for user");
 		}
 		catch(Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
 		}
-	}
-	@PostMapping("/create/success-log")
-	public void createSuccess(@RequestBody DTODepositModel data) {
-		payServ.addSuccessTransaction(data);
 	}
 	@PostMapping("/create/cancelled-log")
 	public void createCancelled(@RequestBody DTODepositModel data) {
@@ -107,7 +116,7 @@ public class PaymentController {
 	
 	@PostMapping("/reject/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> rejectTrans(@PathVariable("id") int id){
+	public ResponseEntity<?> rejectTrans(@PathVariable int id){
 		try {
 			payServ.rejectTransaction(id);
 			return ResponseEntity.ok(Map.of("message", "Rejected transaction with id: "+id));
