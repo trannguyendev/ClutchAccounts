@@ -18,6 +18,7 @@ import UserInfo from '@/pages/UserInfo.vue'
 import ForgotPass from '@/pages/ForgotPass.vue'
 import UserTransactionAndBoughtLog from '@/pages/UserTransactionAndBoughtLog.vue'
 import PaymentCancel from '@/components/PaymentCancel.vue'
+import PaymentSuccess from '@/components/PaymentSuccess.vue'
 
 
 
@@ -120,6 +121,7 @@ const routes = [
   {
     path: '/payment-success',
     namne: 'payment-success',
+    component: PaymentSuccess
   },
   {
     path: '/payment-cancel',
