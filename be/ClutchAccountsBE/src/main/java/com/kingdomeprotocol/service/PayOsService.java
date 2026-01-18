@@ -27,18 +27,18 @@ public class PayOsService {
 	private final UserRepository userRepo;
 	private final TransactionRepository transactionRepo;
 	
-	@Value("${payos.return-url}")
-	private String returnUrl;
-	@Value("${payos.cancel-url}")
-	private String cancelUrl;
 	@Value("${payos.checksum-key}")
 	private String checkSum;
 	//generate pay form for embed in  FE:)
-	public Map<String, Object> createQR(String email, int amount, String descrp){
+	public Map<String, Object> createQR(String baseUrl, String email, int amount, String descrp){
 		UserModel user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("Not found user"));
 		
-		long transactionCode =(System.currentTimeMillis() / 1000)+user.getId();
-		CreatePaymentLinkRequest payData = CreatePaymentLinkRequest.builder().orderCode(transactionCode).amount(Long.parseLong(String.valueOf(amount))).description(descrp).cancelUrl(cancelUrl).returnUrl(returnUrl).build();
+		String transactionCode = String.format("%d%d%04d",
+			    System.currentTimeMillis() / 1000,  
+			    user.getId(),
+			    (int) (Math.random() * 10000)      
+			);
+		CreatePaymentLinkRequest payData = CreatePaymentLinkRequest.builder().orderCode(Long.parseLong(transactionCode)).amount(Long.parseLong(String.valueOf(amount))).description(descrp).cancelUrl(baseUrl+"/payment-cancel").returnUrl(baseUrl+"/payment-success").build();
 		CreatePaymentLinkResponse resPayment = payOs.paymentRequests().create(payData);
 		
 		Map<String, Object> resData = new HashMap<>();
@@ -47,4 +47,6 @@ public class PayOsService {
 		resData.put("checkoutUrl", resPayment.getCheckoutUrl());
 		return resData;
 	}
+	
+//	public void handleWebhook(WebhookDat) {}
 }
