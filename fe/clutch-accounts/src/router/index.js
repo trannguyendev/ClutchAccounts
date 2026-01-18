@@ -17,6 +17,7 @@ import AdminVLRAccount from '@/components/AdminVLRAccount.vue'
 import UserInfo from '@/pages/UserInfo.vue'
 import ForgotPass from '@/pages/ForgotPass.vue'
 import UserTransactionAndBoughtLog from '@/pages/UserTransactionAndBoughtLog.vue'
+import PaymentCancel from '@/components/PaymentCancel.vue'
 
 
 
@@ -115,6 +116,15 @@ const routes = [
     name: 'payment',
     component: Payment,
     meta: { requiresAuth: true , roles: ['user', 'admin']},
+  },
+  {
+    path: '/payment-success',
+    namne: 'payment-success',
+  },
+  {
+    path: '/payment-cancel',
+    name: 'payment-cancel',
+    component: PaymentCancel
   },
   //Path to function of submenu page
   {
