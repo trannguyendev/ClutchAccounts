@@ -45,7 +45,7 @@ const loadPurchasedAcc = async () => {
     })
     console.log(res.data)
     username.value = res.data.username
-    password.value = res.data.account_psw
+    password.value = res.data.password
     emailAcc.value = res.data.email
     return res.data
   } catch (err) {
@@ -307,8 +307,8 @@ onMounted(() => {
       <div>
         <div class="text-xs text-slate-400">Username</div>
         <div class="flex items-center justify-between mt-1">
-          <div class="font-mono text-amber-300 text-lg">{{ username.value }}</div>
-          <button @click="copyToClipboard(username.value, 'username')" class="ml-4 px-3 py-1 rounded bg-slate-700 text-white">Copy</button>
+          <div class="font-mono text-amber-300 text-lg">{{ username }}</div>
+          <button @click="copyToClipboard(username, 'username')" class="ml-4 px-3 py-1 rounded bg-slate-700 text-white">Copy</button>
         </div>
         <div v-if="copiedField === 'username'" class="text-xs text-emerald-400 mt-1">Đã copy username</div>
       </div>
@@ -316,8 +316,8 @@ onMounted(() => {
       <div>
         <div class="text-xs text-slate-400">Password</div>
         <div class="flex items-center justify-between mt-1">
-          <div class="font-mono text-amber-300 text-lg">{{ password.value }}</div>
-          <button @click="copyToClipboard(password.value, 'account_psw')" class="ml-4 px-3 py-1 rounded bg-slate-700 text-white">Copy</button>
+          <div class="font-mono text-amber-300 text-lg">{{ password }}</div>
+          <button @click="copyToClipboard(password, 'password')" class="ml-4 px-3 py-1 rounded bg-slate-700 text-white">Copy</button>
         </div>
         <div v-if="copiedField === 'password'" class="text-xs text-emerald-400 mt-1">Đã copy password</div>
       </div>
