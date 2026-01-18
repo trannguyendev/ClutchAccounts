@@ -4,8 +4,9 @@ import { RouterLink } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 
 const currentUser = useUserStore()
-const username = currentUser.username
-const transactionContent = `NAP%20${username}`
+const id = currentUser.id
+const currentTime = Date.now()
+const transactionContent = `DEPOSIT ${id} ${currentTime}`
 const isMenuOpen = ref(false)
 
 const toggleMenu = () => {
