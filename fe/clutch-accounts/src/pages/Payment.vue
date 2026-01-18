@@ -6,6 +6,7 @@ import mainBackground from '@/img/main-background.jpg'
 import { useUserStore } from '@/stores/user'
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
+// State
 const userDeposit = useUserStore()
 const route = useRoute()
 const router = useRouter()
@@ -17,8 +18,11 @@ const qrVisible = ref(false)
 const qrSrc = ref('')
 const error = ref('')
 const orderCode = ref(null)
+
+
 // Methods
 const confirmPayment = async () => {
+    console.log("TRANSACTION CONTENT: ", transactionContent)
     // basic validation
     const num = parseFloat(amount.value)
     if (!num || num < 10000) {
@@ -29,7 +33,7 @@ const confirmPayment = async () => {
     loading.value = true
     qrVisible.value = true
     qrSrc.value = ''
-
+    
     try {
         // Construct QR URL
         await axios.post("/api/payment/request-deposit", {
@@ -40,6 +44,7 @@ const confirmPayment = async () => {
         .then((res) => {
             console.log(res)
             qrSrc.value = res.data.checkoutUrl;
+            window.location.href = qrSrc.value;
             console.log("QR URL: ", qrSrc.value);
             console.log("length of QR: ", qrSrc.value.length)
             orderCode.value = res.data.orderCode;
@@ -86,7 +91,11 @@ const hideQr = () => {
     qrVisible.value = false
     qrSrc.value = ''
     loading.value = false
-    axios.put(`/api/payment/cancel/${orderCode.value}`)
+    axios.put(`/api/payment/cancel/${orderCode.value}`, {}, {
+        headers: {
+            targetAddressSpace: 'private'
+        }
+    })
     .then(() => {
         axios.post("/api/payment/create/cancelled-log", {
             email: userDeposit.username,
