@@ -1,5 +1,6 @@
 package com.kingdomeprotocol.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,5 +31,20 @@ public interface AccForSellRepository extends JpaRepository<AccForSellModel, Int
 		Integer getAccount_id();
 		Integer getPrice();
 		String getAccount_type();
+	}
+	@Query(value = "", nativeQuery = true)
+	List<customInfoAccAdmin> getAllCurrentAcc();
+	interface customInfoAccAdmin{
+		Integer getAccount_id();
+		String getEmail();
+		String getUsername();
+		String getPassword();
+		LocalDateTime getListed_at();
+		boolean getIsSold();
+		boolean getIsLocked();
+		LocalDateTime getLockedUntil();
+		Integer getPrice();
+		String getAccount_type();
+		String getImage_url();
 	}
 }

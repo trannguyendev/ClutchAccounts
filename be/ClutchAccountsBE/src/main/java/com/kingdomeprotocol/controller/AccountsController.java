@@ -1,12 +1,16 @@
 package com.kingdomeprotocol.controller;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -95,4 +99,50 @@ public class AccountsController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
 		}
 	}
+	@GetMapping("/list-acc")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> displayAccInfoAdmin(){
+		try {
+			return ResponseEntity.ok(accRepo.findAll());
+		}
+		catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+		}
+	}
+	//Update vlr accs
+	@PutMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> updateVlrAcc(@RequestBody DTOupdateAcc data){}
+	
+	//Delete vlr acc
+	@DeleteMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> deleteAcc(){}
+	
+	//Create new 
+	@PostMapping("/new")
+	public ResponseEntity<?> createNew(){}
+	public record DTOnewAcc(
+			String email,
+			String username,
+			String password,
+			Integer price,
+			LocalDateTime listed_at,
+			Boolean isSold,
+			Boolean isLocked,
+			LocalDateTime lockedUntil,
+			String account_type,
+			String image_url
+			) {}
+	public record DTOupdateAcc(
+	        String email,
+	        String username,
+	        String password,
+	        Integer price,
+	        LocalDateTime listed_at,
+	        Boolean isSold,
+	        Boolean isLocked,
+	        LocalDateTime lockedUntil,
+	        String account_type
+	    ) {}
 }
