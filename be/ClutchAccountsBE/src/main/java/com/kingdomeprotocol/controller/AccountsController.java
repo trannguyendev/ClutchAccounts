@@ -109,19 +109,19 @@ public class AccountsController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
 		}
 	}
-	//Update vlr accs
-	@PutMapping("/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> updateVlrAcc(@RequestBody DTOupdateAcc data){}
-	
-	//Delete vlr acc
-	@DeleteMapping("/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> deleteAcc(){}
-	
-	//Create new 
-	@PostMapping("/new")
-	public ResponseEntity<?> createNew(){}
+//	//Update vlr accs
+//	@PutMapping("/{id}")
+//	@PreAuthorize("hasRole('ADMIN')")
+//	public ResponseEntity<?> updateVlrAcc(@RequestBody DTOupdateAcc data){}
+//	
+//	//Delete vlr acc
+//	@DeleteMapping("/{id}")
+//	@PreAuthorize("hasRole('ADMIN')")
+//	public ResponseEntity<?> deleteAcc(){}
+//	
+//	//Create new 
+//	@PostMapping("/new")
+//	public ResponseEntity<?> createNew(){}
 	public record DTOnewAcc(
 			String email,
 			String username,
