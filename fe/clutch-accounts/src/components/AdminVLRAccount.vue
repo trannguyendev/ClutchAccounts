@@ -150,188 +150,355 @@
     </div>
 
     <!-- Add/Edit Account Modal -->
-    <div v-if="showAddModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div class="bg-[#1a1a1a] border border-amber-900/50 rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <h2 class="text-xl font-bold text-amber-300 mb-4">
-          {{ editingAccount ? 'Edit Valorant Account' : 'Add New Valorant Account' }}
-        </h2>
+    <Transition name="modal-fade">
+      <div v-if="showAddModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <Transition name="modal-scale">
+          <div class="bg-[#1a1a1a] border border-amber-900/50 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-content">
+            <h2 class="text-xl font-bold text-amber-300 mb-4 flex items-center gap-2">
+              <i :class="editingAccount ? 'fa-solid fa-pen-to-square' : 'fa-solid fa-plus-circle'" class="text-amber-500"></i>
+              {{ editingAccount ? 'Edit Valorant Account' : 'Add New Valorant Account' }}
+            </h2>
 
-        <div class="space-y-4 mb-6">
-          <div>
-            <label class="block text-sm text-amber-200 mb-1">Email <span class="text-red-400">*</span></label>
-            <input
-              v-model="formData.email"
-              type="email"
-              placeholder="account@example.com"
-              class="w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm text-amber-200 mb-1">Username <span class="text-red-400">*</span></label>
-            <input
-              v-model="formData.username"
-              type="text"
-              placeholder="Username"
-              class="w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm text-amber-200 mb-1">Password <span class="text-red-400">*</span></label>
-            <input
-              v-model="formData.password"
-              type="text"
-              placeholder="Password"
-              class="w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600"
-            />
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm text-amber-200 mb-1">Price (VND) <span class="text-red-400">*</span></label>
-              <input
-                v-model.number="formData.price"
-                type="number"
-                min="0"
-                placeholder="0"
-                class="w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm text-amber-200 mb-1">Account Type <span class="text-red-400">*</span></label>
-              <select
-                v-model="formData.account_type"
-                class="w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600"
+            <!-- Account Info Section -->
+            <div class="mb-6">
+              <div
+                @click="toggleSection('accountInfo')"
+                class="flex items-center justify-between cursor-pointer p-3 bg-amber-900/20 rounded-lg hover:bg-amber-900/30 transition-all duration-300 mb-3"
               >
-                <option value="RANDOM_FA">RANDOM_FA</option>
-                <option value="RANDOM_NFA">RANDOM_NFA</option>
-                <option value="DROP_MAIL">DROP_MAIL</option>
-                <option value="SIEU_SALE">SIEU_SALE</option>
-              </select>
+                <h3 class="text-sm font-semibold text-amber-300 flex items-center gap-2">
+                  <i class="fa-solid fa-user-shield"></i> Account Information
+                </h3>
+                <i :class="expandedSections.accountInfo ? 'fa-chevron-up' : 'fa-chevron-down'" class="fa-solid text-amber-400 transition-transform duration-300"></i>
+              </div>
+              
+              <Transition name="slide-fade">
+                <div v-show="expandedSections.accountInfo" class="space-y-4 pl-2 border-l-2 border-amber-900/30 ml-2">
+                  <div class="form-group">
+                    <label class="block text-sm text-amber-200 mb-1">Email <span class="text-red-400">*</span></label>
+                    <input
+                      v-model="formData.email"
+                      type="email"
+                      placeholder="account@example.com"
+                      class="form-input w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="block text-sm text-amber-200 mb-1">Username <span class="text-red-400">*</span></label>
+                    <input
+                      v-model="formData.username"
+                      type="text"
+                      placeholder="Username"
+                      class="form-input w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300"
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label class="block text-sm text-amber-200 mb-1">Password <span class="text-red-400">*</span></label>
+                    <input
+                      v-model="formData.password"
+                      type="text"
+                      placeholder="Password"
+                      class="form-input w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300"
+                    />
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                      <label class="block text-sm text-amber-200 mb-1">Price (VND) <span class="text-red-400">*</span></label>
+                      <input
+                        v-model.number="formData.price"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        class="form-input w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300"
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label class="block text-sm text-amber-200 mb-1">Account Type <span class="text-red-400">*</span></label>
+                      <select
+                        v-model="formData.account_type"
+                        class="form-input w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300"
+                      >
+                        <option value="RANDOM_FA">RANDOM_FA</option>
+                        <option value="RANDOM_NFA">RANDOM_NFA</option>
+                        <option value="DROP_MAIL">DROP_MAIL</option>
+                        <option value="SIEU_SALE">SIEU_SALE</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="block text-sm text-amber-200 mb-1">Listed At</label>
+                    <input
+                      v-model="formData.listed_at"
+                      type="datetime-local"
+                      class="form-input w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300"
+                    />
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="flex items-center gap-3 p-2 rounded bg-[#0a0a0a]/50 hover:bg-[#0a0a0a] transition-all duration-300">
+                      <input
+                        v-model="formData.isSold"
+                        type="checkbox"
+                        id="isSold"
+                        class="w-4 h-4 accent-amber-600 cursor-pointer"
+                      />
+                      <label for="isSold" class="text-sm text-amber-200 cursor-pointer select-none">Is Sold</label>
+                    </div>
+
+                    <div class="flex items-center gap-3 p-2 rounded bg-[#0a0a0a]/50 hover:bg-[#0a0a0a] transition-all duration-300">
+                      <input
+                        v-model="formData.isLocked"
+                        type="checkbox"
+                        id="isLocked"
+                        class="w-4 h-4 accent-amber-600 cursor-pointer"
+                      />
+                      <label for="isLocked" class="text-sm text-amber-200 cursor-pointer select-none">Is Locked</label>
+                    </div>
+                  </div>
+
+                  <Transition name="slide-fade">
+                    <div v-if="formData.isLocked" class="form-group">
+                      <label class="block text-sm text-amber-200 mb-1">Locked Until</label>
+                      <input
+                        v-model="formData.lockedUntil"
+                        type="datetime-local"
+                        class="form-input w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-600/20 transition-all duration-300"
+                      />
+                    </div>
+                  </Transition>
+                </div>
+              </Transition>
             </div>
-          </div>
 
-          <div>
-            <label class="block text-sm text-amber-200 mb-1">Listed At</label>
-            <input
-              v-model="formData.listed_at"
-              type="datetime-local"
-              class="w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600"
-            />
-          </div>
+            <!-- SubInfo Section -->
+            <div class="mb-6">
+              <div
+                @click="toggleSection('subInfo')"
+                class="flex items-center justify-between cursor-pointer p-3 bg-purple-900/20 rounded-lg hover:bg-purple-900/30 transition-all duration-300 mb-3"
+              >
+                <h3 class="text-sm font-semibold text-purple-300 flex items-center gap-2">
+                  <i class="fa-solid fa-chart-bar"></i> Account Stats (SubInfo)
+                </h3>
+                <i :class="expandedSections.subInfo ? 'fa-chevron-up' : 'fa-chevron-down'" class="fa-solid text-purple-400 transition-transform duration-300"></i>
+              </div>
+              
+              <Transition name="slide-fade">
+                <div v-show="expandedSections.subInfo" class="space-y-4 pl-2 border-l-2 border-purple-900/30 ml-2">
+                  <div class="form-group">
+                    <label class="block text-sm text-purple-200 mb-1">
+                      <i class="fa-solid fa-ranking-star mr-1"></i> Rank Info
+                    </label>
+                    <input
+                      v-model="formData.subInfo.rank_info"
+                      type="text"
+                      maxlength="55"
+                      placeholder="e.g., Diamond 2, Immortal 1..."
+                      class="form-input w-full px-3 py-2 rounded bg-[#0a0a0a] border border-purple-900/50 text-purple-100 placeholder-purple-300/40 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 transition-all duration-300"
+                    />
+                    <p class="text-xs text-purple-300/50 mt-1">Max 55 characters</p>
+                  </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex items-center gap-3">
-              <input
-                v-model="formData.isSold"
-                type="checkbox"
-                id="isSold"
-                class="w-4 h-4 accent-amber-600"
-              />
-              <label for="isSold" class="text-sm text-amber-200">Is Sold</label>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                      <label class="block text-sm text-purple-200 mb-1">
+                        <i class="fa-solid fa-coins mr-1"></i> VP (Valorant Points)
+                      </label>
+                      <input
+                        v-model.number="formData.subInfo.vp"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        class="form-input w-full px-3 py-2 rounded bg-[#0a0a0a] border border-purple-900/50 text-purple-100 placeholder-purple-300/40 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 transition-all duration-300"
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label class="block text-sm text-purple-200 mb-1">
+                        <i class="fa-solid fa-bolt mr-1"></i> BTP (Battle Pass Points)
+                      </label>
+                      <input
+                        v-model.number="formData.subInfo.btp"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        class="form-input w-full px-3 py-2 rounded bg-[#0a0a0a] border border-purple-900/50 text-purple-100 placeholder-purple-300/40 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 transition-all duration-300"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                      <label class="block text-sm text-purple-200 mb-1">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Melee Skins Amount
+                      </label>
+                      <input
+                        v-model.number="formData.subInfo.melee_amount"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        class="form-input w-full px-3 py-2 rounded bg-[#0a0a0a] border border-purple-900/50 text-purple-100 placeholder-purple-300/40 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 transition-all duration-300"
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label class="block text-sm text-purple-200 mb-1">
+                        <i class="fa-solid fa-gun mr-1"></i> Gun Skins Amount
+                      </label>
+                      <input
+                        v-model.number="formData.subInfo.gun_amount"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        class="form-input w-full px-3 py-2 rounded bg-[#0a0a0a] border border-purple-900/50 text-purple-100 placeholder-purple-300/40 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20 transition-all duration-300"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Stats Preview Card -->
+                  <div class="mt-4 p-4 rounded-lg bg-gradient-to-br from-purple-900/20 to-amber-900/20 border border-purple-900/30">
+                    <h4 class="text-xs font-semibold text-amber-300 mb-3 flex items-center gap-2">
+                      <i class="fa-solid fa-eye"></i> Stats Preview
+                    </h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div class="text-center p-2 rounded bg-[#0a0a0a]/50 transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-lg font-bold text-purple-300">{{ formData.subInfo.vp || 0 }}</div>
+                        <div class="text-xs text-purple-400/70">VP</div>
+                      </div>
+                      <div class="text-center p-2 rounded bg-[#0a0a0a]/50 transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-lg font-bold text-amber-300">{{ formData.subInfo.btp || 0 }}</div>
+                        <div class="text-xs text-amber-400/70">BTP</div>
+                      </div>
+                      <div class="text-center p-2 rounded bg-[#0a0a0a]/50 transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-lg font-bold text-emerald-300">{{ formData.subInfo.melee_amount || 0 }}</div>
+                        <div class="text-xs text-emerald-400/70">Melee</div>
+                      </div>
+                      <div class="text-center p-2 rounded bg-[#0a0a0a]/50 transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-lg font-bold text-blue-300">{{ formData.subInfo.gun_amount || 0 }}</div>
+                        <div class="text-xs text-blue-400/70">Guns</div>
+                      </div>
+                    </div>
+                    <div v-if="formData.subInfo.rank_info" class="mt-3 text-center">
+                      <span class="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-purple-600/30 to-amber-600/30 text-sm font-semibold text-amber-200 border border-amber-500/30">
+                        <i class="fa-solid fa-trophy mr-1"></i> {{ formData.subInfo.rank_info }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Transition>
             </div>
 
-            <div class="flex items-center gap-3">
-              <input
-                v-model="formData.isLocked"
-                type="checkbox"
-                id="isLocked"
-                class="w-4 h-4 accent-amber-600"
-              />
-              <label for="isLocked" class="text-sm text-amber-200">Is Locked</label>
+            <!-- Image Section -->
+            <div class="mb-6">
+              <div
+                @click="toggleSection('imageSection')"
+                class="flex items-center justify-between cursor-pointer p-3 bg-emerald-900/20 rounded-lg hover:bg-emerald-900/30 transition-all duration-300 mb-3"
+              >
+                <h3 class="text-sm font-semibold text-emerald-300 flex items-center gap-2">
+                  <i class="fa-solid fa-image"></i> Account Image
+                </h3>
+                <i :class="expandedSections.imageSection ? 'fa-chevron-up' : 'fa-chevron-down'" class="fa-solid text-emerald-400 transition-transform duration-300"></i>
+              </div>
+              
+              <Transition name="slide-fade">
+                <div v-show="expandedSections.imageSection" class="space-y-4 pl-2 border-l-2 border-emerald-900/30 ml-2">
+                  <div class="form-group">
+                    <div class="flex gap-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        @change="handleImageUpload"
+                        ref="imageInput"
+                        class="flex-1 px-3 py-2 rounded bg-[#0a0a0a] border border-emerald-900/50 text-emerald-100 focus:outline-none focus:border-emerald-600 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-emerald-600 file:text-black file:font-semibold file:cursor-pointer hover:file:bg-emerald-500 transition-all duration-300"
+                      />
+                      <button
+                        v-if="uploadingImage"
+                        disabled
+                        class="px-3 py-2 rounded bg-emerald-900/30 text-emerald-300 animate-pulse"
+                      >
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                      </button>
+                    </div>
+                    <Transition name="slide-fade">
+                      <div v-if="formData.imageUrl" class="mt-3">
+                        <p class="text-xs text-emerald-200/60 mb-1">Image URL:</p>
+                        <div class="flex items-center gap-2">
+                          <input
+                            v-model="formData.imageUrl"
+                            type="text"
+                            readonly
+                            class="flex-1 px-3 py-2 rounded bg-[#0a0a0a] border border-emerald-900/50 text-emerald-100/60 text-xs focus:outline-none"
+                          />
+                          <button
+                            @click="formData.imageUrl = ''"
+                            class="px-2 py-1 text-xs bg-red-900/30 text-red-300 rounded hover:bg-red-900/50 transition-all duration-300 hover:scale-105"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        <img :src="formData.imageUrl" alt="Preview" class="mt-3 max-h-40 rounded-lg border border-emerald-900/50 shadow-lg shadow-emerald-900/20 transition-transform duration-300 hover:scale-105" />
+                      </div>
+                    </Transition>
+                  </div>
+                </div>
+              </Transition>
             </div>
-          </div>
 
-          <div v-if="formData.isLocked">
-            <label class="block text-sm text-amber-200 mb-1">Locked Until</label>
-            <input
-              v-model="formData.lockedUntil"
-              type="datetime-local"
-              class="w-full px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm text-amber-200 mb-1">Account Image</label>
-            <div class="flex gap-2">
-              <input
-                type="file"
-                accept="image/*"
-                @change="handleImageUpload"
-                ref="imageInput"
-                class="flex-1 px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100 focus:outline-none focus:border-amber-600 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-amber-600 file:text-black file:font-semibold file:cursor-pointer hover:file:bg-amber-500"
-              />
+            <!-- Action Buttons -->
+            <div class="flex gap-3 pt-4 border-t border-amber-900/30">
               <button
-                v-if="uploadingImage"
-                disabled
-                class="px-3 py-2 rounded bg-amber-900/30 text-amber-300"
+                @click="closeModal"
+                class="flex-1 px-4 py-2 rounded border border-amber-900/50 text-amber-200 hover:bg-amber-900/10 transition-all duration-300 hover:scale-[1.02]"
               >
-                <i class="fa-solid fa-spinner fa-spin"></i>
+                <i class="fa-solid fa-xmark mr-2"></i> Cancel
+              </button>
+              <button
+                @click="saveAccount"
+                :disabled="saving"
+                class="flex-1 px-4 py-2 rounded bg-gradient-to-r from-amber-600 to-amber-500 text-black font-semibold hover:from-amber-500 hover:to-amber-400 transition-all duration-300 disabled:opacity-50 hover:scale-[1.02] hover:shadow-lg hover:shadow-amber-600/20"
+              >
+                <i :class="saving ? 'fa-solid fa-spinner fa-spin' : (editingAccount ? 'fa-solid fa-save' : 'fa-solid fa-plus')" class="mr-2"></i>
+                {{ saving ? 'Saving...' : (editingAccount ? 'Update Account' : 'Create Account') }}
               </button>
             </div>
-            <div v-if="formData.imageUrl" class="mt-2">
-              <p class="text-xs text-amber-200/60 mb-1">Image URL:</p>
-              <div class="flex items-center gap-2">
-                <input
-                  v-model="formData.imageUrl"
-                  type="text"
-                  readonly
-                  class="flex-1 px-3 py-2 rounded bg-[#0a0a0a] border border-amber-900/50 text-amber-100/60 text-xs focus:outline-none"
-                />
-                <button
-                  @click="formData.imageUrl = ''"
-                  class="px-2 py-1 text-xs bg-red-900/30 text-red-300 rounded hover:bg-red-900/50 transition-all"
-                >
-                  ✕
-                </button>
-              </div>
-              <img :src="formData.imageUrl" alt="Preview" class="mt-2 max-h-32 rounded border border-amber-900/50" />
-            </div>
           </div>
-        </div>
-
-        <div class="flex gap-3">
-          <button
-            @click="closeModal"
-            class="flex-1 px-4 py-2 rounded border border-amber-900/50 text-amber-200 hover:bg-amber-900/10 transition-all"
-          >
-            Cancel
-          </button>
-          <button
-            @click="saveAccount"
-            :disabled="saving"
-            class="flex-1 px-4 py-2 rounded bg-amber-600 text-black font-semibold hover:bg-amber-500 transition-all disabled:opacity-50"
-          >
-            {{ saving ? 'Saving...' : (editingAccount ? 'Update' : 'Create') }}
-          </button>
-        </div>
+        </Transition>
       </div>
-    </div>
+    </Transition>
 
     <!-- Delete Confirmation Modal -->
-    <div v-if="showDeleteModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div class="bg-[#1a1a1a] border border-amber-900/50 rounded-xl p-6 w-full max-w-sm">
-        <h2 class="text-xl font-bold text-amber-300 mb-4">Confirm Delete</h2>
-        <p class="text-amber-200 mb-6">Are you sure you want to delete this account? This action cannot be undone.</p>
-        <div class="flex gap-3">
-          <button
-            @click="showDeleteModal = false"
-            class="flex-1 px-4 py-2 rounded border border-amber-900/50 text-amber-200 hover:bg-amber-900/10 transition-all"
-          >
-            Cancel
-          </button>
-          <button
-            @click="confirmDelete"
-            :disabled="deleting"
-            class="flex-1 px-4 py-2 rounded bg-red-600 text-white font-semibold hover:bg-red-500 transition-all disabled:opacity-50"
-          >
-            {{ deleting ? 'Deleting...' : 'Delete' }}
-          </button>
-        </div>
+    <!-- Delete Confirmation Modal -->
+    <Transition name="modal-fade">
+      <div v-if="showDeleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <Transition name="modal-scale">
+          <div class="bg-[#1a1a1a] border border-red-900/50 rounded-xl p-6 w-full max-w-sm shadow-2xl shadow-red-900/20">
+            <h2 class="text-xl font-bold text-red-300 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation text-red-400"></i> Confirm Delete
+            </h2>
+            <p class="text-amber-200 mb-6">Are you sure you want to delete this account? This action cannot be undone.</p>
+            <div class="flex gap-3">
+              <button
+                @click="showDeleteModal = false"
+                class="flex-1 px-4 py-2 rounded border border-amber-900/50 text-amber-200 hover:bg-amber-900/10 transition-all duration-300 hover:scale-[1.02]"
+              >
+                <i class="fa-solid fa-xmark mr-2"></i> Cancel
+              </button>
+              <button
+                @click="confirmDelete"
+                :disabled="deleting"
+                class="flex-1 px-4 py-2 rounded bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold hover:from-red-500 hover:to-red-400 transition-all duration-300 disabled:opacity-50 hover:scale-[1.02] hover:shadow-lg hover:shadow-red-600/20"
+              >
+                <i :class="deleting ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-trash'" class="mr-2"></i>
+                {{ deleting ? 'Deleting...' : 'Delete' }}
+              </button>
+            </div>
+          </div>
+        </Transition>
       </div>
-    </div>
+    </Transition>
   </div>
 </template>
 
@@ -373,6 +540,17 @@ const showDeleteModal = ref(false);
 const editingAccount = ref(null);
 const deleteAccountId = ref(null);
 
+// Collapsible sections state
+const expandedSections = ref({
+  accountInfo: true,
+  subInfo: true,
+  imageSection: false
+});
+
+const toggleSection = (section) => {
+  expandedSections.value[section] = !expandedSections.value[section];
+};
+
 const formData = ref({
   email: '',
   username: '',
@@ -383,7 +561,14 @@ const formData = ref({
   isLocked: false,
   lockedUntil: '',
   account_type: 'RANDOM_FA',
-  imageUrl: ''
+  imageUrl: '',
+  subInfo: {
+    rank_info: '',
+    vp: 0,
+    melee_amount: 0,
+    gun_amount: 0,
+    btp: 0
+  }
 });
 
 // Computed properties
@@ -484,7 +669,20 @@ const editAccount = (account) => {
     isLocked: account.isLocked || false,
     lockedUntil: formatDateTimeLocal(account.lockedUntil),
     account_type: account.account_type || 'RANDOM_FA',
-    imageUrl: account.imageUrl || ''
+    imageUrl: account.imageUrl || '',
+    subInfo: {
+      rank_info: account.subInfo?.rank_info || '',
+      vp: account.subInfo?.vp || 0,
+      melee_amount: account.subInfo?.melee_amount || 0,
+      gun_amount: account.subInfo?.gun_amount || 0,
+      btp: account.subInfo?.btp || 0
+    }
+  };
+  // Reset expanded sections for edit mode
+  expandedSections.value = {
+    accountInfo: true,
+    subInfo: true,
+    imageSection: !!account.imageUrl
   };
   showAddModal.value = true;
 };
@@ -563,7 +761,14 @@ const saveAccount = async () => {
       isLocked: formData.value.isLocked,
       lockedUntil: formData.value.isLocked ? formData.value.lockedUntil : null,
       account_type: formData.value.account_type,
-      imageUrl: formData.value.imageUrl || null
+      imageUrl: formData.value.imageUrl || null,
+      subInfo: {
+        rank_info: formData.value.subInfo.rank_info || null,
+        vp: formData.value.subInfo.vp || 0,
+        melee_amount: formData.value.subInfo.melee_amount || 0,
+        gun_amount: formData.value.subInfo.gun_amount || 0,
+        btp: formData.value.subInfo.btp || 0
+      }
     };
 
     if (editingAccount.value) {
@@ -599,7 +804,20 @@ const closeModal = () => {
     isLocked: false,
     lockedUntil: '',
     account_type: 'RANDOM_FA',
-    imageUrl: ''
+    imageUrl: '',
+    subInfo: {
+      rank_info: '',
+      vp: 0,
+      melee_amount: 0,
+      gun_amount: 0,
+      btp: 0
+    }
+  };
+  // Reset expanded sections
+  expandedSections.value = {
+    accountInfo: true,
+    subInfo: true,
+    imageSection: false
   };
   // Reset file input
   if (imageInput.value) {
@@ -668,4 +886,105 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Modal Fade Transition */
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
+/* Modal Scale Transition */
+.modal-scale-enter-active {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-scale-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.modal-scale-enter-from {
+  opacity: 0;
+  transform: scale(0.9) translateY(-20px);
+}
+
+.modal-scale-leave-to {
+  opacity: 0;
+  transform: scale(0.95) translateY(10px);
+}
+
+/* Slide Fade Transition for collapsible sections */
+.slide-fade-enter-active {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-fade-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+  max-height: 0;
+}
+
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Form input focus animation */
+.form-input {
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15);
+}
+
+/* Form group hover effect */
+.form-group {
+  transition: all 0.2s ease;
+}
+
+.form-group:hover {
+  transform: translateX(2px);
+}
+
+/* Modal content scrollbar styling */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: rgba(217, 119, 6, 0.1);
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(217, 119, 6, 0.3);
+  border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(217, 119, 6, 0.5);
+}
+
+/* Pulse animation for loading states */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(217, 119, 6, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(217, 119, 6, 0.6);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
 </style>
