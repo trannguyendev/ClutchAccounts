@@ -32,8 +32,8 @@ public interface AccForSellRepository extends JpaRepository<AccForSellModel, Int
 		Integer getPrice();
 		String getAccount_type();
 	}
-	@Query(value = "", nativeQuery = true)
-	List<customInfoAccAdmin> getAllCurrentAcc();
+//	@Query(value = "", nativeQuery = true)
+//	List<customInfoAccAdmin> getAllCurrentAcc();
 	interface customInfoAccAdmin{
 		Integer getAccount_id();
 		String getEmail();
