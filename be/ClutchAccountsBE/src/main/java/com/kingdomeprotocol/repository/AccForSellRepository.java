@@ -32,8 +32,20 @@ public interface AccForSellRepository extends JpaRepository<AccForSellModel, Int
 		Integer getPrice();
 		String getAccount_type();
 	}
-//	@Query(value = "", nativeQuery = true)
-//	List<customInfoAccAdmin> getAllCurrentAcc();
+	@Query(value = "select acc.account_id as account_id,\r\n"
+			+ "acc.email as email,\r\n"
+			+ "acc.username as username,\r\n"
+			+ "acc.account_psw as password,\r\n"
+			+ "acc.listed_at as listed_at,\r\n"
+			+ "acc.isSold as isSold,\r\n"
+			+ "acc.isLocked as isLocked,\r\n"
+			+ "acc.lockedUntil as lockedUntil,\r\n"
+			+ "acc.price as price,\r\n"
+			+ "acc.account_type as account_type,\r\n"
+			+ "img.image_url as image_url\r\n"
+			+ "from AccForSell acc left join AccountImage img\r\n"
+			+ "on acc.account_id = img.account_id order by acc.account_id desc", nativeQuery = true)
+	List<customInfoAccAdmin> getAllCurrentAcc();
 	interface customInfoAccAdmin{
 		Integer getAccount_id();
 		String getEmail();
