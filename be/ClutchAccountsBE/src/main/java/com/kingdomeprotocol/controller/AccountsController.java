@@ -111,7 +111,7 @@ public class AccountsController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> displayAccInfoAdmin(){
 		try {
-			return ResponseEntity.ok(accRepo.findAll());
+			return ResponseEntity.ok(accRepo.getAllCurrentAcc());
 		}
 		catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
