@@ -59,28 +59,30 @@
               <th class="pb-3 px-4">Account Type</th>
               <th class="pb-3 px-4">Status</th>
               <th class="pb-3 px-4">Listed At</th>
+              <th class="pb-3 px-4">Image</th>
               <th class="pb-3 px-4">Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="account in paginatedAccounts" :key="account.acc_id" class="border-t border-amber-900/20 hover:bg-amber-900/10 transition-all">
-              <td class="py-3 px-4 text-amber-200">{{ account.acc_id }}</td>
+              <td class="py-3 px-4 text-amber-200">{{ account.account_id }}</td>
               <td class="py-3 px-4 text-amber-200/80">{{ account.email }}</td>
               <td class="py-3 px-4 text-amber-200/80">{{ account.username }}</td>
               <td class="py-3 px-4">
-                <span class="px-2 py-1 bg-amber-900/30 text-amber-300 rounded text-xs font-semibold">{{ formatPrice(account.price) }} VND</span>
+                <span class="px-2 py-1 bg-amber-900/30 text-amber-300 rounded text-xs font-semibold whitespace-nowrap">{{ formatPrice(account.price) }} VND</span>
               </td>
               <td class="py-3 px-4">
                 <span class="px-2 py-1 bg-blue-900/30 text-blue-300 rounded text-xs font-semibold">{{ account.account_type }}</span>
               </td>
-              <td class="py-3 px-4">
+              <td class="py-3 px-4 whitespace-nowrap">
                 <span v-if="account.isSold" class="inline-block px-3 py-1 rounded text-xs font-semibold bg-red-500/20 text-red-300">Sold</span>
                 <span v-else-if="account.isLocked" class="inline-block px-3 py-1 rounded text-xs font-semibold bg-yellow-500/20 text-yellow-300">🔒 Locked</span>
                 <span v-else class="inline-block px-3 py-1 rounded text-xs font-semibold bg-emerald-500/20 text-emerald-300">✓ Available</span>
               </td>
               <td class="py-3 px-4 text-amber-200/60 text-xs">{{ formatDate(account.listed_at) }}</td>
+              <td class="py-3 px-4 text-amber-200/60 text-xs"><img :src="account.image_url ? account.image_url : 'https://www.pcgamesn.com/wp-content/sites/pcgamesn/2020/03/valorant-logo.jpg'" alt="img accounts" width="25" height="25"></td>
               <td class="py-3 px-4">
-                <div class="flex gap-2">
+                <div class="flex gap-2 whitespace-nowrap">
                   <button
                     @click="editAccount(account)"
                     class="px-2 py-1 text-xs bg-blue-900/30 text-blue-300 rounded hover:bg-blue-900/50 transition-all"
@@ -101,7 +103,7 @@
                     {{ account.isLocked ? '🔓 Unlock' : '🔒 Lock' }}
                   </button>
                   <button
-                    @click="deleteAccount(account.acc_id)"
+                    @click="deleteAccount(account.account_id)"
                     :disabled="account.isSold"
                     :class="[
                       'px-2 py-1 text-xs bg-red-900/30 text-red-300 rounded hover:bg-red-900/50 transition-all',
@@ -293,7 +295,7 @@
                       <i class="fa-solid fa-ranking-star mr-1"></i> Rank Info
                     </label>
                     <input
-                      v-model="formData.subInfo.rank_info"
+                      v-model="formData.rank_info"
                       type="text"
                       maxlength="55"
                       placeholder="e.g., Diamond 2, Immortal 1..."
@@ -308,7 +310,7 @@
                         <i class="fa-solid fa-coins mr-1"></i> VP (Valorant Points)
                       </label>
                       <input
-                        v-model.number="formData.subInfo.vp"
+                        v-model.number="formData.vp"
                         type="number"
                         min="0"
                         placeholder="0"
@@ -321,7 +323,7 @@
                         <i class="fa-solid fa-bolt mr-1"></i> BTP (Battle Pass Points)
                       </label>
                       <input
-                        v-model.number="formData.subInfo.btp"
+                        v-model.number="formData.btp"
                         type="number"
                         min="0"
                         placeholder="0"
@@ -336,7 +338,7 @@
                         <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Melee Skins Amount
                       </label>
                       <input
-                        v-model.number="formData.subInfo.melee_amount"
+                        v-model.number="formData.melee_amount"
                         type="number"
                         min="0"
                         placeholder="0"
@@ -349,7 +351,7 @@
                         <i class="fa-solid fa-gun mr-1"></i> Gun Skins Amount
                       </label>
                       <input
-                        v-model.number="formData.subInfo.gun_amount"
+                        v-model.number="formData.gun_amount"
                         type="number"
                         min="0"
                         placeholder="0"
@@ -365,25 +367,25 @@
                     </h4>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       <div class="text-center p-2 rounded bg-[#0a0a0a]/50 transform hover:scale-105 transition-transform duration-300">
-                        <div class="text-lg font-bold text-purple-300">{{ formData.subInfo.vp || 0 }}</div>
+                        <div class="text-lg font-bold text-purple-300">{{ formData.vp || 0 }}</div>
                         <div class="text-xs text-purple-400/70">VP</div>
                       </div>
                       <div class="text-center p-2 rounded bg-[#0a0a0a]/50 transform hover:scale-105 transition-transform duration-300">
-                        <div class="text-lg font-bold text-amber-300">{{ formData.subInfo.btp || 0 }}</div>
+                        <div class="text-lg font-bold text-amber-300">{{ formData.btp || 0 }}</div>
                         <div class="text-xs text-amber-400/70">BTP</div>
                       </div>
                       <div class="text-center p-2 rounded bg-[#0a0a0a]/50 transform hover:scale-105 transition-transform duration-300">
-                        <div class="text-lg font-bold text-emerald-300">{{ formData.subInfo.melee_amount || 0 }}</div>
+                        <div class="text-lg font-bold text-emerald-300">{{ formData.melee_amount || 0 }}</div>
                         <div class="text-xs text-emerald-400/70">Melee</div>
                       </div>
                       <div class="text-center p-2 rounded bg-[#0a0a0a]/50 transform hover:scale-105 transition-transform duration-300">
-                        <div class="text-lg font-bold text-blue-300">{{ formData.subInfo.gun_amount || 0 }}</div>
+                        <div class="text-lg font-bold text-blue-300">{{ formData.gun_amount || 0 }}</div>
                         <div class="text-xs text-blue-400/70">Guns</div>
                       </div>
                     </div>
-                    <div v-if="formData.subInfo.rank_info" class="mt-3 text-center">
+                    <div v-if="formData.rank_info" class="mt-3 text-center">
                       <span class="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-purple-600/30 to-amber-600/30 text-sm font-semibold text-amber-200 border border-amber-500/30">
-                        <i class="fa-solid fa-trophy mr-1"></i> {{ formData.subInfo.rank_info }}
+                        <i class="fa-solid fa-trophy mr-1"></i> {{ formData.rank_info }}
                       </span>
                     </div>
                   </div>
@@ -423,23 +425,23 @@
                       </button>
                     </div>
                     <Transition name="slide-fade">
-                      <div v-if="formData.imageUrl" class="mt-3">
+                      <div v-if="formData.image_url" class="mt-3">
                         <p class="text-xs text-emerald-200/60 mb-1">Image URL:</p>
                         <div class="flex items-center gap-2">
                           <input
-                            v-model="formData.imageUrl"
+                            v-model="formData.image_url"
                             type="text"
                             readonly
                             class="flex-1 px-3 py-2 rounded bg-[#0a0a0a] border border-emerald-900/50 text-emerald-100/60 text-xs focus:outline-none"
                           />
                           <button
-                            @click="formData.imageUrl = ''"
+                            @click="formData.image_url = ''"
                             class="px-2 py-1 text-xs bg-red-900/30 text-red-300 rounded hover:bg-red-900/50 transition-all duration-300 hover:scale-105"
                           >
                             ✕
                           </button>
                         </div>
-                        <img :src="formData.imageUrl" alt="Preview" class="mt-3 max-h-40 rounded-lg border border-emerald-900/50 shadow-lg shadow-emerald-900/20 transition-transform duration-300 hover:scale-105" />
+                        <img :src="formData.image_url" alt="Preview" class="mt-3 max-h-40 rounded-lg border border-emerald-900/50 shadow-lg shadow-emerald-900/20 transition-transform duration-300 hover:scale-105" />
                       </div>
                     </Transition>
                   </div>
@@ -469,7 +471,6 @@
       </div>
     </Transition>
 
-    <!-- Delete Confirmation Modal -->
     <!-- Delete Confirmation Modal -->
     <Transition name="modal-fade">
       <div v-if="showDeleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -561,14 +562,12 @@ const formData = ref({
   isLocked: false,
   lockedUntil: '',
   account_type: 'RANDOM_FA',
-  imageUrl: '',
-  subInfo: {
-    rank_info: '',
-    vp: 0,
-    melee_amount: 0,
-    gun_amount: 0,
-    btp: 0
-  }
+  image_url: '',
+  rank_info: '',
+  vp: 0,
+  melee_amount: 0,
+  gun_amount: 0,
+  btp: 0
 });
 
 // Computed properties
@@ -624,8 +623,9 @@ const fetchAccounts = async () => {
   error.value = null;
   
   try {
-    const response = await axios.get('/api/admin/accounts/valorant');
+    const response = await axios.get('/api/accounts/list-acc');
     accounts.value = response.data;
+    console.log("Acc array: ", accounts.value);
   } catch (err) {
     error.value = err.response?.data?.error || 'Failed to fetch accounts';
     console.error('Error fetching accounts:', err);
@@ -669,20 +669,18 @@ const editAccount = (account) => {
     isLocked: account.isLocked || false,
     lockedUntil: formatDateTimeLocal(account.lockedUntil),
     account_type: account.account_type || 'RANDOM_FA',
-    imageUrl: account.imageUrl || '',
-    subInfo: {
-      rank_info: account.subInfo?.rank_info || '',
-      vp: account.subInfo?.vp || 0,
-      melee_amount: account.subInfo?.melee_amount || 0,
-      gun_amount: account.subInfo?.gun_amount || 0,
-      btp: account.subInfo?.btp || 0
-    }
+    image_url: account.image_url || '',
+    rank_info: account.rank_info || '',
+    vp: account.vp || 0,
+    melee_amount: account.melee_amount || 0,
+    gun_amount: account.gun_amount || 0,
+    btp: account.btp || 0
   };
   // Reset expanded sections for edit mode
   expandedSections.value = {
     accountInfo: true,
     subInfo: true,
-    imageSection: !!account.imageUrl
+    imageSection: !!account.image_url
   };
   showAddModal.value = true;
 };
@@ -725,7 +723,7 @@ const handleImageUpload = async (event) => {
     const response = await axios.post('https://api.imgbb.com/1/upload', formDataImg);
 
     if (response.data && response.data.data && response.data.data.url) {
-      formData.value.imageUrl = response.data.data.url;
+      formData.value.image_url = response.data.data.url;
       toast.success('Image uploaded successfully');
     } else {
       throw new Error('Invalid response from ImgBB');
@@ -761,23 +759,22 @@ const saveAccount = async () => {
       isLocked: formData.value.isLocked,
       lockedUntil: formData.value.isLocked ? formData.value.lockedUntil : null,
       account_type: formData.value.account_type,
-      imageUrl: formData.value.imageUrl || null,
-      subInfo: {
-        rank_info: formData.value.subInfo.rank_info || null,
-        vp: formData.value.subInfo.vp || 0,
-        melee_amount: formData.value.subInfo.melee_amount || 0,
-        gun_amount: formData.value.subInfo.gun_amount || 0,
-        btp: formData.value.subInfo.btp || 0
-      }
+      image_url: formData.value.image_url || null,
+      rank_info: formData.value.rank_info || null,
+      vp: formData.value.vp || 0,
+      melee_amount: formData.value.melee_amount || 0,
+      gun_amount: formData.value.gun_amount || 0,
+      btp: formData.value.btp || 0
     };
 
     if (editingAccount.value) {
       // Update existing account
-      await axios.put(`/api/admin/accounts/valorant/${editingAccount.value.acc_id}`, payload);
+      await axios.put(`/api/accounts/${editingAccount.value.account_id}`, payload);
       toast.success('Account updated successfully');
     } else {
       // Add new account
-      await axios.post('/api/admin/accounts/valorant', payload);
+      console.log("current payload:", payload);
+      await axios.post('/api/accounts/new', payload);
       toast.success('Account created successfully');
     }
 
@@ -804,14 +801,12 @@ const closeModal = () => {
     isLocked: false,
     lockedUntil: '',
     account_type: 'RANDOM_FA',
-    imageUrl: '',
-    subInfo: {
-      rank_info: '',
-      vp: 0,
-      melee_amount: 0,
-      gun_amount: 0,
-      btp: 0
-    }
+    image_url: '',
+    rank_info: '',
+    vp: 0,
+    melee_amount: 0,
+    gun_amount: 0,
+    btp: 0
   };
   // Reset expanded sections
   expandedSections.value = {
@@ -834,7 +829,8 @@ const confirmDelete = async () => {
   deleting.value = true;
   
   try {
-    await axios.delete(`/api/admin/accounts/valorant/${deleteAccountId.value}`);
+    console.log("Deleting account ID:", deleteAccountId.value);
+    await axios.delete(`/api/accounts/${deleteAccountId.value}`);
     toast.success('Account deleted successfully');
     await fetchAccounts();
     showDeleteModal.value = false;
@@ -857,7 +853,7 @@ const toggleLock = async (account) => {
       lockedUntil: !account.isLocked ? new Date(Date.now() + 30 * 60 * 1000).toISOString() : null
     };
     
-    await axios.put(`/api/admin/accounts/valorant/${account.acc_id}`, payload);
+    await axios.put(`/api/accounts/${account.account_id}`, payload);
     toast.success(account.isLocked ? 'Account unlocked' : 'Account locked');
     await fetchAccounts();
   } catch (err) {
