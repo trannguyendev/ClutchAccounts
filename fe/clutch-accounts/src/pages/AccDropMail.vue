@@ -5,6 +5,37 @@ import { useUserStore } from '@/stores/user';
 
 const user = useUserStore();
 
+// Popup state
+const showBuyPopup = ref(false)
+const selectedAcc = ref(null)
+const voucherCode = ref('')
+
+const openBuyPopup = (item) => {
+  selectedAcc.value = item
+  showBuyPopup.value = true
+}
+
+const closeBuyPopup = () => {
+  showBuyPopup.value = false
+  selectedAcc.value = null
+  voucherCode.value = ''
+}
+
+const applyVoucher = () => {
+  // TODO: Implement voucher logic
+  console.log('Applying voucher:', voucherCode.value)
+}
+
+const handleDeposit = () => {
+  // TODO: Navigate to deposit page
+  console.log('Navigate to deposit')
+}
+
+const handleWarrantyPolicy = () => {
+  // TODO: Show warranty policy
+  console.log('Show warranty policy')
+}
+
 const accs = ref([
   {
     id: 1197,
@@ -205,7 +236,7 @@ const getRankColor = (rank) => {
                 </button>
                 
                 <!-- Buy Now Button -->
-                <button class="buy-btn flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm text-black bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 bg-size-200 bg-pos-0 transition-all duration-500 hover:bg-pos-100 hover:shadow-[0_0_30px_rgba(245,158,11,0.5)] active:scale-95">
+                <button @click="openBuyPopup(item)" class="buy-btn flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm text-black bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 bg-size-200 bg-pos-0 transition-all duration-500 hover:bg-pos-100 hover:shadow-[0_0_30px_rgba(245,158,11,0.5)] active:scale-95">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                   </svg>
@@ -224,6 +255,96 @@ const getRankColor = (rank) => {
 
     <!-- Footer Spacer -->
     <div class="h-20"></div>
+
+    <!-- Buy Popup Modal -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showBuyPopup" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <!-- Backdrop -->
+          <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" @click="closeBuyPopup"></div>
+          
+          <!-- Modal Content -->
+          <div class="relative bg-gradient-to-b from-slate-900 via-slate-950 to-black border border-amber-500/30 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-[0_0_60px_rgba(245,158,11,0.2)]">
+            <!-- Close Button -->
+            <button @click="closeBuyPopup" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white transition-colors z-10">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+
+            <!-- Header -->
+            <div class="p-6 pb-4">
+              <h2 class="text-3xl font-black italic">
+                <span class="text-purple-400">MÃ SỐ</span>
+                <span class="text-amber-400"> #{{ selectedAcc?.id }}</span>
+              </h2>
+            </div>
+
+            <!-- Category Info -->
+            <div class="px-6 pb-4">
+              <p class="text-gray-400">
+                DANH MỤC: <span class="text-purple-400 font-bold">ACC VALORANT DROP MAIL</span>
+              </p>
+            </div>
+
+            <!-- Payment Info Box -->
+            <div class="mx-6 mb-4 bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-300 font-semibold">PHÍ THANH TOÁN</span>
+                <span class="text-gray-300 font-semibold">MIỄN PHÍ</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-300 font-semibold">PHƯƠNG THỨC GIAO DỊCH</span>
+                <span class="text-gray-300 font-semibold">TỰ ĐỘNG</span>
+              </div>
+            </div>
+
+            <!-- Balance Info -->
+            <div class="px-6 pb-4 flex justify-between items-center">
+              <span class="text-gray-300 font-semibold italic">SỐ DƯ CỦA BẠN</span>
+              <span class="text-3xl font-black text-amber-400">{{ formatPrice(user.balance) }}đ</span>
+            </div>
+
+            <!-- Voucher Section -->
+            <div class="mx-6 mb-4 bg-white rounded-2xl p-5">
+              <div class="flex items-center gap-2 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                </svg>
+                <span class="text-gray-800 font-bold">VOUCHER</span>
+              </div>
+              <div class="flex gap-2">
+                <input
+                  v-model="voucherCode"
+                  type="text"
+                  placeholder="Hãy nhập mã giảm giá (nếu có)"
+                  class="flex-1 px-4 py-3 bg-gray-100 rounded-full text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                >
+                <button @click="applyVoucher" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-full hover:shadow-lg transition-all">
+                  Áp dụng
+                </button>
+              </div>
+            </div>
+
+            <!-- Total Payment -->
+            <div class="px-6 pb-4 flex justify-between items-center">
+              <span class="text-2xl font-black text-purple-400 italic">TỔNG THANH TOÁN</span>
+              <span class="text-3xl font-black text-amber-400">{{ formatPrice(selectedAcc?.price) }}Đ</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="p-6 pt-2 flex gap-4">
+              <button @click="handleWarrantyPolicy" class="flex-1 py-4 px-6 bg-transparent border-2 border-gray-600 text-white font-bold rounded-full hover:border-gray-400 transition-all">
+                Chính sách bảo hành
+              </button>
+              <button @click="handleDeposit" class="flex-1 py-4 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-full hover:shadow-[0_0_20px_rgba(6,182,212,0.5)] transition-all">
+                NẠP TIỀN
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </main>
 </template>
 
