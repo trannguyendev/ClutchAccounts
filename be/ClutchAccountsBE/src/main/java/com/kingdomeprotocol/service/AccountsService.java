@@ -1,17 +1,23 @@
 package com.kingdomeprotocol.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kingdomeprotocol.controller.AccountsController.DTOnewAcc;
 import com.kingdomeprotocol.model.AccForSellModel;
+import com.kingdomeprotocol.model.AccountImageModel;
 import com.kingdomeprotocol.model.BoughtLogModel;
+import com.kingdomeprotocol.model.SubInfoModel;
 import com.kingdomeprotocol.model.TransactionsModel;
 import com.kingdomeprotocol.model.UserModel;
 import com.kingdomeprotocol.repository.AccForSellRepository;
+import com.kingdomeprotocol.repository.AccountImageRepository;
 import com.kingdomeprotocol.repository.BoughtLogRepository;
+import com.kingdomeprotocol.repository.SubInfoRepository;
 import com.kingdomeprotocol.repository.TransactionRepository;
 import com.kingdomeprotocol.repository.UserRepository;
 
@@ -25,7 +31,8 @@ public class AccountsService {
 	private final TransactionRepository transRepo;
 	private final AccForSellRepository accRepo;
 	private final BoughtLogRepository boughtRepo;
-	
+	private final AccountImageRepository imgRepo;
+	private final SubInfoRepository subRepo;
 @Transactional
 public BuyRes buyAcc(String email, int idAcc) {
 	
@@ -117,6 +124,41 @@ public List<?> getList5RandomFA(){
 		throw new RuntimeException("This kind of account has been sold out");
 	}
 	return accRandomFA;
+}
+
+//Create new account for sell (admin role)
+public void createAccForSell(DTOnewAcc dto) {
+	
+	AccForSellModel account = new AccForSellModel();
+    account.setEmail(dto.email());
+    account.setUsername(dto.username());
+    account.setAccount_psw(dto.password());
+    account.setPrice(dto.price());  
+    account.setListed_at(dto.listed_at() != null ? dto.listed_at() : LocalDateTime.now());
+    account.setSold(dto.isSold() != null ? dto.isSold() : false);
+    account.setLocked(dto.isLocked() != null ? dto.isLocked() : false);
+    account.setLockedUntil(dto.lockedUntil());
+    account.setAccount_type(dto.account_type());
+    
+    accRepo.save(account);
+    
+    if (dto.image_url() != null && !dto.image_url().isBlank()) {
+    	AccountImageModel img = new AccountImageModel();
+    	img.setImage_url(dto.image_url());
+    	img.setAccId(account);
+    	
+    	imgRepo.save(img);
+    }
+
+	SubInfoModel subInfoData = new SubInfoModel();
+	subInfoData.setAccSubInfo(account);
+	subInfoData.setRank_info(dto.rank_info());
+	subInfoData.setVp(dto.vp());
+	subInfoData.setMelee_amount(dto.melee_amount());
+	subInfoData.setGun_amount(dto.gun_amount());
+	subInfoData.setBtp(dto.btp());
+    
+	subRepo.save(subInfoData);
 }
 public record BuyRes(String username, String email, String password) {}
 }
