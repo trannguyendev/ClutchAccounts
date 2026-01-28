@@ -1,9 +1,16 @@
 package com.kingdomeprotocol.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -14,17 +21,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kingdomeprotocol.model.AccForSellModel;
 import com.kingdomeprotocol.model.AccountImageModel;
 import com.kingdomeprotocol.model.DTOBuyRequest;
 import com.kingdomeprotocol.model.SubInfoModel;
 import com.kingdomeprotocol.repository.AccForSellRepository;
+import com.kingdomeprotocol.repository.AccForSellRepository.customExportInfoAccAdmin;
 import com.kingdomeprotocol.repository.AccountImageRepository;
 import com.kingdomeprotocol.repository.BoughtLogRepository;
 import com.kingdomeprotocol.repository.SubInfoRepository;
 import com.kingdomeprotocol.service.AccountsService;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -160,38 +172,106 @@ public class AccountsController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> createNew(@RequestBody DTOnewAcc dto){
 		try {
-			AccForSellModel account = new AccForSellModel();
-            account.setEmail(dto.email());
-            account.setUsername(dto.username());
-            account.setAccount_psw(dto.password());
-            account.setPrice(dto.price());  
-            account.setListed_at(dto.listed_at() != null ? dto.listed_at() : LocalDateTime.now());
-            account.setSold(dto.isSold() != null ? dto.isSold() : false);
-            account.setLocked(dto.isLocked() != null ? dto.isLocked() : false);
-            account.setLockedUntil(dto.lockedUntil());
-            account.setAccount_type(dto.account_type());
-            
-            accRepo.save(account);
-            
-            if (dto.image_url() != null && !dto.image_url().isBlank()) {
-            	AccountImageModel img = new AccountImageModel();
-            	img.setImage_url(dto.image_url());
-            	img.setAccId(account);
-            	
-            	imgRepo.save(img);
-            }
-
-			SubInfoModel subInfoData = new SubInfoModel();
-			subInfoData.setAccSubInfo(account);
-			subInfoData.setRank_info(dto.rank_info());
-			subInfoData.setVp(dto.vp());
-			subInfoData.setMelee_amount(dto.melee_amount());
-			subInfoData.setGun_amount(dto.gun_amount());
-			subInfoData.setBtp(dto.btp());
-            
-			subRepo.save(subInfoData);
+			accServ.createAccForSell(dto);
 			return ResponseEntity.ok(Map.of("message","create done"));
 		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",e.getMessage()));
+		}
+	}
+	
+	//Import/Export to csv file
+	@PostMapping("/import")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> importCSV(@RequestParam("file") MultipartFile file){
+		try {
+			if (file.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","File is empty"));
+			}
+			CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()));
+			String header[] = reader.readNext();
+			List<String[]> rows = reader.readAll();
+			
+			int successCount = 0;
+			for (String[] row : rows) {
+				DTOnewAcc newAcc = new DTOnewAcc(row[0], 
+						row[1], 
+						row[2], 
+						Integer.parseInt(row[3]), 
+						row[4].isBlank() ? null : LocalDateTime.parse(row[4]), 
+						row[5].isBlank() ? null : Boolean.parseBoolean(row[5]), 
+						row[6].isBlank() ? null : Boolean.parseBoolean(row[6]), 
+						row[7].isBlank() ? null : LocalDateTime.parse(row[7]), 
+						row[8], 
+						row[9], 
+						row[10], 
+						Integer.parseInt(row[11]),
+						Integer.parseInt(row[12]),
+						Integer.parseInt(row[13]),
+						Integer.parseInt(row[14]));
+				accServ.createAccForSell(newAcc);
+				successCount++;
+				
+			}
+			return ResponseEntity.ok("Import success "+successCount+" accounts");
+		}
+		catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",e.getMessage()));
+		}
+	}
+	
+	@GetMapping("/export")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> exportCSV(){
+		try {
+			List<customExportInfoAccAdmin> lstExport = accRepo.customExportAccForAdmin();
+			//create csv in-memory
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			CSVWriter writer = new CSVWriter(new OutputStreamWriter(baos));
+			
+			writer.writeNext(new String[]{
+					"accountId",
+					"email",
+					"username",
+					"password",
+					"listedAt",
+					"isSold",
+					"isLocked",
+					"lockedUntil",
+					"price",
+					"accountType",
+					"imageUrl",
+					"rankInfo",
+					"vp",
+					"meleeAmount",
+					"gunAmount",
+					"btp"
+		        });
+			for (customExportInfoAccAdmin customExportInfoAccAdmin : lstExport) {
+				writer.writeNext(new String[] {
+						String.valueOf(customExportInfoAccAdmin.getAccount_id()),
+						customExportInfoAccAdmin.getEmail(),
+						customExportInfoAccAdmin.getUsername(),
+						customExportInfoAccAdmin.getPassword(),
+						customExportInfoAccAdmin.getListed_at() != null ?  String.valueOf(customExportInfoAccAdmin.getListed_at()) : "",
+						String.valueOf(customExportInfoAccAdmin.getIsSold()),
+						String.valueOf(customExportInfoAccAdmin.getIsLocked()),
+						customExportInfoAccAdmin.getLockedUntil() != null ? String.valueOf(customExportInfoAccAdmin.getLockedUntil()) : "",
+						String.valueOf(customExportInfoAccAdmin.getPrice()),
+						customExportInfoAccAdmin.getAccount_type(),
+						String.valueOf(customExportInfoAccAdmin.getImage_url()),
+						customExportInfoAccAdmin.getRank_info(),
+						String.valueOf(customExportInfoAccAdmin.getVp()),
+						String.valueOf(customExportInfoAccAdmin.getMelee_amount()),
+						String.valueOf(customExportInfoAccAdmin.getGun_amount()),
+						String.valueOf(customExportInfoAccAdmin.getBtp())
+				});
+			}
+			writer.close();
+			ByteArrayResource res = new ByteArrayResource(baos.toByteArray());
+			return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=valorant_accounts.csv").contentType(MediaType.parseMediaType("text/csv")).body(res);
+		}
+		catch (Exception e) {
+			// TODO: handle exception
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error",e.getMessage()));
 		}
 	}
