@@ -720,7 +720,11 @@ const handleImageUpload = async (event) => {
     formDataImg.append('key', IMGBB_API_KEY);
     formDataImg.append('image', base64);
 
-    const response = await axios.post('https://api.imgbb.com/1/upload', formDataImg);
+    const response = await axios.post('https://api.imgbb.com/1/upload', formDataImg, {
+      headers: {
+        Authorization: undefined
+      }
+    });
 
     if (response.data && response.data.data && response.data.data.url) {
       formData.value.image_url = response.data.data.url;
