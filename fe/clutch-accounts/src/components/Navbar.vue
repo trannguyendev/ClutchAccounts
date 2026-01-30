@@ -1,8 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/user'
+import LanguageToggle from './LanguageToggle.vue'
 
+const { t } = useI18n()
 const currentUser = useUserStore()
 const id = currentUser.id
 const currentTime = Date.now()
@@ -25,6 +28,7 @@ const toggleMenu = () => {
                 <span class="self-center text-lg md:text-2xl font-extrabold tracking-tight text-amber-300 drop-shadow-[0_3px_10px_rgba(255,184,28,0.12)]">Team name</span>
             </a>
             <div class="flex md:order-2 space-x-2 md:space-x-3 rtl:space-x-reverse items-center">
+                <LanguageToggle />
                 <button @click="toggleMenu" type="button"
                     class="inline-flex items-center p-2.5 md:p-2 w-10 h-10 justify-center text-sm text-amber-200 rounded-lg md:hidden hover:bg-amber-900/12 focus:outline-none focus:ring-2 focus:ring-amber-300 transition-colors duration-200"
                     aria-controls="navbar-sticky">
@@ -42,19 +46,19 @@ const toggleMenu = () => {
                     <li>
                         <router-link :to="'/main'"
                             class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md"
-                            aria-current="page">Home</router-link>
+                            aria-current="page">{{ t('nav.home') }}</router-link>
                     </li>
                     <li>
                         <a href="#"
-                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md">About</a>
+                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md">{{ t('nav.about') }}</a>
                     </li>
                     <li>
                         <router-link :to="'/payment/'+transactionContent"
-                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md">Add Money</router-link>
+                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md">{{ t('nav.addMoney') }}</router-link>
                     </li>
                     <li>
                         <a href="#"
-                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md">Contact</a>
+                            class="nav-link block py-2 px-4 rounded-md md:p-0 font-semibold transition-colors duration-200 text-md">{{ t('nav.contact') }}</a>
                     </li>
                 </ul>
             </div>

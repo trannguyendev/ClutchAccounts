@@ -1,7 +1,9 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
+const { t } = useI18n()
 
 const goBack = () => {
   router.back()
@@ -14,12 +16,12 @@ const goBack = () => {
       <!-- Large 404 Text -->
       <div class="space-y-2">
         <h1 class="text-8xl md:text-9xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-amber-600">404</h1>
-        <p class="text-2xl md:text-3xl font-bold text-amber-300">Page Not Found</p>
+        <p class="text-2xl md:text-3xl font-bold text-amber-300">{{ t('error.error404') }}</p>
       </div>
 
       <!-- Description -->
       <p class="text-amber-200/80 text-base md:text-lg leading-relaxed">
-        The page you're looking for doesn't exist or has been moved. Let's get you back on track.
+        {{ t('error.error404Desc') }}
       </p>
 
       <!-- Back Button -->
@@ -28,13 +30,13 @@ const goBack = () => {
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
-        <span>Go Back</span>
+        <span>{{ t('common.back') }}</span>
       </button>
 
       <!-- Decorative elements -->
       <div class="pt-12 space-y-3 text-amber-300/40">
         <div class="h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
-        <p class="text-xs tracking-widest uppercase">Error • Not Found</p>
+        <p class="text-xs tracking-widest uppercase">{{ t('common.error') }} • Not Found</p>
       </div>
     </div>
   </div>

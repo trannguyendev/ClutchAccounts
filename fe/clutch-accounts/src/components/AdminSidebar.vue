@@ -2,7 +2,7 @@
   <aside class="w-64 border-r-2 border-amber-900/60">
     <div class="p-6 flex items-center justify-between gap-4">
       <div class="text-lg font-semibold text-amber-400">
-        Admin Dashboard
+        {{ t('admin.adminDashboard') }}
       </div>
       <div class="w-12 h-12 rounded-lg bg-amber-900/40 border border-amber-600/50 flex items-center justify-center flex-shrink-0 overflow-hidden cursor-pointer hover:bg-amber-900/60 transition-all duration-300" @click="goToMainPage">
         <img src="../img/Logo.png" alt="Logo" class="w-full h-full object-cover"/>
@@ -22,7 +22,7 @@
         ]"
       >
         <span v-if="item.icon.includes('<')" v-html="item.icon" class="text-xl"></span>
-        <span>{{ item.name }}</span>
+        <span>{{ item.label }}</span>
       </div>
     </div>
   </aside>
@@ -30,7 +30,9 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 const router = useRouter();
+const { t } = useI18n();
 defineProps({
   activeLi: {
     type: Number,
@@ -41,11 +43,11 @@ defineProps({
 defineEmits(['navigate']);
 
 const sidebarItems = [
-  { name: 'Dashboard', icon: '<i class="fa-solid fa-chart-line"></i>', route: '/admin' },
-  { name: 'Transaction', icon: '<i class="fa-solid fa-money-bill-transfer"></i>', route: '/admin/transaction' },
-  { name: 'Account Management', icon: '<i class="fa-solid fa-people-roof"></i>', route: '/admin/account' },
-  { name: 'News', icon: '<i class="fa-solid fa-newspaper"></i>', route: '/admin/news' },
-  { name: 'Valorant Account Management', icon: '<i class="fa-solid fa-gamepad"></i>', route: '/admin/vlr_account' }
+  { label: t('admin.dashboard'), icon: '<i class="fa-solid fa-chart-line"></i>', route: '/admin' },
+  { label: t('admin.transaction'), icon: '<i class="fa-solid fa-money-bill-transfer"></i>', route: '/admin/transaction' },
+  { label: t('admin.accountManagement'), icon: '<i class="fa-solid fa-people-roof"></i>', route: '/admin/account' },
+  { label: t('admin.news'), icon: '<i class="fa-solid fa-newspaper"></i>', route: '/admin/news' },
+  { label: t('admin.valorantAccountManagement'), icon: '<i class="fa-solid fa-gamepad"></i>', route: '/admin/vlr_account' }
 ];
 
 const goToMainPage = () => {
