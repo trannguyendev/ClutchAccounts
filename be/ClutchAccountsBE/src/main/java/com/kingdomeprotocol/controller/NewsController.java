@@ -27,7 +27,7 @@ public class NewsController {
 	private final NewsService newsService;
 	
 	// GET all news
-	@GetMapping
+	@GetMapping("/info")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllNews() {
 		try {
@@ -39,7 +39,7 @@ public class NewsController {
 	}
 	
 	// GET news by id
-	@GetMapping("/{id}")
+	@GetMapping("/info/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getNewsById(@PathVariable int id) {
 		try {
@@ -57,7 +57,7 @@ public class NewsController {
 	}
 	
 	// POST create new news
-	@PostMapping
+	@PostMapping("/create")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> createNews(@RequestBody Map<String, Object> request) {
 		try {
@@ -87,7 +87,7 @@ public class NewsController {
 	}
 	
 	// PUT update news
-	@PutMapping("/{id}")
+	@PutMapping("/update/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> updateNews(@PathVariable int id, @RequestBody Map<String, Object> request) {
 		try {
@@ -107,7 +107,7 @@ public class NewsController {
 	}
 	
 	// DELETE news
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/delete/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> deleteNews(@PathVariable int id) {
 		try {

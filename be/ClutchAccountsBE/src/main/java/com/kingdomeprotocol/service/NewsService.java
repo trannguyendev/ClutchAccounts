@@ -62,9 +62,9 @@ public class NewsService {
 		if (content != null && !content.isEmpty()) {
 			news.setContent(content);
 		}
-		if (embedLink != null && !embedLink.isEmpty()) {
-			news.setEmbed_link(embedLink);
-		}
+		 if (embedLink != null && !embedLink.isEmpty()) {
+		 	news.setEmbed_link(embedLink);
+		 }
 		
 		return newsRepo.save(news);
 	}
