@@ -19,6 +19,8 @@ import ForgotPass from '@/pages/ForgotPass.vue'
 import UserTransactionAndBoughtLog from '@/pages/UserTransactionAndBoughtLog.vue'
 import PaymentCancel from '@/components/PaymentCancel.vue'
 import PaymentSuccess from '@/components/PaymentSuccess.vue'
+import FAQ from '@/pages/FAQ.vue'
+
 
 
 
@@ -140,6 +142,11 @@ const routes = [
     name: 'purchase-history',
     component: UserTransactionAndBoughtLog,
     meta: { requiresAuth: true , roles: ['user', 'admin']},
+  },
+  {
+    path: '/faq',
+    name: 'faq',
+    component: FAQ
   },
   //Catch-all route for some s2pid access paths which doesn't exist
   {
