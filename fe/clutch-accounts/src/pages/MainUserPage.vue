@@ -1,10 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import { useUserStore } from '../stores/user'
+import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import Navbar from '@/components/Navbar.vue'
 
-
+const { t } = useI18n()
 let currentUser = useUserStore()
 const isMenuOpen = ref(false)
 const videoRef = ref(null)
@@ -39,23 +40,23 @@ const colorMap = {
 }
 
 const categories = [
-  { id: 1, name: 'ACC VALORANT', subtitle: 'DROPMAIL', color: 'from-yellow-500 to-orange-500', textColor: 'text-yellow-500', img: '', link: '/accounts/acc-drop-mail' },
-  { id: 2, name: 'ACC VALORANT', subtitle: 'SUPER SALE', color: 'from-cyan-400 to-blue-500', textColor: 'text-cyan-400', img: '', link: '/accounts/acc-sieu-sale' },
-  { id: 3, name: 'ACC VALORANT', subtitle: 'RANDOM NFA', color: 'from-pink-500 to-purple-500', textColor: 'text-pink-500', img: '', link: '/accounts/acc-random-nfa' },
-  { id: 4, name: 'ACC VALORANT', subtitle: 'RANDOM FA', color: 'from-red-500 to-pink-500', textColor: 'text-red-500', img: '', link: '/accounts/acc-random-fa' }
+  { id: 1, name: t('main.accValorant'), subtitle: t('main.dropmail'), color: 'from-yellow-500 to-orange-500', textColor: 'text-yellow-500', img: '', link: '/accounts/acc-drop-mail' },
+  { id: 2, name: t('main.accValorant'), subtitle: t('main.superSale'), color: 'from-cyan-400 to-blue-500', textColor: 'text-cyan-400', img: '', link: '/accounts/acc-sieu-sale' },
+  { id: 3, name: t('main.accValorant'), subtitle: t('main.randomNFA'), color: 'from-pink-500 to-purple-500', textColor: 'text-pink-500', img: '', link: '/accounts/acc-random-nfa' },
+  { id: 4, name: t('main.accValorant'), subtitle: t('main.randomFA'), color: 'from-red-500 to-pink-500', textColor: 'text-red-500', img: '', link: '/accounts/acc-random-fa' }
 ]
 
 const otherProducts = [
-  { id: 1, name: 'ĐẾN RIOT', image: '🎮' },
-  { id: 2, name: 'DAO MỎ HÌNH MELEE', image: '⚔️' },
-  { id: 3, name: 'COMBO HỢP 2-3 MỎ HÌNH', image: '🎯' },
-  { id: 4, name: 'PC GAMING SALE', image: '🖥️' }
+  { id: 1, name: t('main.riotPass'), image: '🎮' },
+  { id: 2, name: t('main.meleeWeapon'), image: '⚔️' },
+  { id: 3, name: t('main.weaponCombo'), image: '🎯' },
+  { id: 4, name: t('main.pcGamingSale'), image: '🖥️' }
 ]
 
 const announcements = [
-  { id: 1, title: 'Shop bán acc uy tín', desc: 'Lựa chọn hàng đầu của...' },
+  { id: 1, title: t('main.shopTrusted'), desc: t('main.shopTrustedDesc') },
   { id: 2, title: 'Shop Acc Valorant Uy Tín', desc: 'Nền bản đăng tin mua...' },
-  { id: 3, title: 'Hướng dẫn nạp Valorant', desc: 'Hướng dẫn nạp Valorant...' }
+  { id: 3, title: t('main.accountGuide'), desc: t('main.accountGuideDesc') }
 ]
 </script>
 <template>
@@ -75,7 +76,7 @@ const announcements = [
       <button @click="toggleAudio"
         class="absolute top-4 right-4 z-20 bg-amber-600/80 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-amber-600/50 flex items-center gap-2">
         <i :class="isAudioMuted ? 'fa fa-volume-mute' : 'fa fa-volume-high'"></i>
-        <span class="text-sm">{{ isAudioMuted ? 'Unmute' : 'Mute' }}</span>
+        <span class="text-sm">{{ isAudioMuted ? t('main.unmute') : t('main.mute') }}</span>
       </button>
 
       <!-- Video Overlay for better text contrast -->
@@ -89,15 +90,15 @@ const announcements = [
       <!-- Content -->
       <div class="relative z-10 flex items-center justify-between h-full px-8">
         <div class="flex-1">
-          <h1 class="text-5xl font-black text-white mb-4 drop-shadow-lg">WELCOME BACK!</h1>
-          <p class="text-xl text-amber-300 font-semibold drop-shadow-md">Step into the game with top-tier Valorant accounts — variety, quality, and trust in one place</p>
+          <h1 class="text-5xl font-black text-white mb-4 drop-shadow-lg">{{ t('main.welcomeBack') }}</h1>
+          <p class="text-xl text-amber-300 font-semibold drop-shadow-md">{{ t('main.subtitle') }}</p>
         </div>
 
         <div class="flex gap-6 mt-12">
           <!-- Balance Card -->
           <div
             class="bg-gradient-to-br from-amber-400/10 to-orange-600/10 backdrop-blur-md border border-amber-500/30 rounded-2xl p-6 min-w-max">
-            <p class="text-amber-200 text-sm font-semibold mb-2">CURRENT BALANCE</p>
+            <p class="text-amber-200 text-sm font-semibold mb-2">{{ t('main.currentBalance') }}</p>
             <p class="text-3xl font-black text-amber-300 drop-shadow-[0_3px_10px_rgba(255,184,28,0.3)]">{{
               currentUser.balance}} VND</p>
           </div>
@@ -128,13 +129,13 @@ const announcements = [
                     <!-- Profile -->
                     <RouterLink to="/user/profile" class="w-full px-6 py-3 text-left text-slate-200 hover:bg-amber-500/10 hover:text-amber-300 transition-all duration-200 flex items-center gap-3 group border-b border-slate-800/50">
                       <i class="fa fa-user text-amber-400 group-hover:scale-110 transition-transform"></i>
-                      <span class="font-medium">Profile</span>
+                      <span class="font-medium">{{ t('common.profile') }}</span>
                       <span class="ml-auto text-amber-400/60 text-xs">→</span>
                     </RouterLink>
                     <!-- Transaction History -->
                     <RouterLink to="/user/purchase-history" class="w-full px-6 py-3 text-left text-slate-200 hover:bg-amber-500/10 hover:text-amber-300 transition-all duration-200 flex items-center gap-3 group border-b border-slate-800/50">
                       <i class="fa fa-magnifying-glass-dollar text-amber-400 group-hover:scale-110 transition-transform"></i>
-                      <span class="font-medium">Transactions</span>
+                      <span class="font-medium">{{ t('userPanel.transactionHistory') }}</span>
                       <span class="ml-auto text-amber-400/60 text-xs">→</span>
                     </RouterLink>
                     <!-- Help & Support -->
@@ -147,7 +148,7 @@ const announcements = [
                     <!-- Logout -->
                     <button @click="handleLogout" class="w-full px-6 py-3 text-left text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 flex items-center gap-3 group">
                       <i class="fa fa-sign-out text-red-500 group-hover:scale-110 transition-transform"></i>
-                      <span class="font-medium">Logout</span>
+                      <span class="font-medium">{{ t('common.logout') }}</span>
                       <span class="ml-auto text-red-500/60 text-xs">→</span>
                     </button>
                   </div>
@@ -158,7 +159,7 @@ const announcements = [
               <div v-if="isMenuOpen" @click="closeMenu" class="fixed inset-0 z-40"></div>
               
               <div class="font-medium text-heading">
-                <div class="text-purple-200 text-sm font-semibold mb-2">Have a good day!</div>
+                <div class="text-purple-200 text-sm font-semibold mb-2">{{ t('main.quote') }}</div>
                 <div class="text-2xl font-black text-purple-300 drop-shadow-[0_3px_10px_rgba(168,85,247,0.3)]">{{
                   currentUser.username }}</div>
               </div>
@@ -166,7 +167,7 @@ const announcements = [
             <button @click="handleLogout"
               class="mt-4 w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-red-600/50 hover:scale-105 active:scale-95 group">
               <i class="fa fa-power-off transition-transform duration-300 group-hover:rotate-12" aria-hidden="true"></i>
-              Logout
+              {{ t('common.logout') }}
             </button>
           </div>
         </div>
@@ -182,7 +183,7 @@ const announcements = [
       <!-- Announcements Section -->
       <div class="mb-20">
         <h2 class="text-3xl font-black text-white mb-8 flex items-center gap-3">
-          <span class="text-amber-400">📢</span> NEWS
+          <span class="text-amber-400">📢</span> {{ t('main.announcements') }}
           <div class="flex-1 h-1 bg-gradient-to-r from-amber-400 to-transparent ml-4"></div>
         </h2>
 
@@ -207,7 +208,7 @@ const announcements = [
       <!-- Products Section -->
       <div class="mb-20">
         <h2 class="text-3xl font-black text-white mb-8 flex items-center gap-3">
-          <span class="text-purple-400">⚡</span> ACC VALORANT
+          <span class="text-purple-400">⚡</span> {{ t('main.accValorant') }}
           <div class="flex-1 h-1 bg-gradient-to-r from-purple-400 to-transparent ml-4"></div>
         </h2>
 
@@ -232,7 +233,6 @@ const announcements = [
                   {{ item.subtitle }}
                 </p>
               </router-link>
-              <p class="text-amber-400 text-xs mt-4 font-semibold">🔥 ĐỐI FULL THÔNG TIN 🔥</p>
             </div>
 
             <!-- Border Glow -->
@@ -246,7 +246,7 @@ const announcements = [
       <!-- PC Gaming Section -->
       <div>
         <h2 class="text-3xl font-black text-white mb-8 flex items-center gap-3">
-          <span class="text-cyan-400">🖥️</span> MỎ HÌNH VALORANT - SUPER PC GAMING
+          <span class="text-cyan-400">🖥️</span> {{ t('main.accValorant') }} - {{ t('main.superSale') }} PC GAMING
           <div class="flex-1 h-1 bg-gradient-to-r from-cyan-400 to-transparent ml-4"></div>
         </h2>
 

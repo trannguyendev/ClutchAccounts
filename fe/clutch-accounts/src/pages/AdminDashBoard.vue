@@ -3,15 +3,18 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const router = useRouter();
 const activeLi = ref(0);
 let pollingInterval = null;
 const sidebarItems = [
-  { name: 'Dashboard', icon: '<i class="fa-solid fa-chart-line"></i>', route: '/admin' },
-  { name: 'Transaction', icon: '<i class="fa-solid fa-money-bill-transfer"></i>', route: '/admin/transaction' },
-  { name: 'Account Management', icon: '<i class="fa-solid fa-people-roof"></i>', route: '/admin/account' },
-  { name: 'News', icon: '<i class="fa-solid fa-newspaper"></i>', route: '/admin/news' },
-  { name: 'Valorant Account Management', icon: '<i class="fa-solid fa-gamepad"></i>', route: '/admin/vlr_account' }
+  { name: t('admin.dashboard'), icon: '<i class="fa-solid fa-chart-line"></i>', route: '/admin' },
+  { name: t('admin.transaction'), icon: '<i class="fa-solid fa-money-bill-transfer"></i>', route: '/admin/transaction' },
+  { name: t('admin.accountManagement'), icon: '<i class="fa-solid fa-people-roof"></i>', route: '/admin/account' },
+  { name: t('admin.news'), icon: '<i class="fa-solid fa-newspaper"></i>', route: '/admin/news' },
+  { name: t('admin.valorantAccountManagement'), icon: '<i class="fa-solid fa-gamepad"></i>', route: '/admin/vlr_account' }
 ];
 
 const handleNavigation = (item, index) => {
