@@ -21,26 +21,28 @@
             <table class="min-w-full text-left text-amber-100">
               <thead>
                 <tr class="border-b border-amber-900/50">
-                  <th class="px-3 py-2">#</th>
+                  <th class="px-3 py-2">STT</th>
                   <th class="px-3 py-2">Tiêu đề</th>
-                  <th class="px-3 py-2">Trạng thái</th>
-                  <th class="px-3 py-2">Ngày</th>
+                  <th class="px-3 py-2">Nội dung</th>
+                  <th class="px-3 py-2">Ảnh</th>
+                  <th class="px-3 py-2">Ngày tạo</th>
                   <th class="px-3 py-2">Hành động</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(n, idx) in newsList" :key="n.id" class="border-b border-amber-900/20">
+                <tr v-for="(n, idx) in newsList" :key="n.news_id" class="border-b border-amber-900/20">
                   <td class="px-3 py-2">{{ idx + 1 }}</td>
                   <td class="px-3 py-2">{{ n.title }}</td>
-                  <td class="px-3 py-2">{{ n.published ? 'Đã đăng' : 'Bản nháp' }}</td>
-                  <td class="px-3 py-2">{{ formatDate(n.publishedAt) }}</td>
+                  <td class="px-3 py-2 truncate max-w-xs">{{ n.content }}</td>
+                  <td class="px-3 py-2"><a v-if="n.embed_link" :href="n.embed_link" target="_blank" class="text-amber-200 underline text-sm">Link</a><span v-else class="text-amber-400/50">-</span></td>
+                  <td class="px-3 py-2">{{ formatDate(n.created_at) }}</td>
                   <td class="px-3 py-2 space-x-2">
                     <button @click="openEdit('news', n)" class="px-2 py-1 bg-amber-400 text-black rounded">Sửa</button>
-                    <button @click="remove('news', n.id)" class="px-2 py-1 bg-red-600 rounded">Xóa</button>
+                    <button @click="remove('news', n.news_id)" class="px-2 py-1 bg-red-600 rounded">Xóa</button>
                   </td>
                 </tr>
                 <tr v-if="!newsList.length">
-                  <td colspan="5" class="px-3 py-4 text-amber-400/60">Không có bài viết.</td>
+                  <td colspan="6" class="px-3 py-4 text-amber-400/60">Không có bài viết.</td>
                 </tr>
               </tbody>
             </table>
@@ -120,7 +122,9 @@ import { ref, reactive, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import AdminSidebar from './AdminSidebar.vue';
+import { useUserStore } from '@/stores/user';
 
+const user = useUserStore();
 const router = useRouter();
 const activeLi = ref(3);
 const handleNavigation = (item, index) => {
@@ -137,16 +141,14 @@ const modalOpen = ref(false);
 const editing = reactive({ type: 'news', id: null });
 const form = reactive({ title: '', content: '', image: '', link: '', published: false });
 
-const API = {
-  news: '/api/admin/news',
-  ads: '/api/admin/ads'
-};
+const API = "/api/news"
 
 const fetchNews = async () => {
   try {
     loading.value = true;
-    const res = await axios.get(API.news);
+    const res = await axios.get(API+"/info");
     newsList.value = res.data || [];
+    console.log("NEWS DATA: ",res.data);
   } catch (e) {
     console.error(e);
     alert('Lỗi khi tải danh sách tin.');
@@ -170,7 +172,6 @@ const fetchAds = async () => {
 
 onMounted(() => {
   fetchNews();
-  fetchAds();
 });
 
 const openCreate = () => {
@@ -186,10 +187,10 @@ const openCreate = () => {
 
 const openEdit = (type, item) => {
   editing.type = type;
-  editing.id = item.id;
+  editing.id = item.news_id || item.id;
   form.title = item.title || '';
   form.content = item.content || '';
-  form.image = item.image || '';
+  form.image = item.embed_link || item.image || '';
   form.link = item.link || '';
   form.published = !!(item.published || item.active);
   modalOpen.value = true;
@@ -202,13 +203,30 @@ const closeModal = () => {
 const save = async () => {
   const type = editing.type;
   try {
+    let payload = {};
+    if (type === 'news') {
+      payload = {
+        news_title: form.title,
+        news_content: form.content,
+        embed_link: form.image,
+        author_id: user.id
+      };
+    } else {
+      payload = {
+        title: form.title,
+        link: form.link,
+        active: form.published
+      };
+    }
+
     if (editing.id) {
       // update
-      await axios.put(`${type === 'news' ? API.news : API.ads}/${editing.id}`, form);
+      await axios.put(`${API}/update/${editing.id}`, payload);
       alert('Cập nhật thành công');
     } else {
       // create
-      await axios.post(type === 'news' ? API.news : API.ads, form);
+      await axios.post(API+"/create", payload);
+      console.log(payload);
       alert('Tạo thành công');
     }
     modalOpen.value = false;
@@ -222,7 +240,7 @@ const save = async () => {
 const remove = async (type, id) => {
   if (!confirm('Bạn chắc chắn muốn xóa?')) return;
   try {
-    await axios.delete(`${type === 'news' ? API.news : API.ads}/${id}`);
+    await axios.delete(`${API}/delete/${id}`);
     alert('Xóa thành công');
     await (type === 'news' ? fetchNews() : fetchAds());
   } catch (e) {

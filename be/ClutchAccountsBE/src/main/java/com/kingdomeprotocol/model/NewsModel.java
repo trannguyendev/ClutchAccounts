@@ -2,6 +2,7 @@ package com.kingdomeprotocol.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
@@ -39,6 +40,7 @@ public class NewsModel {
 	@JsonProperty("created_at")
 	LocalDateTime created_at;
 	
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "author_id")
 	UserModel author_id;
