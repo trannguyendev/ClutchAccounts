@@ -41,7 +41,7 @@ public class VoucherController { // 1. Đã có public (Tốt)
     }
 
     @GetMapping("/getVoucherByVoucherCode")
-    public List<Vouchers> getOneVoucherByVoucherCode(@RequestParam("voucherCode") String voucherCode){
+    public Vouchers getOneVoucherByVoucherCode(@RequestParam("voucherCode") String voucherCode){
         return voucherService.getVoucherByVoucherCode(voucherCode);
     }
 }

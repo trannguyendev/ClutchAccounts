@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface VouchersRepository extends JpaRepository<Vouchers, Integer> {
 
     @Query("SELECT v FROM Vouchers v WHERE v.voucherCode LIKE %:voucherCode%")
-    List<Vouchers> getVoucherByVoucherCode(@Param("voucherCode") String voucherCode);
+    Vouchers getVoucherByVoucherCode(@Param("voucherCode") String voucherCode);
 }

@@ -25,7 +25,14 @@
     "cancel": "Hủy",
     "loading": "Đang tải",
     "error": "Lỗi",
-    "success": "Thành công"
+    "success": "Thành công",
+    "free": "Miễn phí",
+    "auto": "Tự động",
+    "voucher": "Mã giảm giá",
+    "apply": "Áp dụng",
+    "warranty": "Chính sách bảo hành",
+    "voucherQuote":"Vui lòng nhập mã giảm giá nếu bạn có",
+    "totalPrice":"Tổng thanh toán"
   },
   "main": {
     "welcomeBack": "CHÀO MỪNG TRỞ LẠI!",
@@ -51,6 +58,42 @@
     "shopTrustedDesc": "Lựa chọn hàng đầu của...",
     "accountGuide": "Hướng dẫn nạp Valorant",
     "accountGuideDesc": "Hướng dẫn nạp Valorant..."
+  },
+  "accs":{
+    "buyNow":"Mua ngay",
+    "viewDetails":"Xem chi tiết",
+    "price": "Giá",
+    "gun": "S.Súng",
+    "melee": "S.Dao",
+    "id": "Mã số",
+    "transFee":"Phí giao dịch",
+    "transWay":"Phương thức giao dịch",
+    "category":"Danh mục"
+  },
+  "filter": {
+    "searchByRequirements": "TÌM KIẾM THEO YÊU CẦU",
+    "searchNickname": "Tìm kiếm mã nick",
+    "allRanks": "Tìm kiếm rank",
+    "allPrices": "Tìm kiếm giá",
+    "sortDefault": "Tìm kiếm sắp xếp",
+    "priceLowest": "Giá: Thấp đến Cao",
+    "priceHighest": "Giá: Cao đến Thấp",
+    "newest": "Mới nhất",
+    "search": "TÌM KIẾM",
+    "clear": "XÓA",
+    "budgetFriendly": "ACC GIÁ RẺ",
+    "under2m": "Acc dưới 2 triệu",
+    "midTier": "ACC TỪ 2M - 6M",
+    "premium": "ACC TỪ 6M - 10M",
+    "elite": "SIÊU VIP TRÊN 10M+",
+    "above10m": "Acc siêu vip trên 10 triệu",
+    "showing": "Hiển thị",
+    "of": "trên",
+    "results": "kết quả",
+    "page": "Trang",
+    "noResults": "Không Tìm Thấy Tài Khoản",
+    "tryChangingFilters": "Hãy thử điều chỉnh bộ lọc hoặc tiêu chí tìm kiếm của bạn",
+    "resetFilters": "Đặt Lại Bộ Lọc"
   },
   "payment": {
     "addMoney": "Nạp tiền",

@@ -21,7 +21,7 @@ public class VoucherService {
         return vouchersRepository.findById(id);
     }
 
-    public List<Vouchers> getVoucherByVoucherCode(String voucherCode){
+    public Vouchers getVoucherByVoucherCode(String voucherCode){
         return vouchersRepository.getVoucherByVoucherCode(voucherCode);
     }
 
@@ -34,6 +34,9 @@ public class VoucherService {
         return vouchersRepository.save(voucher);
     }
 
+//    public boolean validateVoucher(String voucherCode) {
+//    	
+//    }
     public void deleteVouchers(int id){
         vouchersRepository.deleteById(id);
     }

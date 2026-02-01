@@ -25,7 +25,14 @@
     "cancel": "Cancel",
     "loading": "Loading",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "free": "Free",
+    "auto": "Auto",
+    "voucher": "Voucher",
+    "apply": "Apply",
+    "warranty": "Warranty Policy",
+    "voucherQuote":"Please enter voucher code if you have one",
+    "totalPrice":"Total Price"
   },
   "main": {
     "welcomeBack": "WELCOME BACK!",
@@ -51,6 +58,42 @@
     "shopTrustedDesc": "Lựa chọn hàng đầu của...",
     "accountGuide": "Hướng dẫn nạp Valorant",
     "accountGuideDesc": "Hướng dẫn nạp Valorant..."
+  },
+  "accs":{
+    "buyNow":"Buy Now",
+    "viewDetails":"View Details",
+    "price": "Price",
+    "gun": "S.Gun",
+    "melee": "S.Melee",
+    "id": "ID",
+    "transFee":"Transaction Fee",
+    "transWay":"Transaction Method",
+    "category":"Category"
+  },
+  "filter": {
+    "searchByRequirements": "SEARCH ACCORDING TO REQUIREMENTS",
+    "searchNickname": "Search for nickname code",
+    "allRanks": "Search rank",
+    "allPrices": "Search price",
+    "sortDefault": "Search sort",
+    "priceLowest": "Price: Lowest to Highest",
+    "priceHighest": "Price: Highest to Lowest",
+    "newest": "Newest",
+    "search": "SEARCH",
+    "clear": "CLEAR",
+    "budgetFriendly": "BUDGET FRIENDLY",
+    "under2m": "Under 2M",
+    "midTier": "MID-TIER",
+    "premium": "PREMIUM",
+    "elite": "ELITE",
+    "above10m": "Above 10M",
+    "showing": "Showing",
+    "of": "of",
+    "results": "results",
+    "page": "Page",
+    "noResults": "No Accounts Found",
+    "tryChangingFilters": "Try adjusting your filters or search criteria",
+    "resetFilters": "Reset Filters"
   },
   "payment": {
     "addMoney": "Add Money",
