@@ -47,7 +47,9 @@ const sidebarItems = [
   { label: t('admin.transaction'), icon: '<i class="fa-solid fa-money-bill-transfer"></i>', route: '/admin/transaction' },
   { label: t('admin.accountManagement'), icon: '<i class="fa-solid fa-people-roof"></i>', route: '/admin/account' },
   { label: t('admin.news'), icon: '<i class="fa-solid fa-newspaper"></i>', route: '/admin/news' },
-  { label: t('admin.valorantAccountManagement'), icon: '<i class="fa-solid fa-gamepad"></i>', route: '/admin/vlr_account' }
+  { label: t('admin.valorantAccountManagement'), icon: '<i class="fa-solid fa-gamepad"></i>', route: '/admin/vlr_account' },
+  {label: t('admin.adminFAQ'), icon: '<i class="fa-solid fa-question"></i>', route: '/admin/faq' },
+  {label: t('admin.adminVoucher'), icon: '<i class="fa-solid fa-ticket"></i>', route: '/admin/voucher' }
 ];
 
 const goToMainPage = () => {

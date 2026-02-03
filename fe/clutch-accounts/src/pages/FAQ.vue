@@ -46,7 +46,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 auto-rows-max max-w-5xl mx-auto">
           <div
             v-for="(item, index) in faqItems"
-            :key="index"
+            :key="item.question"
             class="faq-card group relative bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-amber-600/20 rounded-lg overflow-hidden backdrop-blur-xl transition-all duration-500 hover:border-amber-500/60 hover:shadow-2xl hover:shadow-amber-900/40"
             :class="{ 'border-amber-500/100 bg-gradient-to-br from-slate-900 to-slate-950 shadow-2xl shadow-amber-900/50': openedIndex === index }"
           >
@@ -78,7 +78,9 @@
             <transition
               name="slide-down"
               @enter="onEnter"
+              @after-enter="onAfterEnter"
               @leave="onLeave"
+              @after-leave="onAfterLeave"
             >
             <div v-if="openedIndex === index" class="relative px-6 sm:px-8 pb-7 pt-2 border-t border-amber-600/30">
                 <div class="absolute inset-0 bg-gradient-to-b from-amber-950/10 to-transparent pointer-events-none"></div>
@@ -136,6 +138,7 @@ export default {
   data() {
     return {
       openedIndex: null,
+      animating: false, // prevent rapid toggles while animation runs
       votes: {}, // Track votes: { faqIndex: { liked: boolean/null, count: number } }
       faqItems: [
         {
@@ -159,18 +162,41 @@ export default {
   },
   methods: {
     toggleFAQ(index) {
+      if (this.animating) return; // ignore rapid clicks while animating
       this.openedIndex = this.openedIndex === index ? null : index;
     },
     onEnter(el) {
+      // prepare for animated open
+      this.animating = true;
+      el.style.overflow = 'hidden';
       el.style.height = '0';
       el.style.opacity = '0';
-      el.offsetHeight; // Force reflow
+      // force reflow then expand to content height
+      el.offsetHeight;
       el.style.height = el.scrollHeight + 'px';
       el.style.opacity = '1';
     },
     onLeave(el) {
+      // animate collapse
+      this.animating = true;
+      el.style.overflow = 'hidden';
+      el.style.height = el.scrollHeight + 'px';
+      el.offsetHeight;
       el.style.height = '0';
       el.style.opacity = '0';
+    },
+    // cleanup inline styles after animation to allow future measurements
+    onAfterEnter(el) {
+      this.animating = false;
+      el.style.height = '';
+      el.style.overflow = '';
+      el.style.opacity = '';
+    },
+    onAfterLeave(el) {
+      this.animating = false;
+      el.style.height = '';
+      el.style.overflow = '';
+      el.style.opacity = '';
     },
     voteHelpful(index, isHelpful) {
       if (!this.votes[index]) {
