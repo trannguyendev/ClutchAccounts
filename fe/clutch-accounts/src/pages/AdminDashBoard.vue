@@ -1,12 +1,14 @@
 <script setup>
     /* ===== Sidebar.vue ===== */
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 import { useI18n } from 'vue-i18n'
 
+
 const { t } = useI18n()
 const router = useRouter();
+const route = useRoute();
 const activeLi = ref(0);
 let pollingInterval = null;
 const sidebarItems = [
@@ -14,12 +16,37 @@ const sidebarItems = [
   { name: t('admin.transaction'), icon: '<i class="fa-solid fa-money-bill-transfer"></i>', route: '/admin/transaction' },
   { name: t('admin.accountManagement'), icon: '<i class="fa-solid fa-people-roof"></i>', route: '/admin/account' },
   { name: t('admin.news'), icon: '<i class="fa-solid fa-newspaper"></i>', route: '/admin/news' },
-  { name: t('admin.valorantAccountManagement'), icon: '<i class="fa-solid fa-gamepad"></i>', route: '/admin/vlr_account' }
+  { name: t('admin.valorantAccountManagement'), icon: '<i class="fa-solid fa-gamepad"></i>', route: '/admin/vlr_account' },
+  { name: t('admin.adminFAQ'), icon: '<i class="fa-solid fa-question"></i>', route: '/admin/faq' },
+  { name: t('admin.adminVoucher'), icon: '<i class="fa-solid fa-ticket"></i>', route: '/admin/voucher' }
 ];
 
-const handleNavigation = (item, index) => {
-  activeLi.value = index;
-  router.push(item.route);
+const routeToIndex = {
+  '/admin': 0,
+  '/admin/transaction': 1,
+  '/admin/account': 2,
+  '/admin/news': 3,
+  '/admin/vlr_account': 4,
+  '/admin/faq': 5,
+  '/admin/voucher': 6
+};
+
+function syncActiveFromRoute() {
+  activeLi.value = routeToIndex[route.path] ?? 0;
+}
+
+onMounted(() => { syncActiveFromRoute(); });
+watch(() => route.path, syncActiveFromRoute);
+
+const handleNavigation = async (item, index) => {
+  try {
+    await router.push(item.route);
+    // only update active when navigation succeeds
+    activeLi.value = index;
+  } catch (err) {
+    // navigation failed/blocked by guard — keep current active
+    console.warn('navigation cancelled', err);
+  }
 };
 
 /* ===== Dashboard.vue ===== */
@@ -115,6 +142,69 @@ function goToPage(n) {
 
 function prevPage() { if (page.value > 1) page.value -= 1; }
 function nextPage() { if (page.value < totalPages.value) page.value += 1; }
+
+// Visible pages with sliding window + ellipsis
+const visiblePages = computed(() => {
+  const total = totalPages.value;
+  const current = page.value;
+  const siblingCount = 1; // number of pages to show on each side of current
+
+  // total page numbers to show (first + last + current +- siblings)
+  const totalNumbers = siblingCount * 2 + 3;
+  const totalBlocks = totalNumbers + 2; // including 2 ellipses
+
+  if (total <= totalBlocks) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  const left = Math.max(2, current - siblingCount);
+  const right = Math.min(total - 1, current + siblingCount);
+  const pages = [];
+
+  pages.push(1);
+
+  if (left > 2) {
+    pages.push('...');
+  } else {
+    for (let i = 2; i < left; i++) pages.push(i);
+  }
+
+  for (let i = left; i <= right; i++) pages.push(i);
+
+  if (right < total - 1) {
+    pages.push('...');
+  } else {
+    for (let i = right + 1; i < total; i++) pages.push(i);
+  }
+
+  pages.push(total);
+  return pages;
+});
+
+// preserve table height by rendering invisible placeholder rows when a page has fewer items than pageSize
+const emptyRowCount = computed(() => Math.max(0, pageSize.value - pagedDeposits.value.length));
+const emptyRows = computed(() => Array.from({ length: emptyRowCount.value }));
+
+// Date formatting helpers (localized to Vietnamese)
+function formatDate(dateString) {
+  if (!dateString) return '-';
+  try {
+    return new Date(dateString).toLocaleString('vi-VN', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  } catch (e) {
+    return dateString;
+  }
+}
+function formatDateLong(dateString) {
+  if (!dateString) return '-';
+  try {
+    return new Date(dateString).toLocaleString('vi-VN', { dateStyle: 'long', timeStyle: 'short' });
+  } catch (e) {
+    return dateString;
+  }
+}
 
 onMounted(() => {
   // Fetch recent deposits on mount
@@ -234,20 +324,20 @@ onUnmounted(() => {
 
           <!-- Recent deposits table (right) -->
           <div class="w-full md:w-2/3">
-            <div class="rounded-xl border border-amber-900/50 p-4 bg-[#141414] h-full flex flex-col">
+            <div class="rounded-xl border border-amber-900/50 p-4 bg-[#141414] h-full flex flex-col min-w-0">
               <div class="mb-2">
                 <h3 class="text-lg font-semibold text-amber-300">Recently request deposit</h3>
                 <div class="text-sm text-amber-200/60">List of deposit</div>
               </div>
 
-              <div class="flex-1 overflow-hidden">
-                <table class="w-full text-left table-auto text-sm">
+              <div class="flex-1 overflow-x-auto">
+                <table class="w-full text-left table-fixed text-sm">
                   <thead>
                     <tr class="text-amber-200/70">
                       <th class="pb-2 break-words">ID</th>
                       <th class="pb-2 break-words">Username</th>
-                      <th class="pb-2 break-words">Deposit Amount</th>
-                      <th class="pb-2 break-words">Request at</th>
+                      <th class="pb-2 break-words sticky-col sticky-col-amount" style="width:10rem;">Deposit Amount</th>
+                      <th class="pb-2 break-words sticky-col sticky-col-request" style="width:9rem;">Request at</th>
                       <th class="pb-2 break-words">Status</th>
                       <th class="pb-2 break-words">Type</th>
                       <th class="pb-2 break-words">Description</th>
@@ -257,8 +347,8 @@ onUnmounted(() => {
                     <tr v-for="d in pagedDeposits" :key="d.id" class="border-t border-amber-900/20">
                       <td class="py-2 truncate cell-limit">{{ d.id }}</td>
                       <td class="py-2 truncate cell-limit">{{ d.descrp.substring(4) }}</td>
-                      <td class="py-2 truncate cell-limit">{{ d.amount }}</td>
-                      <td class="py-2 text-amber-200/60 truncate cell-limit">{{ d.created_at }}</td>
+                      <td class="py-2 truncate cell-limit sticky-col sticky-col-amount">{{ d.amount }}</td>
+                      <td class="py-2 text-amber-200/60 truncate cell-limit sticky-col sticky-col-request" :title="formatDateLong(d.created_at)">{{ formatDate(d.created_at) }}</td> 
                       <td class="py-2 truncate cell-limit">
                         <div class="w-28">
                           <span v-if="d.status==='APPROVED'" class="inline-block w-full text-center px-2 py-0.5 rounded text-xs bg-emerald-500 text-black truncate">APPROVED</span>
@@ -269,19 +359,47 @@ onUnmounted(() => {
                       <td class="py-2 truncate cell-limit">{{ d.type }}</td>
                       <td class="py-2 truncate cell-limit">{{ d.descrp }}</td>
                     </tr>
+
+                    <!-- invisible placeholder rows to preserve table height when page has fewer items -->
+                    <tr v-for="(_, idx) in emptyRows" :key="`empty-${idx}`" class="border-t border-amber-900/20 invisible-row" aria-hidden="true">
+                      <td class="py-2 cell-limit">&nbsp;</td>
+                      <td class="py-2 cell-limit">&nbsp;</td>
+                      <td class="py-2 cell-limit">&nbsp;</td>
+                      <td class="py-2 cell-limit">&nbsp;</td>
+                      <td class="py-2 cell-limit">&nbsp;</td>
+                      <td class="py-2 cell-limit">&nbsp;</td>
+                      <td class="py-2 cell-limit">&nbsp;</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
 
               <!-- pagination -->
-              <div class="mt-3 flex items-center justify-between">
-                <div class="text-sm text-amber-200/60">Trang {{ page }} / {{ totalPages }}</div>
-                <div class="flex items-center gap-2">
-                  <button @click="prevPage" class="px-2 py-1 bg-amber-900/20 rounded text-amber-200 hover:bg-amber-900/30">Prev</button>
-                  <div class="flex gap-1">
-                    <button v-for="n in totalPages" :key="n" @click="goToPage(n)" :class="['px-2 py-1 rounded', page===n ? 'bg-amber-600 text-black' : 'bg-amber-900/20 text-amber-200 hover:bg-amber-900/30']">{{ n }}</button>
+              <div class="mt-3 flex items-center justify-between flex-wrap gap-2 min-w-0 pagination-fixed">
+                <div class="text-sm text-amber-200/60 min-w-0 truncate">Trang {{ page }} / {{ totalPages }}</div>
+                <div class="flex items-center gap-2 min-w-0">
+                  <button @click="prevPage" class="px-2 py-1 bg-amber-900/20 rounded text-amber-200 hover:bg-amber-900/30 shrink-0">Prev</button>
+
+                  <div class="flex items-center gap-1 overflow-x-auto no-scrollbar max-w-[18rem] min-w-0">
+                    <template v-for="(p, idx) in visiblePages" :key="`p-${idx}`">
+                      <button
+                        v-if="p !== '...'
+                        "
+                        @click="goToPage(p)"
+                        :aria-current="page===p ? 'page' : null"
+                        :class="[
+                          'px-2 py-1 text-sm rounded shrink-0',
+                          page===p ? 'bg-amber-600 text-black' : 'bg-amber-900/20 text-amber-200 hover:bg-amber-900/30'
+                        ]"
+                      >
+                        {{ p }}
+                      </button>
+
+                      <span v-else class="px-2 py-1 text-sm text-amber-200/60 shrink-0">…</span>
+                    </template>
                   </div>
-                  <button @click="nextPage" class="px-2 py-1 bg-amber-900/20 rounded text-amber-200 hover:bg-amber-900/30">Next</button>
+
+                  <button @click="nextPage" class="px-2 py-1 bg-amber-900/20 rounded text-amber-200 hover:bg-amber-900/30 shrink-0">Next</button>
                 </div>
               </div>
             </div>
@@ -319,4 +437,40 @@ div {
   background-size: 50px 50px;
   pointer-events: none;
 }
+
+/* small helper to hide native scrollbars for horizontal pagers */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  -webkit-overflow-scrolling: touch;
+}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* placeholder rows: keep table/card height stable between pages */
+.invisible-row {
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Sticky columns: keep Deposit Amount + Request at visible during horizontal scroll */
+.sticky-col {
+  position: -webkit-sticky;
+  position: sticky;
+  background: rgba(20,20,20,0.98); /* match card bg to avoid bleed-through */
+  backdrop-filter: none;
+  z-index: 20;
+  box-shadow: -6px 0 8px -6px rgba(0,0,0,0.6);
+  border-left: 1px solid rgba(255,215,0,0.03);
+}
+
+/* order: Request at sits at far right, Deposit Amount sits to its left */
+.sticky-col-request { right: 0; min-width: 9rem; width: 9rem; }
+.sticky-col-amount { right: 9rem; min-width: 10rem; width: 10rem; }
+
+/* ensure header cells for sticky columns sit above body cells */
+thead .sticky-col { z-index: 30; box-shadow: none; border-bottom: 1px solid rgba(255,255,255,0.02); }
+
+/* ensure pagination region doesn't change layout height when its content changes */
+.pagination-fixed { min-height: 2.5rem; }
 </style>
