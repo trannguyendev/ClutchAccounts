@@ -20,6 +20,8 @@ import UserTransactionAndBoughtLog from '@/pages/UserTransactionAndBoughtLog.vue
 import PaymentCancel from '@/components/PaymentCancel.vue'
 import PaymentSuccess from '@/components/PaymentSuccess.vue'
 import FAQ from '@/pages/FAQ.vue'
+import AdminFAQ from '@/components/AdminFAQ.vue'
+import AdminVoucher from '@/components/AdminVoucher.vue'
 
 
 
@@ -63,6 +65,18 @@ const routes = [
     path: '/admin/vlr_account',
     name: 'admin-vlr_account',
     component: AdminVLRAccount,
+    meta: { requiresAuth: true , roles: ['admin']}
+  },
+  {
+    path: '/admin/faq',
+    name: 'admin-faq',
+    component: AdminFAQ,
+    meta: { requiresAuth: true , roles: ['admin']}
+  },
+  {
+    path: '/admin/voucher',
+    name: 'admin-voucher',
+    component: AdminVoucher,
     meta: { requiresAuth: true , roles: ['admin']}
   },
   {
