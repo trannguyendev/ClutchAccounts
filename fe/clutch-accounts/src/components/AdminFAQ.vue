@@ -252,7 +252,7 @@ function loadLocal() {
 async function fetchAll() {
   loading.value = true;
   try {
-    const res = await axios.get(apiBase);
+    const res = await axios.get(apiBase+"/info");
     if (Array.isArray(res.data)) {
       items.value = res.data.map(normalize);
       apiHealthy.value = true;
@@ -297,11 +297,11 @@ async function save() {
   const payload = { title: form.title, content: form.content, like_amount: form.like_amount ?? 0, dislike_amount: form.dislike_amount ?? 0 };
   try {
     if (editing.id) {
-      await axios.put(`${apiBase}/${editing.id}`, payload);
+      await axios.put(`${apiBase}/update/${editing.id}`, payload);
       const idx = items.value.findIndex(x => x.id === editing.id);
       if (idx !== -1) items.value[idx] = { ...items.value[idx], ...payload, updated_at: new Date().toISOString() };
     } else {
-      const res = await axios.post(apiBase, payload);
+      const res = await axios.post(apiBase+"/create", payload);
       const created = normalize(res?.data || { id: Date.now(), ...payload, created_at: new Date().toISOString() });
       items.value.unshift(created);
     }
@@ -330,7 +330,7 @@ async function confirmDelete(f) {
 }
 async function remove(id) {
   try {
-    await axios.delete(`${apiBase}/${id}`);
+    await axios.delete(`${apiBase}/delete/${id}`);
     items.value = items.value.filter(i => i.id !== id);
     persistLocal();
     apiHealthy.value = true;
