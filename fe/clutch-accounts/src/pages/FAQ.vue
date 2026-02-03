@@ -130,6 +130,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import { RouterLink } from 'vue-router';
 
 export default {
@@ -140,27 +141,28 @@ export default {
       openedIndex: null,
       animating: false, // prevent rapid toggles while animation runs
       votes: {}, // Track votes: { faqIndex: { liked: boolean/null, count: number } }
-      faqItems: [
-        {
-          question: 'ACC MAIL BẢO HÀNH LÀ ACC NHƯ NÀO ?',
-          answer: 'Tài khoản mail bảo hành là những tài khoản được đảm bảo 100% không bị khóa. Nếu tài khoản bị khóa hoặc gặp sự cố, shop sẽ hỗ trợ đổi tài khoản mới hoặc hoàn tiền toàn bộ theo chính sách bảo hành của shop.'
-        },
-        {
-          question: 'CHÍNH SÁCH BẢO HÀNH BẾN SHOP NHƯ NÀO ĐỐI VỚI ACC BẢO HÀNH ?',
-          answer: 'Shop bảo hành toàn bộ tài khoản trong 30 ngày. Nếu tài khoản gặp bất kỳ vấn đề nào trong thời gian này (bị khóa, gặp sự cố), khách hàng có thể liên hệ shop để được hỗ trợ đổi tài khoản mới hoặc hoàn tiền ngay lập tức.'
-        },
-        {
-          question: 'SHOP CÓ THU LẠI ACC BẾN SHOP KHÔNG ?',
-          answer: 'Không, shop không thu lại tài khoản sau khi bán. Tài khoản là quyền sở hữu riêng của khách hàng. Tuy nhiên, khách hàng cần lưu ý thay đổi mật khẩu, email recovery để đảm bảo bảo mật cho tài khoản.'
-        },
-        {
-          question: 'SHOP CÓ HỖ TRỢ NẠP VPoint KHÔNG ?',
-          answer: 'Có, shop hỗ trợ nạp VPoint cho tất cả các tài khoản. Khách hàng có thể liên hệ shop để được hỗ trợ nạp VPoint với giá cạnh tranh và an toàn. Chúng tôi sử dụng phương pháp nạp bảo mật, không lưu lại thông tin tài khoản.'
-        }
-      ]
+      faqItems: []
     }
   },
+  async mounted() {
+    await this.fetchFAQs();
+  },
   methods: {
+    async fetchFAQs() {
+        await axios.get('/api/faq/info')
+    .then((res) => {
+      const data = res.data;
+      this.faqItems = data.map(item => ({
+      id: item.id,
+      question: item.title,
+      answer: item.content,
+      like_amount: item.like_amount,
+      dislike_amount: item.dislike_amount
+    }))})
+    .catch((error) => {
+      console.error('Error fetching FAQs:', error);
+    });
+    },
     toggleFAQ(index) {
       if (this.animating) return; // ignore rapid clicks while animating
       this.openedIndex = this.openedIndex === index ? null : index;
