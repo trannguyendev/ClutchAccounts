@@ -9,7 +9,6 @@
         <div class="flex items-center justify-between mb-4">
           <div class="space-x-2">
             <button @click="tab = 'news'" :class="tab === 'news' ? 'bg-amber-600 text-black' : 'bg-transparent'" class="px-3 py-1 rounded">Tin tức</button>
-            <button @click="tab = 'ads'" :class="tab === 'ads' ? 'bg-amber-600 text-black' : 'bg-transparent'" class="px-3 py-1 rounded">Quảng cáo</button>
           </div>
           <div>
             <button @click="openCreate()" class="bg-amber-500 text-black px-3 py-1 rounded">Tạo mới</button>
@@ -49,36 +48,6 @@
           </div>
         </div>
 
-        <div v-else>
-          <div class="overflow-x-auto">
-            <table class="min-w-full text-left text-amber-100">
-              <thead>
-                <tr class="border-b border-amber-900/50">
-                  <th class="px-3 py-2">#</th>
-                  <th class="px-3 py-2">Tiêu đề</th>
-                  <th class="px-3 py-2">Link</th>
-                  <th class="px-3 py-2">Trạng thái</th>
-                  <th class="px-3 py-2">Hành động</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(a, idx) in adsList" :key="a.id" class="border-b border-amber-900/20">
-                  <td class="px-3 py-2">{{ idx + 1 }}</td>
-                  <td class="px-3 py-2">{{ a.title }}</td>
-                  <td class="px-3 py-2"><a :href="a.link" target="_blank" class="text-amber-200 underline">{{ a.link }}</a></td>
-                  <td class="px-3 py-2">{{ a.active ? 'Hiện' : 'Ẩn' }}</td>
-                  <td class="px-3 py-2 space-x-2">
-                    <button @click="openEdit('ads', a)" class="px-2 py-1 bg-amber-400 text-black rounded">Sửa</button>
-                    <button @click="remove('ads', a.id)" class="px-2 py-1 bg-red-600 rounded">Xóa</button>
-                  </td>
-                </tr>
-                <tr v-if="!adsList.length">
-                  <td colspan="5" class="px-3 py-4 text-amber-400/60">Không có quảng cáo.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
       </div>
 
       <!-- Modal -->
@@ -134,7 +103,6 @@ const handleNavigation = (item, index) => {
 
 const tab = ref('news');
 const newsList = ref([]);
-const adsList = ref([]);
 const loading = ref(false);
 const modalOpen = ref(false);
 
@@ -152,19 +120,6 @@ const fetchNews = async () => {
   } catch (e) {
     console.error(e);
     alert('Lỗi khi tải danh sách tin.');
-  } finally {
-    loading.value = false;
-  }
-};
-
-const fetchAds = async () => {
-  try {
-    loading.value = true;
-    const res = await axios.get(API.ads);
-    adsList.value = res.data || [];
-  } catch (e) {
-    console.error(e);
-    alert('Lỗi khi tải danh sách QC.');
   } finally {
     loading.value = false;
   }
