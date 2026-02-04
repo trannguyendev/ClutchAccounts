@@ -243,5 +243,87 @@
     "facebook": "Facebook page",
     "discord": "Discord community",
     "github": "GitHub account"
+  },
+  "warranty": {
+    "heroTitle": "WARRANTY POLICY",
+    "heroSubtitle": "Your peace of mind is our priority. Learn about our comprehensive warranty coverage for all Valorant accounts.",
+    "learnMore": "Learn More",
+    "coverageTitle": "Warranty Coverage",
+    "coverageDesc": "Comprehensive protection for your account against lock issues and security concerns.",
+    "durationTitle": "Warranty Duration",
+    "durationDesc": "Extended warranty periods ranging from 7 to 60 days depending on account type.",
+    "processTitle": "Easy Claims",
+    "processDesc": "Simple 4-step process to file and resolve your warranty claims quickly.",
+    "exclusionsTitle": "Clear Terms",
+    "exclusionsDesc": "Transparent coverage limits and situations not covered by warranty.",
+    "whatCovered": "What's Covered",
+    "coveredItems": {
+      "accountLock": "Account Lock Issues",
+      "accountLockDesc": "Full protection if your account gets locked or suspended without your fault.",
+      "security": "Security Breaches",
+      "securityDesc": "Coverage for unauthorized access or security-related issues.",
+      "delivery": "Delivery Issues",
+      "deliveryDesc": "Replacement or refund if account credentials don't work upon delivery.",
+      "access": "Access Problems",
+      "accessDesc": "Assistance if you cannot access your purchased account."
+    },
+    "notCovered": "What's Not Covered",
+    "notCoveredItems": {
+      "userAction": "User Violations",
+      "userActionDesc": "Accounts locked due to Terms of Service violations by the user.",
+      "gameUpdate": "Game Updates",
+      "gameUpdateDesc": "Issues caused by official game updates or balance changes.",
+      "thirdParty": "Third-Party Software",
+      "thirdPartyDesc": "Problems from using unauthorized third-party programs or mods.",
+      "misuse": "Account Misuse",
+      "misuseDesc": "Damage caused by sharing account or improper account management."
+    },
+    "claimProcess": "How to Claim Warranty",
+    "steps": {
+      "contact": "Contact Us",
+      "contactDesc": "Reach out through live chat, email, or social media.",
+      "provide": "Provide Details",
+      "provideDesc": "Share your order ID and describe the issue encountered.",
+      "review": "We Review",
+      "reviewDesc": "Our team verifies the claim within 24-48 hours.",
+      "resolve": "Resolution",
+      "resolveDesc": "Get account replacement or full refund based on warranty terms."
+    },
+    "warrantyDuration": "Warranty Duration & Coverage",
+    "table": {
+      "accountType": "Account Type",
+      "duration": "Duration",
+      "coverage": "Coverage Level",
+      "days": "days",
+      "rows": {
+        "warranty": "Warranty Account",
+        "regular": "Regular Account",
+        "vip": "VIP Account",
+        "fullCoverage": "Full Replacement + Refund",
+        "basicCoverage": "Replacement Only",
+        "extendedCoverage": "Priority Support + Extended Coverage"
+      }
+    },
+    "faqTitle": "Frequently Asked Questions",
+    "faq": {
+      "q1": "How do I know if my account is covered?",
+      "a1": "All warranty accounts are clearly marked on the product page. Check the account type before purchasing. Warranty periods start from the date of purchase.",
+      "q2": "What happens if my account gets locked?",
+      "a2": "Contact our support team immediately with your order details. We'll verify the situation and provide a replacement account or full refund within 48 hours.",
+      "q3": "Can I extend my warranty coverage?",
+      "a3": "Yes! You can extend your warranty at any time during the active period. Contact support for VIP extension options and pricing.",
+      "q4": "Is there any fee for warranty claims?",
+      "a4": "No, warranty claims are completely free for all covered issues. We don't charge any fees for replacements or refunds under warranty."
+    },
+    "needHelp": "Need Assistance?",
+    "contactDesc": "Our support team is available 24/7 to help you with any warranty-related questions.",
+    "contact": {
+      "liveChat": "Live Chat",
+      "liveChatDesc": "Available 24/7",
+      "email": "Email Support",
+      "emailDesc": "support@clutchaccounts.com",
+      "social": "Social Media",
+      "socialDesc": "Facebook & Discord"
+    }
   }
 }
