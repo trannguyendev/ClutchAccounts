@@ -28,7 +28,6 @@ public class NewsController {
 	
 	// GET all news
 	@GetMapping("/info")
-	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getAllNews() {
 		try {
 			return ResponseEntity.ok(newsService.getAllNews());
