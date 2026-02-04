@@ -243,5 +243,87 @@
     "facebook": "Trang Facebook",
     "discord": "Cộng đồng Discord",
     "github": "Tài khoản GitHub"
+  },
+  "warranty": {
+    "heroTitle": "CHÍNH SÁCH BẢO HÀNH",
+    "heroSubtitle": "Sự yên tâm của bạn là ưu tiên hàng đầu của chúng tôi. Tìm hiểu về chế độ bảo hành toàn diện cho tất cả tài khoản Valorant.",
+    "learnMore": "Tìm hiểu thêm",
+    "coverageTitle": "Phạm Vi Bảo Hành",
+    "coverageDesc": "Bảo vệ toàn diện cho tài khoản của bạn khỏi các vấn đề khóa tài khoản và bảo mật.",
+    "durationTitle": "Thời Hạn Bảo Hành",
+    "durationDesc": "Thời gian bảo hành kéo dài từ 7 đến 60 ngày tùy thuộc vào loại tài khoản.",
+    "processTitle": "Dễ Dàng Khiếu Nại",
+    "processDesc": "Quy trình 4 bước đơn giản để nộp đơn và giải quyết khiếu nại bảo hành nhanh chóng.",
+    "exclusionsTitle": "Điều Khoản Rõ Ràng",
+    "exclusionsDesc": "Giới hạn bảo hiểm minh bạch và các tình huống không được bảo hành.",
+    "whatCovered": "Những Gì Được Bảo Hành",
+    "coveredItems": {
+      "accountLock": "Vấn Đề Khóa Tài Khoản",
+      "accountLockDesc": "Bảo vệ đầy đủ nếu tài khoản của bạn bị khóa hoặc đình chỉ không phải do lỗi của bạn.",
+      "security": "Vi Phạm Bảo Mật",
+      "securityDesc": "Bảo hiểm cho việc truy cập trái phép hoặc các vấn đề liên quan đến bảo mật.",
+      "delivery": "Vấn Đề Giao Hàng",
+      "deliveryDesc": "Thay thế hoặc hoàn tiền nếu thông tin đăng nhập tài khoản không hoạt động khi nhận hàng.",
+      "access": "Vấn Đề Truy Cập",
+      "accessDesc": "Hỗ trợ nếu bạn không thể truy cập tài khoản đã mua."
+    },
+    "notCovered": "Những Gì Không Được Bảo Hành",
+    "notCoveredItems": {
+      "userAction": "Vi Phạm Người Dùng",
+      "userActionDesc": "Tài khoản bị khóa do vi phạm Điều khoản Dịch vụ bởi người dùng.",
+      "gameUpdate": "Cập Nhật Game",
+      "gameUpdateDesc": "Các vấn đề do bản cập nhật game chính thức hoặc thay đổi cân bằng.",
+      "thirdParty": "Phần Mềm Bên Thứ Ba",
+      "thirdPartyDesc": "Vấn đề từ việc sử dụng chương trình hoặc mod không được phép của bên thứ ba.",
+      "misuse": "Sử Dụng Sai Mục Đích",
+      "misuseDesc": "Hư hỏng do chia sẻ tài khoản hoặc quản lý tài khoản không đúng cách."
+    },
+    "claimProcess": "Cách Yêu Cầu Bảo Hành",
+    "steps": {
+      "contact": "Liên Hệ Chúng Tôi",
+      "contactDesc": "Liên hệ qua chat trực tiếp, email hoặc mạng xã hội.",
+      "provide": "Cung Cấp Chi Tiết",
+      "provideDesc": "Chia sẻ mã đơn hàng và mô tả vấn đề bạn gặp phải.",
+      "review": "Chúng Tôi Xem Xét",
+      "reviewDesc": "Đội ngũ của chúng tôi sẽ xác minh khiếu nại trong vòng 24-48 giờ.",
+      "resolve": "Giải Quyết",
+      "resolveDesc": "Nhận tài khoản thay thế hoặc hoàn tiền đầy đủ dựa trên điều khoản bảo hành."
+    },
+    "warrantyDuration": "Thời Hạn & Phạm Vi Bảo Hành",
+    "table": {
+      "accountType": "Loại Tài Khoản",
+      "duration": "Thời Hạn",
+      "coverage": "Mức Bảo Hiểm",
+      "days": "ngày",
+      "rows": {
+        "warranty": "Tài Khoản Bảo Hành",
+        "regular": "Tài Khoản Thường",
+        "vip": "Tài Khoản VIP",
+        "fullCoverage": "Thay Thế Đầy Đủ + Hoàn Tiền",
+        "basicCoverage": "Chỉ Thay Thế",
+        "extendedCoverage": "Hỗ Trợ Ưu Tiên + Bảo Hành Mở Rộng"
+      }
+    },
+    "faqTitle": "Câu Hỏi Thường Gặp",
+    "faq": {
+      "q1": "Làm sao tôi biết tài khoản của mình có được bảo hành?",
+      "a1": "Tất cả tài khoản bảo hành được đánh dấu rõ trên trang sản phẩm. Kiểm tra loại tài khoản trước khi mua. Thời gian bảo hành bắt đầu từ ngày mua hàng.",
+      "q2": "Điều gì xảy ra nếu tài khoản của tôi bị khóa?",
+      "a2": "Liên hệ ngay với đội ngũ hỗ trợ với chi tiết đơn hàng của bạn. Chúng tôi sẽ xác minh tình huống và cung cấp tài khoản thay thế hoặc hoàn tiền đầy đủ trong vòng 48 giờ.",
+      "q3": "Tôi có thể gia hạn bảo hành không?",
+      "a3": "Có! Bạn có thể gia hạn bảo hành bất kỳ lúc nào trong thời gian hoạt động. Liên hệ hỗ trợ để biết các tùy chọn và giá gia hạn VIP.",
+      "q4": "Có phí nào cho yêu cầu bảo hành không?",
+      "a4": "Không, yêu cầu bảo hành hoàn toàn miễn phí cho tất cả các vấn đề được bảo hiểm. Chúng tôi không tính bất kỳ phí nào cho việc thay thế hoặc hoàn tiền theo bảo hành."
+    },
+    "needHelp": "Cần Hỗ Trợ?",
+    "contactDesc": "Đội ngũ hỗ trợ của chúng tôi có mặt 24/7 để giúp bạn với bất kỳ câu hỏi nào liên quan đến bảo hành.",
+    "contact": {
+      "liveChat": "Chat Trực Tiếp",
+      "liveChatDesc": "Hoạt động 24/7",
+      "email": "Hỗ Trợ Email",
+      "emailDesc": "support@clutchaccounts.com",
+      "social": "Mạng Xã Hội",
+      "socialDesc": "Facebook & Discord"
+    }
   }
 }

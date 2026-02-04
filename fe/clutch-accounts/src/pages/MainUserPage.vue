@@ -1,16 +1,30 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useUserStore } from '../stores/user'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import Navbar from '@/components/Navbar.vue'
-
+import axios from 'axios'
+import { onMounted } from 'vue'
 const { t } = useI18n()
 let currentUser = useUserStore()
 const isMenuOpen = ref(false)
 const videoRef = ref(null)
 const isAudioMuted = ref(true)
+const carouselIndex = ref(0)
+const itemsPerSlide = ref(8)
+const announcements = ref([])
 
+const loadNews = () => {
+  axios.get('/api/news/info')
+  .then((res) => {
+    console.log(res.data)
+    announcements.value = res.data
+  })
+  .catch((err) => {
+    console.error('Error fetching news:', err)
+  })
+}
 const handleLogout = () => {
   currentUser.logout()
   isMenuOpen.value = false
@@ -53,11 +67,44 @@ const otherProducts = [
   { id: 4, name: t('main.pcGamingSale'), image: '🖥️' }
 ]
 
-const announcements = [
-  { id: 1, title: t('main.shopTrusted'), desc: t('main.shopTrustedDesc') },
-  { id: 2, title: 'Shop Acc Valorant Uy Tín', desc: 'Nền bản đăng tin mua...' },
-  { id: 3, title: t('main.accountGuide'), desc: t('main.accountGuideDesc') }
+
+// Carousel computed property
+const visibleAnnouncements = computed(() => {
+  const start = carouselIndex.value
+  const end = start + itemsPerSlide.value
+  return announcements.value.slice(start, end)
+})
+
+const totalSlides = computed(() => Math.ceil(announcements.value.length / itemsPerSlide.value))
+
+const nextSlide = () => {
+  carouselIndex.value = (carouselIndex.value + itemsPerSlide.value) % announcements.value.length
+}
+
+const prevSlide = () => {
+  carouselIndex.value = (carouselIndex.value - itemsPerSlide.value + announcements.value.length) % announcements.value.length
+}
+
+const goToSlide = (index) => {
+  carouselIndex.value = index * itemsPerSlide.value
+}
+
+// Helper function to truncate text
+const truncateText = (text, length = 188) => {
+  if (!text) return ''
+  return text.length > length ? text.substring(0, length) + '...' : text
+}
+
+// Quick links for sidebar
+const quickLinks = [
+  { icon: 'fa fa-question-circle', label: t('main.faq') || 'FAQ', route: '/faq', color: 'from-blue-500 to-cyan-500', borderColor: 'border-blue-500/30 hover:border-blue-400/50' },
+  { icon: 'fa fa-history', label: t('userPanel.transactionHistory'), route: '/user/purchase-history', color: 'from-purple-500 to-pink-500', borderColor: 'border-purple-500/30 hover:border-purple-400/50' },
+  { icon: 'fa fa-shield-alt', label: t('common.warranty'), route: '/warranty-policy', color: 'from-green-500 to-emerald-500', borderColor: 'border-green-500/30 hover:border-green-400/50' }
 ]
+
+onMounted(() => {
+  loadNews()
+})
 </script>
 <template>
   <Navbar></Navbar>
@@ -180,27 +227,104 @@ const announcements = [
 
     <!-- Main Content -->
     <section class="max-w-7xl mx-auto px-8 py-16 relative z-10">
-      <!-- Announcements Section -->
+      <!-- Announcements Carousel Section -->
       <div class="mb-20">
         <h2 class="text-3xl font-black text-white mb-8 flex items-center gap-3">
           <span class="text-amber-400">📢</span> {{ t('main.announcements') }}
           <div class="flex-1 h-1 bg-gradient-to-r from-amber-400 to-transparent ml-4"></div>
         </h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div v-for="item in announcements" :key="item.id"
-            class="group bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-amber-500/20 rounded-xl p-5 hover:border-amber-400/50 transition-all duration-300 cursor-pointer">
-            <div class="flex gap-4">
-              <div
-                class="w-16 h-16 bg-gradient-to-br from-amber-400/20 to-orange-600/20 rounded-lg flex items-center justify-center text-2xl flex-shrink-0">
-                <p><img class="" :src="item.img" alt="Image section"></p>
+        <div class="flex gap-8">
+          <!-- Carousel Container -->
+          <div class="flex-1">
+            <!-- Carousel Wrapper -->
+            <div class="relative">
+              <!-- Carousel Items -->
+              <div class="grid grid-cols-2 gap-4 overflow-hidden">
+                <div v-for="item in visibleAnnouncements" 
+                  :key="item.news_id"
+                  class="announcement-card group bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-amber-500/20 rounded-2xl p-4 hover:border-amber-400/50 transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-amber-600/20 hover:scale-105 animate-fadeInSlide">
+                  <div class="flex gap-3 h-full">
+                    <!-- Left: Image -->
+                    <div class="w-20 h-20 bg-gradient-to-br from-amber-400/20 to-orange-600/20 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:from-amber-400/40 group-hover:to-orange-600/40 transition-all duration-300 overflow-hidden">
+                      <img class="object-cover w-full h-full" :src="item.embed_link ? item.embed_link : 'https://cdn.oneesports.vn/cdn-data/sites/4/2021/11/valorant-chamber-6180efdccf50a-scaled.jpg'" alt="Image section">
+                    </div>
+                    <!-- Right: Title and Content -->
+                    <div class="flex-1 flex flex-col justify-start gap-1">
+                      <h3 class="text-amber-300 font-bold group-hover:text-amber-200 transition-colors text-sm line-clamp-1">{{ item.title }}</h3>
+                      <p class="text-slate-400 text-xs group-hover:text-slate-300 transition-colors">{{ truncateText(item.content, 188) }}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="flex-1">
-                <h3 class="text-amber-300 font-bold mb-1 group-hover:text-amber-200 transition-colors">{{ item.title }}
-                </h3>
-                <p class="text-slate-400 text-sm line-clamp-2">{{ item.desc }}</p>
-              </div>
+
+              <!-- Navigation Buttons -->
+              <button @click="prevSlide"
+                class="absolute -left-16 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-amber-600/50 hover:scale-110 active:scale-95 disabled:opacity-50"
+                title="Previous">
+                <i class="fa fa-chevron-left"></i>
+              </button>
+
+              <button @click="nextSlide"
+                class="absolute -right-16 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:shadow-amber-600/50 hover:scale-110 active:scale-95"
+                title="Next">
+                <i class="fa fa-chevron-right"></i>
+              </button>
             </div>
+
+            <!-- Carousel Indicators -->
+            <div class="flex justify-center gap-3 mt-8">
+              <button v-for="(_, index) in Array(totalSlides)"
+                :key="index"
+                @click="goToSlide(index)"
+                :class="[
+                  'transition-all duration-300 rounded-full',
+                  carouselIndex === index * itemsPerSlide ? 
+                    'w-8 h-3 bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg shadow-amber-600/50' : 
+                    'w-3 h-3 bg-slate-600 hover:bg-slate-500'
+                ]"
+                :aria-label="`Go to slide ${index + 1}`">
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Sidebar - Quick Links -->
+          <div class="hidden lg:flex flex-col gap-4 w-60">
+            <div class="text-sm font-bold text-amber-300 mb-4 text-center px-4 py-2 bg-amber-500/10 rounded-lg border border-amber-500/20">
+              Quick Access
+            </div>
+            
+            <RouterLink v-for="link in quickLinks" 
+              :key="link.label"
+              :to="link.route"
+              class="group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border transition-all duration-300 rounded-xl p-4 hover:shadow-xl overflow-hidden"
+              :class="link.borderColor">
+              
+              <!-- Background Gradient Overlay -->
+              <div :class="`absolute inset-0 opacity-0 group-hover:opacity-10 bg-gradient-to-br ${link.color} transition-opacity duration-300`"></div>
+              
+              <!-- Content -->
+              <div class="relative z-10 flex flex-col items-center gap-3">
+                <div :class="`w-12 h-12 rounded-lg bg-gradient-to-br ${link.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`">
+                  <i :class="`${link.icon} text-white text-xl`"></i>
+                </div>
+                <span class="text-center text-sm font-semibold text-slate-200 group-hover:text-white transition-colors">{{ link.label }}</span>
+                <div class="w-0 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 group-hover:w-full transition-all duration-300"></div>
+              </div>
+            </RouterLink>
+          </div>
+
+          <!-- Mobile Quick Links -->
+          <div class="lg:hidden flex gap-3 mt-4">
+            <RouterLink v-for="link in quickLinks" 
+              :key="link.label"
+              :to="link.route"
+              class="flex-1 group bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-amber-500/20 rounded-xl p-3 hover:border-amber-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-amber-600/20 text-center">
+              <div class="flex flex-col items-center gap-2">
+                <i :class="`${link.icon} text-amber-400 text-lg`"></i>
+                <span class="text-xs font-semibold text-slate-200 group-hover:text-amber-300 transition-colors">{{ link.label }}</span>
+              </div>
+            </RouterLink>
           </div>
         </div>
       </div>
@@ -282,6 +406,26 @@ main {
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
+}
+
+/* Carousel Animation */
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeInSlide {
+  animation: fadeInSlide 0.5s ease-out forwards;
+}
+
+.announcement-card {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Shimmer animation for premium feel */

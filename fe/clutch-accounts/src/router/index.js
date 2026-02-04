@@ -22,6 +22,7 @@ import PaymentSuccess from '@/components/PaymentSuccess.vue'
 import FAQ from '@/pages/FAQ.vue'
 import AdminFAQ from '@/components/AdminFAQ.vue'
 import AdminVoucher from '@/components/AdminVoucher.vue'
+import WarrantyPolicy from '@/pages/WarrantyPolicy.vue'
 
 
 
@@ -161,6 +162,11 @@ const routes = [
     path: '/faq',
     name: 'faq',
     component: FAQ
+  },
+  {
+    path: '/warranty-policy',
+    name: 'warranty-policy',
+    component: WarrantyPolicy
   },
   //Catch-all route for some s2pid access paths which doesn't exist
   {
