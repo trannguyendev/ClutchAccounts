@@ -60,7 +60,7 @@ public SecurityFilterChain configSecure(HttpSecurity http, JwtAuthenticationFilt
 		config.requestMatchers("/api/news/**").authenticated();
 		config.requestMatchers("/api/faq/**").authenticated();
 		config.requestMatchers("/test-api").permitAll();
-		config.requestMatchers("/api/vouchers/**").authenticated();
+		config.requestMatchers("/api/vouchers/**").permitAll();
 	});
 	http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 	return http.build();

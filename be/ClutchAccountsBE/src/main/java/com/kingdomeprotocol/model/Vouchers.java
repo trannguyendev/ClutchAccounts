@@ -30,9 +30,12 @@ public class Vouchers {
     @Column(name = "used_count")
     private int usedCount;
 
-    @Column(name = "exprired_at")
+    @Column(name = "expired_at")
     private LocalDateTime expiryAt;
 
     @Column(name = "isActive")
     private boolean isActive;
+    
+    @Column(name = "max_discount")
+    private int maxDiscount;
 }

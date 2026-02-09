@@ -52,7 +52,7 @@ public class AccountsController {
 	@PostMapping("/buy")
 	public ResponseEntity<?> buyAcc(@RequestBody DTOBuyRequest dtoReq){
 		try {
-			return ResponseEntity.ok(accServ.buyAcc(dtoReq.getEmail(), dtoReq.getAccId()));
+			return ResponseEntity.ok(accServ.buyAcc(dtoReq.getEmail(), dtoReq.getAccId(), dtoReq.getVoucherCode()));
 		}
 		catch(RuntimeException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));

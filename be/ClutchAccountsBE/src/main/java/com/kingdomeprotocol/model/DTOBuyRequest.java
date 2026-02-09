@@ -16,4 +16,6 @@ public class DTOBuyRequest {
 	String type;
 	@JsonProperty("accId")
 	int accId;
+	@JsonProperty("voucher")
+	String voucherCode;
 }

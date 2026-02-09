@@ -686,6 +686,7 @@ const getRankColor = (rank) => {
             <div class="px-6 pb-4 flex justify-between items-center">
               <span class="text-2xl font-black text-purple-400 italic">{{ t('common.totalPrice') }}</span>
               <span class="text-3xl font-black text-amber-400">{{ formatPrice(selectedAcc?.price) }}Đ</span>
+              <span v-if="totalDiscount" class="text-3xl font-black text-red-700 italic">- {{}} Đ</span>
             </div>
 
             <!-- Action Buttons -->
