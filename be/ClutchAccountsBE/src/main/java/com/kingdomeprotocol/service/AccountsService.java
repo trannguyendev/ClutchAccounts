@@ -34,7 +34,7 @@ public class AccountsService {
 	private final AccountImageRepository imgRepo;
 	private final SubInfoRepository subRepo;
 @Transactional
-public BuyRes buyAcc(String email, int idAcc) {
+public BuyRes buyAcc(String email, int idAcc, String voucherCode) {
 	
 	UserModel user = userRepo.findUser4Upd(email).orElseThrow(() -> new RuntimeException("Not found user"));
 	AccForSellModel acc = accRepo.findAccbyId4Lock(idAcc).orElseThrow(() -> new RuntimeException("Account is not existed"));
@@ -42,12 +42,18 @@ public BuyRes buyAcc(String email, int idAcc) {
 	if (acc.isSold()) {
 		throw new RuntimeException("This account has been sold out");
 	}
-	if (user.getBalance() < acc.getPrice()) {
-		throw new RuntimeException("Insufficient balance, pls charge");
+	if (voucherCode == null || voucherCode.isEmpty()) {
+		//Process when no voucher
+		if (user.getBalance() < acc.getPrice()) {
+			throw new RuntimeException("Insufficient balance, pls charge");
+		}
+		
+		user.setBalance(user.getBalance() - acc.getPrice());
+		userRepo.save(user);
 	}
-	
-	user.setBalance(user.getBalance() - acc.getPrice());
-	userRepo.save(user);
+	else {
+		
+	}
 	
 	//Create bought log
 	BoughtLogModel boughtLog = new BoughtLogModel();
