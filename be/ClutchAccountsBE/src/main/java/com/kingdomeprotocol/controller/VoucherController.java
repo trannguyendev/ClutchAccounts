@@ -2,6 +2,8 @@ package com.kingdomeprotocol.controller;
 
 import com.kingdomeprotocol.model.Vouchers;
 import com.kingdomeprotocol.service.VoucherService;
+import com.kingdomeprotocol.service.VoucherService.virtualTotal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/vouchers")
-public class VoucherController { // 1. Đã có public (Tốt)
+public class VoucherController { 
     @Autowired
     VoucherService voucherService;
 
@@ -43,5 +45,10 @@ public class VoucherController { // 1. Đã có public (Tốt)
     @GetMapping("/getVoucherByVoucherCode")
     public Vouchers getOneVoucherByVoucherCode(@RequestParam("voucherCode") String voucherCode){
         return voucherService.getVoucherByVoucherCode(voucherCode);
+    }
+    
+    @PostMapping("/caculateDiscount")
+    public int caculateDiscount(virtualTotal data) {
+    	return voucherService.caculateVirtualTotal(data);
     }
 }
