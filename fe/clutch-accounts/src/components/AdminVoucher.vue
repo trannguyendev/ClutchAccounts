@@ -117,6 +117,12 @@
               </div>
 
               <div>
+                <label class="text-amber-300 text-sm">Max Discount</label>
+                <p class="text-xs text-amber-400/60 mt-1">default 0 is unlimited</p>
+                <input type="number" v-model.number="form.max_discount" min="0" class="w-full mt-2 bg-[#121212] border border-amber-900/40 px-3 py-2 rounded" />
+              </div>
+
+              <div>
                 <label class="text-amber-300 text-sm">{{ t('admin.voucherPage.form.expires') }}</label>
                 <input type="datetime-local" v-model="form.expire_at_local" class="w-full mt-2 bg-[#121212] border border-amber-900/40 px-3 py-2 rounded" />
               </div>
@@ -150,11 +156,14 @@ import { ref, reactive, computed, onMounted, watch, onErrorCaptured } from 'vue'
 import { useI18n } from 'vue-i18n';
 import axios from 'axios';
 import AdminSidebar from './AdminSidebar.vue';
-
 import { useRouter, useRoute } from 'vue-router';
+import { useUserStore } from '../stores/user';
+
+
 const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
+const userStore = useUserStore();
 
 const routeToIndex = {
   '/admin': 0,
@@ -181,7 +190,6 @@ const handleNavigation = async (item, index) => {
   }
 };
 
-const apiBase = '/api/voucher';
 const localKey = 'admin.voucher.cache.v1';
 
 const items = ref([]);
@@ -192,7 +200,7 @@ const editing = reactive({ id: null });
 const previewItem = reactive({});
 const runtimeError = ref(null);
 
-const form = reactive({ voucher_code: '', discount_percent: 0, max_usage: 1, used_count: 0, expire_at: null, expire_at_local: '', isActive: true });
+const form = reactive({ voucher_code: '', discount_percent: 0, max_usage: 1, max_discount: 0, used_count: 0, expire_at: null, expire_at_local: '', isActive: true });
 const search = ref('');
 
 const startIndex = computed(() => (page.value - 1) * perPage.value);
@@ -217,9 +225,6 @@ const filtered = computed(() => {
 const totalPages = computed(() => Math.max(1, Math.ceil(filtered.value.length / perPage.value)));
 const paged = computed(() => filtered.value.slice(startIndex.value, startIndex.value + perPage.value));
 
-function persist() { try { localStorage.setItem(localKey, JSON.stringify(items.value)); } catch (e) {} }
-function loadLocal() { try { const s = localStorage.getItem(localKey); if (s) items.value = JSON.parse(s).map(normalize); } catch (e) {} }
-
 function toLocalDatetime(iso) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -231,34 +236,45 @@ function toLocalDatetime(iso) {
 function fromLocalDatetime(local) {
   if (!local) return null;
   const iso = new Date(local);
-  return iso.toISOString();
+  return iso.toISOString().slice(0, -1);
 }
 
 async function fetchAll() {
   loading.value = true;
-  runtimeError.value = null;
-  try {
-    const res = await axios.get(apiBase);
-    if (Array.isArray(res.data)) {
+  runtimeError.value = null
+    axios.get("/api/vouchers/getAllVouchers")
+    .then((res) => {
+      if (Array.isArray(res.data)) {
       items.value = res.data.map(normalize);
       apiHealthy.value = true;
-      persist();
     } else {
       throw new Error('unexpected payload');
-    }
-  } catch (e) {
-    console.error('fetchAll error', e);
-    runtimeError.value = (e && e.message) ? e.message : 'Failed to load vouchers';
+    }})
+   .catch(err => {
+    console.error('fetchAll error', err);
+    runtimeError.value = (err && err.message) ? err.message : 'Failed to load vouchers';
     apiHealthy.value = false;
-    try { loadLocal(); } catch (e2) { console.error('loadLocal failed', e2); }
-  } finally {
+   }) 
+   .finally(() => {
     loading.value = false;
-  }
+   })
 }
 
 onMounted(async () => {
   try {
-    loadLocal();
+    // Ensure user is initialized and has auth token
+    await new Promise(resolve => {
+      if (userStore.token) {
+        resolve();
+      } else {
+        const unwatch = watch(() => userStore.token, () => {
+          unwatch();
+          resolve();
+        });
+        // Timeout after 2 seconds
+        setTimeout(resolve, 2000);
+      }
+    });
     await fetchAll();
   } catch (e) {
     console.error('onMounted error', e);
@@ -278,6 +294,7 @@ function openCreate() {
   form.voucher_code = '';
   form.discount_percent = 0;
   form.max_usage = 1;
+  form.max_discount = 0;
   form.used_count = 0;
   form.expire_at = null;
   form.expire_at_local = '';
@@ -290,6 +307,7 @@ function openEdit(v) {
   form.voucher_code = v.voucher_code || v.code || '';
   form.discount_percent = v.discount_percent ?? v.discount ?? 0;
   form.max_usage = v.max_usage ?? v.maxUsage ?? null;
+  form.max_discount = v.max_discount ?? v.maxDiscount ?? 0;
   form.used_count = v.used_count ?? v.usedCount ?? 0;
   form.expire_at = v.expire_at ?? v.expireAt ?? null;
   form.expire_at_local = toLocalDatetime(form.expire_at);
@@ -310,21 +328,22 @@ async function save() {
     voucher_code: form.voucher_code.trim(),
     discount_percent: Number(form.discount_percent) || 0,
     max_usage: form.max_usage ? Number(form.max_usage) : null,
-    expire_at: fromLocalDatetime(form.expire_at_local),
-    isActive: !!form.isActive
+    expired_at: fromLocalDatetime(form.expire_at_local),
+    isActive: !!form.isActive,
+    max_discount: Number(form.max_discount) || 0
   };
 
   try {
     if (editing.id) {
-      await axios.put(`${apiBase}/${editing.id}`, payload);
+      await axios.put('/api/vouchers/updateVoucher/'+editing.id, payload);
       const idx = items.value.findIndex(x => (x.voucher_id || x.id) === editing.id);
       if (idx !== -1) items.value[idx] = normalize({ ...items.value[idx], ...payload, updated_at: new Date().toISOString() });
     } else {
-      const res = await axios.post(apiBase, payload);
+      console.log(payload)
+      const res = await axios.post('/api/vouchers/addVoucher', payload);
       const created = normalize(res?.data || { voucher_id: Date.now(), ...payload, used_count: 0, expire_at: payload.expire_at });
       items.value.unshift(created);
     }
-    persist();
     modalOpen.value = false;
     apiHealthy.value = true;
   } catch (e) {
@@ -333,7 +352,6 @@ async function save() {
     if (!editing.id) {
       const fake = normalize({ voucher_id: Date.now(), ...payload, used_count: 0, expire_at: payload.expire_at });
       items.value.unshift(fake);
-      persist();
       modalOpen.value = false;
       alert(t('admin.voucherPage.msg.savedLocal'));
     } else {
@@ -355,15 +373,13 @@ async function confirmDelete(v) {
 }
 async function remove(id) {
   try {
-    await axios.delete(`${apiBase}/${id}`);
+    await axios.delete('/api/vouchers/deleteVoucher/'+id);
     items.value = items.value.filter(x => (x.voucher_id || x.id) !== id);
-    persist();
     toast(t('admin.voucherPage.msg.deleted') || 'Đã xóa', 'ok');
   } catch (e) {
     console.warn(e);
     // optimistic fallback: remove locally
     items.value = items.value.filter(x => (x.voucher_id || x.id) !== id);
-    persist();
     toast(t('admin.voucherPage.msg.deletedLocal') || 'Xóa cục bộ (offline)', 'info');
   }
 }
@@ -374,9 +390,8 @@ async function toggleActive(v){
   // optimistic UI
   v.isActive = !prev;
   try {
-    await axios.put(`${apiBase}/${id}`, { isActive: v.isActive });
+    await axios.put(`/api/vouchers/updateVoucher/${id}`, { isActive: v.isActive });
     toast(t('admin.voucherPage.msg.updated') || 'Cập nhật thành công', 'ok');
-    persist();
   } catch (e) {
     v.isActive = prev; // revert
     toast(t('admin.voucherPage.msg.updateFail') || 'Cập nhật thất bại', 'err');

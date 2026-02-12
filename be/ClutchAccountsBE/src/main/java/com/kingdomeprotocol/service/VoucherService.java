@@ -43,7 +43,8 @@ public class VoucherService {
     }
 	public int caculateVirtualTotal(virtualTotal data) {
 		Vouchers voucherCode = getVoucherByVoucherCode(data.voucher);
-		if (voucherCode == null) throw new RuntimeException("Not voucher has been found");
+		if (voucherCode == null) throw new RuntimeException("No voucher has been found");
+		if (voucherCode.getMaxUsage() == voucherCode.getUsedCount()) throw new RuntimeException("You have reached limit of this voucher");
 		if (voucherCode.getMaxDiscount() == 0) {
 			return data.price*(voucherCode.getDiscountPercent()/100);
 		}

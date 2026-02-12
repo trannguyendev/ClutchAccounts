@@ -33,7 +33,8 @@
       "errors": { "code": "Voucher code is required.", "discount": "Discount must be between 0 and 100.", "max": "Max usage must be >= 1." },
       "confirmDelete": "Delete this voucher? This cannot be undone.",
       "msg": { "savedLocal": "Saved locally (API unreachable).", "updateFail": "Update failed (API unreachable)." },
-      "empty": "No vouchers yet. Click Create to add."
+      "empty": "No vouchers yet. Click Create to add.",
+      "loadError": "Failed to load vouchers (API unreachable)."
     },
     "faqPage": {
       "pageTitle": "Admin — FAQ Management",
@@ -80,7 +81,9 @@
     "apply": "Apply",
     "warranty": "Warranty Policy",
     "voucherQuote":"Please enter voucher code if you have one",
-    "totalPrice":"Total Price"
+    "totalPrice":"Total Price",
+    "retry": "Retry",
+    "dismiss": "Dismiss"
   },
   "main": {
     "welcomeBack": "WELCOME BACK!",
@@ -116,7 +119,8 @@
     "id": "ID",
     "transFee":"Transaction Fee",
     "transWay":"Transaction Method",
-    "category":"Category"
+    "category":"Category",
+    "voucherApplied":"Voucher applied!"
   },
   "filter": {
     "searchByRequirements": "SEARCH ACCORDING TO REQUIREMENTS",
@@ -144,6 +148,7 @@
     "resetFilters": "Reset Filters"
   },
   "payment": {
+    "buy": "Buy Now",
     "addMoney": "Add Money",
     "enterAmount": "Enter the amount you want to add to your account",
     "amount": "Amount",

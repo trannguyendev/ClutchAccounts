@@ -33,7 +33,8 @@
       "errors": { "code": "Cần nhập mã voucher.", "discount": "Phần trăm giảm phải từ 0 đến 100.", "max": "Số lần tối đa phải >= 1." },
       "confirmDelete": "Xóa voucher này? Hành động không thể hoàn tác.",
       "msg": { "savedLocal": "Đã lưu cục bộ (API không phản hồi).", "updateFail": "Cập nhật thất bại (API không phản hồi)." },
-      "empty": "Chưa có voucher. Nhấn Tạo để thêm."
+      "empty": "Chưa có voucher. Nhấn Tạo để thêm.",
+      "loadError": "Không thể tải voucher (API không phản hồi)."
     },
     "faqPage": {
       "pageTitle": "Admin — Quản lý FAQ",
@@ -80,7 +81,9 @@
     "apply": "Áp dụng",
     "warranty": "Chính sách bảo hành",
     "voucherQuote":"Vui lòng nhập mã giảm giá nếu bạn có",
-    "totalPrice":"Tổng thanh toán"
+    "totalPrice":"Tổng thanh toán",
+    "retry": "Thử lại",
+    "dismiss": "Đóng"
   },
   "main": {
     "welcomeBack": "CHÀO MỪNG TRỞ LẠI!",
@@ -116,7 +119,8 @@
     "id": "Mã số",
     "transFee":"Phí giao dịch",
     "transWay":"Phương thức giao dịch",
-    "category":"Danh mục"
+    "category":"Danh mục",
+    "voucherApplied":"Mã giảm giá đã được áp dụng!"
   },
   "filter": {
     "searchByRequirements": "TÌM KIẾM THEO YÊU CẦU",
@@ -144,6 +148,7 @@
     "resetFilters": "Đặt Lại Bộ Lọc"
   },
   "payment": {
+    "buy": "Mua ngay",
     "addMoney": "Nạp tiền",
     "enterAmount": "Nhập số tiền bạn muốn nạp vào tài khoản",
     "amount": "Số tiền",
