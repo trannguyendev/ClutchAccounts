@@ -15,7 +15,7 @@ const carouselIndex = ref(0)
 const itemsPerSlide = ref(8)
 const announcements = ref([])
 
-const loadNews = () => {
+const loadNews = async () => {
   axios.get('/api/news/info')
   .then((res) => {
     console.log(res.data)
@@ -104,6 +104,15 @@ const quickLinks = [
 
 onMounted(() => {
   loadNews()
+  // Load Zapier chatbot script
+  if (!window.zapierLoaded) {
+    const script = document.createElement('script')
+    script.src = 'https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'
+    script.type = 'module'
+    script.async = true
+    document.head.appendChild(script)
+    window.zapierLoaded = true
+  }
 })
 </script>
 <template>
@@ -391,9 +400,9 @@ onMounted(() => {
       </div>
     </section>
 
-    <!-- Footer Spacer -->
-    <div class="h-20"></div>
-  </main>
+  <!-- Chatbot Widget -->
+  <zapier-interfaces-chatbot-embed is-popup='true' chatbot-id='cmlg2aq03004wjirt2oif879r'></zapier-interfaces-chatbot-embed>
+</main>
 </template>
 
 <style scoped>
