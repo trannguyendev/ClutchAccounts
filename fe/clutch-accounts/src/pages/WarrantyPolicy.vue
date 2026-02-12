@@ -295,8 +295,6 @@ const warrantySections = [
       </div>
     </section>
 
-    <Footer />
-
     <!-- Back to Top Button -->
     <button
       @click="scrollToSection('top')"
