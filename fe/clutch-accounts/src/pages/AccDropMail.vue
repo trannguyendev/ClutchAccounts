@@ -3,7 +3,13 @@ import { ref, computed } from 'vue'
 import Navbar from '@/components/Navbar.vue'
 import { useUserStore } from '@/stores/user';
 import { useI18n } from 'vue-i18n'
+import axios from 'axios';
+import { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css';
+import { useRouter } from 'vue-router';
 
+
+const router = useRouter();
 const { t } = useI18n();
 const user = useUserStore();
 
@@ -21,6 +27,7 @@ const itemsPerPage = ref(8)
 const showBuyPopup = ref(false)
 const selectedAcc = ref(null)
 const voucherCode = ref('')
+const totalDiscount = ref(0)
 
 const rankOptions = [
   { value: '', label: t('filter.allRanks') },
@@ -160,7 +167,19 @@ const closeBuyPopup = () => {
 
 const applyVoucher = () => {
   // TODO: Implement voucher logic
-  console.log('Applying voucher:', voucherCode.value)
+  axios.post('/api/vouchers/caculateDiscount', {
+    price: selectedAcc.value.price,
+    voucher: voucherCode.value
+  })
+  .then((res) => {
+    console.log('Voucher applied:', res.data)
+    totalDiscount.value = res.data
+    toast.success(t('accs.voucherApplied'))
+  })
+  .catch((err) => {
+    console.error('Voucher error:', err)
+    toast.error(err.response?.data?.message || 'Error applying voucher')
+  })
 }
 
 const handleDeposit = () => {
@@ -171,6 +190,7 @@ const handleDeposit = () => {
 const handleWarrantyPolicy = () => {
   // TODO: Show warranty policy
   console.log('Show warranty policy')
+  router.push('/warranty-policy')
 }
 
 const accs = ref([
@@ -186,48 +206,6 @@ const accs = ref([
       bpass: 0,
       ssung: 21,
       sdao: 5
-    }
-  },
-  {
-    id: 1198,
-    name: "ACC #1198",
-    rank: "GOLD",
-    image: "https://cdn-offer-photos.zeusx.com/b2b9d6cb-cbd6-4a51-a142-4a62a69734ba.png",
-    description: "Premium Valorant account with rare items",
-    price: 4200000,
-    stats: {
-      vp: 120,
-      bpass: 2,
-      ssung: 35,
-      sdao: 8
-    }
-  },
-  {
-    id: 1199,
-    name: "ACC #1199",
-    rank: "PLATINUM",
-    image: "https://cdn-offer-photos.zeusx.com/b2b9d6cb-cbd6-4a51-a142-4a62a69734ba.png",
-    description: "High-tier Valorant account",
-    price: 5500000,
-    stats: {
-      vp: 200,
-      bpass: 3,
-      ssung: 42,
-      sdao: 12
-    }
-  },
-  {
-    id: 1200,
-    name: "ACC #1200",
-    rank: "DIAMOND",
-    image: "https://cdn-offer-photos.zeusx.com/b2b9d6cb-cbd6-4a51-a142-4a62a69734ba.png",
-    description: "Elite Valorant account with premium skins",
-    price: 7800000,
-    stats: {
-      vp: 350,
-      bpass: 5,
-      ssung: 58,
-      sdao: 15
     }
   }
 ])
@@ -686,7 +664,7 @@ const getRankColor = (rank) => {
             <div class="px-6 pb-4 flex justify-between items-center">
               <span class="text-2xl font-black text-purple-400 italic">{{ t('common.totalPrice') }}</span>
               <span class="text-3xl font-black text-amber-400">{{ formatPrice(selectedAcc?.price) }}Đ</span>
-              <span v-if="totalDiscount" class="text-3xl font-black text-red-700 italic">- {{}} Đ</span>
+              <span v-if="totalDiscount" class="text-3xl font-black text-red-700 italic">- {{totalDiscount}} Đ</span>
             </div>
 
             <!-- Action Buttons -->
@@ -695,7 +673,7 @@ const getRankColor = (rank) => {
                 {{ t('common.warranty') }}
               </button>
               <button @click="handleDeposit" class="flex-1 py-4 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-full hover:shadow-[0_0_20px_rgba(6,182,212,0.5)] transition-all">
-                {{ t('payment.addMoney') }}
+                {{ t('payment.buy') }}
               </button>
             </div>
           </div>
