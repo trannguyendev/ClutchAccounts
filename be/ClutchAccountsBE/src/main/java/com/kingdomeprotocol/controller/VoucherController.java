@@ -48,7 +48,7 @@ public class VoucherController {
     }
     
     @PostMapping("/caculateDiscount")
-    public int caculateDiscount(virtualTotal data) {
+    public int caculateDiscount(@RequestBody virtualTotal data) {
     	return voucherService.caculateVirtualTotal(data);
     }
 }
