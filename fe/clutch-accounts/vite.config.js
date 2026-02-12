@@ -6,7 +6,13 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    vue(),
+    vue({
+      template:{
+        compilerOptions: {
+          isCustomElement: (tag) => tag.startsWith('zapier-')
+        }
+      }
+    }),
     vueDevTools(),
   ],
   resolve: {
@@ -15,12 +21,16 @@ export default defineConfig({
     },
   },
   server: {
+    host: 'localhost',
+    port: 5173,
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
-        changeOrigin: true
+        changeOrigin: true,
+        cors: true,
+        secure: false
       }
     },
-    cors: true
+    
   }
 })
