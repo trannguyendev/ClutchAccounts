@@ -50,7 +50,7 @@ public class AccForSellModel {
 	
 	@OneToOne(mappedBy = "accId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	public AccountImageModel accImg;
-	@OneToOne(mappedBy = "accSubInfo")
+	@OneToOne(mappedBy = "accSubInfo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	public SubInfoModel subInfo;
 
 	public void setSoldBoughtLog(BoughtLogModel boughtLog) {
