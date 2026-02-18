@@ -17,6 +17,6 @@ public interface VouchersRepository extends JpaRepository<Vouchers, Integer> {
     
     @Modifying
     @Transactional
-    @Query(value = "update Vouchers v set v.used_count = v.used_count + 1 where v.voucher_code = :code and v.used_count < v.max_usage and v.isActive = 1 and v.expired_at > CURRENT_TIMESTAMP", nativeQuery = true)
+    @Query(value = "update v set v.used_count = v.used_count + 1 from Vouchers v where v.voucher_code = :code and v.used_count < v.max_usage and v.isActive = 1 and v.expired_at > CURRENT_TIMESTAMP", nativeQuery = true)
     int increaseUsedCountWhenValid(@Param("code") String code);
 }
