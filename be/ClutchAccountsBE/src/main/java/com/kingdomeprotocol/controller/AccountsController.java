@@ -50,14 +50,15 @@ public class AccountsController {
 	private final AccountImageRepository imgRepo;
 	private final SubInfoRepository subRepo;
 	@PostMapping("/buy")
-	public ResponseEntity<?> buyAcc(@RequestBody DTOBuyRequest dtoReq){
+	public ResponseEntity<?> buyAcc(@RequestBody DTOBuyRequest dtoReq, Authentication authen){
 		try {
-			return ResponseEntity.ok(accServ.buyAcc(dtoReq.getEmail(), dtoReq.getAccId(), dtoReq.getVoucherCode()));
+			return ResponseEntity.ok(accServ.buyAcc(dtoReq.getEmail(), dtoReq.getAccId(), dtoReq.getVoucherCode(), authen));
 		}
 		catch(RuntimeException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
 		}
 		catch(Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
 		}
 	}
@@ -110,6 +111,30 @@ public class AccountsController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
 		}
 	}
+	@GetMapping("/list-for-sell/drop-mail")
+	public ResponseEntity<?> getInfoAccDropMail(){
+		try {
+			return ResponseEntity.ok(accRepo.getCustomAccInfoForUser("DROP_MAIL"));
+		}
+		catch(RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+		}
+		catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+		}
+	}
+	@GetMapping("/list-for-sell/super-sale")
+	public ResponseEntity<?> getInfoAccSuperSale(){
+		try {
+			return ResponseEntity.ok(accRepo.getCustomAccInfoForUser("SUPER_SALE"));
+		}
+		catch(RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+		}
+		catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+		}
+	}
 	@GetMapping("/bought-log/me")
 	public ResponseEntity<?> displaySelfBoughtLog(Authentication authen){
 		try {
@@ -145,6 +170,20 @@ public class AccountsController {
 				if (data.lockedUntil() != null) acc.setLockedUntil(data.lockedUntil());
 				if (data.account_type() != null) acc.setAccount_type(data.account_type());
 				
+				
+				SubInfoModel subInfo = acc.getSubInfo();
+				
+				if (subInfo == null) {
+					subInfo = new SubInfoModel();
+					subInfo.setAccSubInfo(acc);
+					acc.setSubInfo(subInfo);
+				}
+				
+				if (data.rank_info() != null) subInfo.setRank_info(data.rank_info());
+				if (data.vp() >= 0) subInfo.setVp(data.vp());
+				if (data.melee_amount() >= 0) subInfo.setMelee_amount(data.melee_amount());
+				if (data.gun_amount() >= 0) subInfo.setGun_amount(data.gun_amount());
+				if (data.btp() >= 0) subInfo.setBtp(data.btp());
 				return ResponseEntity.ok(accRepo.save(acc));
 			}).orElseThrow(() -> new RuntimeException("An error occurred while update"));
 		} catch (Exception e) {
@@ -301,7 +340,12 @@ public class AccountsController {
 	        Boolean isSold,
 	        Boolean isLocked,
 	        LocalDateTime lockedUntil,
-	        String account_type
+	        String account_type,
+	        String rank_info,
+			int vp,
+			int melee_amount,
+			int gun_amount,
+			int btp
 	    ) {}
 	
 }
