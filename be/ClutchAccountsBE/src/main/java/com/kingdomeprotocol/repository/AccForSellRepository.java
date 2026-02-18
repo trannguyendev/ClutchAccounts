@@ -32,19 +32,27 @@ public interface AccForSellRepository extends JpaRepository<AccForSellModel, Int
 		Integer getPrice();
 		String getAccount_type();
 	}
-	@Query(value = "select acc.account_id as account_id,\r\n"
-			+ "acc.email as email,\r\n"
-			+ "acc.username as username,\r\n"
-			+ "acc.account_psw as password,\r\n"
-			+ "acc.listed_at as listed_at,\r\n"
-			+ "acc.isSold as isSold,\r\n"
-			+ "acc.isLocked as isLocked,\r\n"
-			+ "acc.lockedUntil as lockedUntil,\r\n"
-			+ "acc.price as price,\r\n"
-			+ "acc.account_type as account_type,\r\n"
-			+ "img.image_url as image_url\r\n"
-			+ "from AccForSell acc left join AccountImage img\r\n"
-			+ "on acc.account_id = img.account_id order by acc.account_id desc", nativeQuery = true)
+	@Query(value = "SELECT \r\n"
+			+ "    acc.account_id,\r\n"
+			+ "    acc.email,\r\n"
+			+ "    acc.username,\r\n"
+			+ "    acc.account_psw AS password,\r\n"
+			+ "    acc.listed_at,\r\n"
+			+ "    acc.isSold,\r\n"
+			+ "    acc.isLocked,\r\n"
+			+ "    acc.lockedUntil,\r\n"
+			+ "    acc.price,\r\n"
+			+ "    acc.account_type,\r\n"
+			+ "    img.image_url,\r\n"
+			+ "    sub.rank_info,\r\n"
+			+ "    sub.vp,\r\n"
+			+ "    sub.melee_amount,\r\n"
+			+ "    sub.gun_amount,\r\n"
+			+ "    sub.btp\r\n"
+			+ "FROM AccForSell acc\r\n"
+			+ "LEFT JOIN AccountImage img ON acc.account_id = img.account_id\r\n"
+			+ "LEFT JOIN SubInfo sub ON acc.account_id = sub.account_id\r\n"
+			+ "ORDER BY acc.account_id DESC", nativeQuery = true)
 	List<customInfoAccAdmin> getAllCurrentAcc();
 	@Query(value = "SELECT \r\n"
 			+ "    acc.account_id,\r\n"
@@ -68,6 +76,28 @@ public interface AccForSellRepository extends JpaRepository<AccForSellModel, Int
 			+ "LEFT JOIN AccountImage img ON acc.account_id = img.account_id\r\n"
 			+ "LEFT JOIN SubInfo sub ON acc.account_id = sub.account_id;", nativeQuery = true)
 	List<customExportInfoAccAdmin> customExportAccForAdmin();
+	
+	@Query(value = "select \r\n"
+			+ "    acc.account_id,\r\n"
+			+ "    acc.listed_at,\r\n"
+			+ "    acc.isSold,\r\n"
+			+ "    acc.isLocked,\r\n"
+			+ "    acc.lockedUntil,\r\n"
+			+ "    acc.price,\r\n"
+			+ "    acc.account_type,\r\n"
+			+ "    img.image_url,\r\n"
+			+ "    sub.rank_info,\r\n"
+			+ "    sub.vp,\r\n"
+			+ "    sub.melee_amount,\r\n"
+			+ "    sub.gun_amount,\r\n"
+			+ "    sub.btp\r\n"
+			+ "from AccForSell acc\r\n"
+			+ "left join AccountImage img on acc.account_id = img.account_id\r\n"
+			+ "left join SubInfo sub on sub.account_id = acc.account_id\r\n"
+			+ "where acc.isSold = 0 \r\n"
+			+ "  and acc.isLocked = 0\r\n"
+			+ "  and acc.account_type = :type", nativeQuery = true)
+	List<customAccInfoForUser> getCustomAccInfoForUser(@Param("type") String type);
 	interface customInfoAccAdmin{
 		Integer getAccount_id();
 		String getEmail();
@@ -80,12 +110,32 @@ public interface AccForSellRepository extends JpaRepository<AccForSellModel, Int
 		Integer getPrice();
 		String getAccount_type();
 		String getImage_url();
+		String getRank_info();
+		Integer getVp();
+		Integer getMelee_amount();
+		Integer getGun_amount();
+		Integer getBtp();
 	}
 	public interface customExportInfoAccAdmin{
 		Integer getAccount_id();
 		String getEmail();
 		String getUsername();
 		String getPassword();
+		LocalDateTime getListed_at();
+		boolean getIsSold();
+		boolean getIsLocked();
+		LocalDateTime getLockedUntil();
+		Integer getPrice();
+		String getAccount_type();
+		String getImage_url();
+		String getRank_info();
+		Integer getVp();
+		Integer getMelee_amount();
+		Integer getGun_amount();
+		Integer getBtp();
+	}
+	public interface customAccInfoForUser{
+		Integer getAccount_id();
 		LocalDateTime getListed_at();
 		boolean getIsSold();
 		boolean getIsLocked();

@@ -5,6 +5,7 @@ import com.kingdomeprotocol.service.VoucherService;
 import com.kingdomeprotocol.service.VoucherService.virtualTotal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,12 +44,12 @@ public class VoucherController {
     }
 
     @GetMapping("/getVoucherByVoucherCode")
-    public Vouchers getOneVoucherByVoucherCode(@RequestParam("voucherCode") String voucherCode){
+    public Vouchers getOneVoucherByVoucherCode(@RequestParam String voucherCode){
         return voucherService.getVoucherByVoucherCode(voucherCode);
     }
     
     @PostMapping("/caculateDiscount")
-    public int caculateDiscount(@RequestBody virtualTotal data) {
-    	return voucherService.caculateVirtualTotal(data);
+    public int caculateDiscount(@RequestBody virtualTotal data, Authentication authen) {
+    	return voucherService.caculateVirtualTotal(data, authen);
     }
 }

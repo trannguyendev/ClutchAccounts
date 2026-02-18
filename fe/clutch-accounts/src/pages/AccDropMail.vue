@@ -7,7 +7,7 @@ import axios from 'axios';
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css';
 import { useRouter } from 'vue-router';
-
+import { onMounted } from 'vue';
 
 const router = useRouter();
 const { t } = useI18n();
@@ -58,6 +58,18 @@ const sortOptions = [
   { value: 'newest', label: t('filter.newest') }
 ]
 
+const fetchAccounts = () => {
+  axios.get('/api/accounts/list-for-sell/drop-mail')
+  .then((res) => {
+    accs.value = res.data
+  })
+  .catch((err) => {
+    console.error('Fetch accounts error:', err.message)
+    toast.error('Fetch error: '+err, {
+      position: "top-center"
+    })
+  })
+}
 const resetFilters = () => {
   searchNickname.value = ''
   selectedRank.value = ''
@@ -85,12 +97,12 @@ const filteredAccounts = computed(() => {
   // Filter by nickname
   if (searchNickname.value) {
     const search = searchNickname.value.toLowerCase()
-    result = result.filter(acc => acc.name.toLowerCase().includes(search))
+    result = result.filter(acc => acc.account_id.toLowerCase().includes(search))
   }
 
   // Filter by rank
   if (selectedRank.value) {
-    result = result.filter(acc => acc.rank === selectedRank.value)
+    result = result.filter(acc => acc.rank_info === selectedRank.value)
   }
 
   // Filter by price range
@@ -172,19 +184,46 @@ const applyVoucher = () => {
     voucher: voucherCode.value
   })
   .then((res) => {
-    console.log('Voucher applied:', res.data)
+    console.log('Voucher applied: ', res.data)
     totalDiscount.value = res.data
-    toast.success(t('accs.voucherApplied'))
+    toast.success(t('accs.voucherApplied'), {
+      position: "top-center"
+    })
   })
   .catch((err) => {
-    console.error('Voucher error:', err)
-    toast.error(err.response?.data?.message || 'Error applying voucher')
+    console.error('Voucher error:', err.message)
+    voucherCode.value = ''
+    totalDiscount.value = 0
+    toast.error(err.response?.data?.message || 'Invalid or your voucher has reached the limit', {
+      position: "top-center"
+    })
   })
 }
 
 const handleDeposit = () => {
   // TODO: Navigate to deposit page
-  console.log('Navigate to deposit')
+  const payload = {
+    email: user.username,
+    type: 'DROP_MAIL',
+    accId: selectedAcc.value.account_id,
+    voucher: voucherCode.value
+  }
+  console.log('Buy account with payload: ', payload)
+  axios.post('/api/accounts/buy', payload)
+  .then((res) => {
+    console.log('Purchase successful: ', res.data)
+    toast.success(t('accs.purchaseSuccess'), {
+      position: "top-center"
+    })
+    closeBuyPopup()
+    fetchAccounts() // Refresh accounts after purchase
+  })
+  .catch((err) => {
+    console.error('Purchase error:', err.message)
+    toast.error(err.response?.data?.message || 'Purchase failed', {
+      position: "top-center"
+    })
+  })
 }
 
 const handleWarrantyPolicy = () => {
@@ -201,12 +240,10 @@ const accs = ref([
     image: "https://cdn-offer-photos.zeusx.com/b2b9d6cb-cbd6-4a51-a142-4a62a69734ba.png",
     description: "Premium Valorant account with exclusive skins",
     price: 3600000,
-    stats: {
-      vp: 75,
-      bpass: 0,
-      ssung: 21,
-      sdao: 5
-    }
+    vp: 75,
+    bpass: 0,
+    ssung: 21,
+    sdao: 5
   }
 ])
 
@@ -216,18 +253,22 @@ const formatPrice = (price) => {
 
 const getRankColor = (rank) => {
   const colors = {
-    'IRON': 'from-gray-400 to-gray-600',
-    'BRONZE': 'from-amber-600 to-amber-800',
-    'SILVER': 'from-slate-300 to-slate-500',
-    'GOLD': 'from-yellow-400 to-yellow-600',
-    'PLATINUM': 'from-cyan-300 to-cyan-500',
-    'DIAMOND': 'from-purple-400 to-pink-500',
-    'ASCENDANT': 'from-emerald-400 to-emerald-600',
-    'IMMORTAL': 'from-red-400 to-red-600',
-    'RADIANT': 'from-yellow-200 to-yellow-400'
+    'Iron': 'from-gray-400 to-gray-600',
+    'Bronze': 'from-amber-600 to-amber-800',
+    'Silver': 'from-slate-300 to-slate-500',
+    'Gold': 'from-yellow-400 to-yellow-600',
+    'Platinum': 'from-cyan-300 to-cyan-500',
+    'Diamond': 'from-purple-400 to-pink-500',
+    'Ascendant': 'from-emerald-400 to-emerald-600',
+    'Immortal': 'from-red-400 to-red-600',
+    'Radiant': 'from-yellow-200 to-yellow-400'
   }
   return colors[rank] || 'from-gray-400 to-gray-600'
 }
+
+onMounted(() => {
+  fetchAccounts()
+})
 </script>
 <template>
       <Navbar></Navbar>
@@ -420,7 +461,7 @@ const getRankColor = (rank) => {
 
         <!-- Accounts Grid -->
         <div v-if="filteredAccounts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          <div v-for="item in paginatedAccounts" :key="item.id"
+          <div v-for="item in paginatedAccounts" :key="item.account_id"
             class="acc-card group relative bg-gradient-to-b from-black via-neutral-950 to-black backdrop-blur-xl border border-amber-500/30 rounded-3xl overflow-hidden transition-all duration-500 cursor-pointer hover:border-amber-400/70 hover:shadow-[0_0_60px_rgba(245,158,11,0.25)] hover:-translate-y-2">
             
             <!-- Glowing Border Effect -->
@@ -430,7 +471,7 @@ const getRankColor = (rank) => {
             <div class="relative z-10">
               <!-- Image Section -->
               <div class="relative overflow-hidden">
-                <img :src="item.image" alt="Product Image" 
+                <img :src="item.image_url ? item.image_url : 'https://valboosting.com/wp-content/uploads/2024/11/GmO2LZ3.png'" alt="Product Image" 
                   class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110">
                 <!-- Image Overlay -->
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
@@ -441,10 +482,10 @@ const getRankColor = (rank) => {
               <!-- Title Section -->
               <div class="relative px-6 pt-4 pb-3 text-center border-b border-amber-500/20">
                 <h3 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-200 to-amber-300 tracking-wider drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">
-                  {{ item.name }}
+                  {{ 'ACC #'+item.account_id }}
                 </h3>
                 <span :class="['inline-block mt-2 px-4 py-1 rounded-full text-sm font-bold text-white bg-gradient-to-r', getRankColor(item.rank)]">
-                  {{ item.rank }}
+                  {{ item.rank_info }}
                 </span>
               </div>
 
@@ -452,19 +493,19 @@ const getRankColor = (rank) => {
               <div class="grid grid-cols-4 gap-2 px-4 py-4 border-b border-amber-500/20 bg-gradient-to-r from-amber-950/30 via-amber-900/20 to-amber-950/30">
                 <div class="text-center">
                   <p class="text-xs text-amber-400/70 font-semibold">VP</p>
-                  <p class="text-lg font-black text-amber-100">{{ item.stats.vp }}</p>
+                  <p class="text-lg font-black text-amber-100">{{ item.vp }}</p>
                 </div>
                 <div class="text-center">
                   <p class="text-xs text-amber-400/70 font-semibold">B.PASS</p>
-                  <p class="text-lg font-black text-amber-100">{{ item.stats.bpass }}</p>
+                  <p class="text-lg font-black text-amber-100">{{ item.btp }}</p>
                 </div>
                 <div class="text-center">
                   <p class="text-xs text-amber-400/70 font-semibold">{{t('accs.gun')}}</p>
-                  <p class="text-lg font-black text-amber-100">{{ item.stats.ssung }}</p>
+                  <p class="text-lg font-black text-amber-100">{{ item.gun_amount }}</p>
                 </div>
                 <div class="text-center">
                   <p class="text-xs text-amber-400/70 font-semibold">{{ t('accs.melee') }}</p>
-                  <p class="text-lg font-black text-amber-100">{{ item.stats.sdao }}</p>
+                  <p class="text-lg font-black text-amber-100">{{ item.melee_amount }}</p>
                 </div>
               </div>
 
@@ -610,7 +651,7 @@ const getRankColor = (rank) => {
             <div class="p-6 pb-4">
               <h2 class="text-3xl font-black italic">
                 <span class="text-purple-400">{{ t('accs.id') }}</span>
-                <span class="text-amber-400"> #{{ selectedAcc?.id }}</span>
+                <span class="text-amber-400"> #{{ selectedAcc?.account_id }}</span>
               </h2>
             </div>
 
@@ -664,7 +705,7 @@ const getRankColor = (rank) => {
             <div class="px-6 pb-4 flex justify-between items-center">
               <span class="text-2xl font-black text-purple-400 italic">{{ t('common.totalPrice') }}</span>
               <span class="text-3xl font-black text-amber-400">{{ formatPrice(selectedAcc?.price) }}Đ</span>
-              <span v-if="totalDiscount" class="text-3xl font-black text-red-700 italic">- {{totalDiscount}} Đ</span>
+              <div v-if="totalDiscount" class="text-3xl font-black text-red-700 italic whitespace-nowrap">- {{formatPrice(totalDiscount)}} Đ</div>
             </div>
 
             <!-- Action Buttons -->

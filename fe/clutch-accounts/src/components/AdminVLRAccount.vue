@@ -686,7 +686,7 @@ const editAccount = (account) => {
 };
 
 // ImgBB API key - you should move this to environment variables in production
-const IMGBB_API_KEY = 'bb90d85c6800641f4eb243db95c329cc'; // Replace with your actual ImgBB API key
+const hashKey = 'bb90d85c6800641f4eb243db95c329cc'; // Replace with your actual ImgBB API key
 
 const handleImageUpload = async (event) => {
   const file = event.target.files[0];
@@ -717,7 +717,7 @@ const handleImageUpload = async (event) => {
 
     // Upload to ImgBB
     const formDataImg = new FormData();
-    formDataImg.append('key', IMGBB_API_KEY);
+    formDataImg.append('key', hashKey);
     formDataImg.append('image', base64);
 
     const response = await axios.post('https://api.imgbb.com/1/upload', formDataImg, {
@@ -773,8 +773,15 @@ const saveAccount = async () => {
 
     if (editingAccount.value) {
       // Update existing account
-      await axios.put(`/api/accounts/${editingAccount.value.account_id}`, payload);
-      toast.success('Account updated successfully');
+      await axios.put(`/api/accounts/${editingAccount.value.account_id}`, payload)
+      .then((res) => {
+        console.log("Update response:", res.data);
+        toast.success('Account updated successfully')
+      })
+      .catch((err) => {
+        console.error('Error updating account:', err);
+        toast.error(err.response?.data?.error || 'Failed to update account');
+      });
     } else {
       // Add new account
       console.log("current payload:", payload);

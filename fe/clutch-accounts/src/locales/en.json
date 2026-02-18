@@ -83,7 +83,9 @@
     "voucherQuote":"Please enter voucher code if you have one",
     "totalPrice":"Total Price",
     "retry": "Retry",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "no": "No",
+    "yes": "Yes"
   },
   "main": {
     "welcomeBack": "WELCOME BACK!",

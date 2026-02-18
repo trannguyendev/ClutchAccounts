@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,12 +15,16 @@ import com.kingdomeprotocol.model.BoughtLogModel;
 import com.kingdomeprotocol.model.SubInfoModel;
 import com.kingdomeprotocol.model.TransactionsModel;
 import com.kingdomeprotocol.model.UserModel;
+import com.kingdomeprotocol.model.Vouchers;
+import com.kingdomeprotocol.model.VoucherusageModel;
 import com.kingdomeprotocol.repository.AccForSellRepository;
 import com.kingdomeprotocol.repository.AccountImageRepository;
 import com.kingdomeprotocol.repository.BoughtLogRepository;
 import com.kingdomeprotocol.repository.SubInfoRepository;
 import com.kingdomeprotocol.repository.TransactionRepository;
 import com.kingdomeprotocol.repository.UserRepository;
+import com.kingdomeprotocol.repository.VoucherusageRepository;
+import com.kingdomeprotocol.service.VoucherService.virtualTotal;
 
 import io.netty.util.internal.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +38,10 @@ public class AccountsService {
 	private final BoughtLogRepository boughtRepo;
 	private final AccountImageRepository imgRepo;
 	private final SubInfoRepository subRepo;
+	private final VoucherusageRepository usageRepo;
+	private final VoucherService voucherServ;
 @Transactional
-public BuyRes buyAcc(String email, int idAcc, String voucherCode) {
+public BuyRes buyAcc(String email, int idAcc, String voucherCode, Authentication authen) {
 	
 	UserModel user = userRepo.findUser4Upd(email).orElseThrow(() -> new RuntimeException("Not found user"));
 	AccForSellModel acc = accRepo.findAccbyId4Lock(idAcc).orElseThrow(() -> new RuntimeException("Account is not existed"));
@@ -50,30 +57,62 @@ public BuyRes buyAcc(String email, int idAcc, String voucherCode) {
 		
 		user.setBalance(user.getBalance() - acc.getPrice());
 		userRepo.save(user);
+		
+		//Create bought log
+		BoughtLogModel boughtLog = new BoughtLogModel();
+		boughtLog.setUser(user);
+		boughtLog.setAccSold(acc);
+		boughtRepo.save(boughtLog);
+		
+		acc.setBoughtLog(boughtLog);
+		acc.setSold(true);
+		accRepo.save(acc);
+		
+		TransactionsModel tx = new TransactionsModel();
+		tx.setTransactionUser(user);
+		tx.setAmount(-acc.getPrice());
+		tx.setType("BUY_ACC_"+acc.getAccount_type());
+		tx.setDescrp("Buy account type: "+acc.getAccount_type());
+		tx.setStatus("APPROVED");
+		
+		transRepo.save(tx);
 	}
 	else {
+		Vouchers voucher = voucherServ.validateVoucher(voucherCode, authen);
+		virtualTotal data = new virtualTotal(acc.getPrice(), voucherCode);
+		int discountAmount = voucherServ.caculateVirtualTotal(data, authen);
+		int priceAfterDiscount = acc.getPrice() - discountAmount;
+		if (user.getBalance() < priceAfterDiscount) {
+			throw new RuntimeException("Insufficient balance, pls charge");
+		}
 		
+		user.setBalance(user.getBalance() - priceAfterDiscount);
+		userRepo.save(user);
+		
+		VoucherusageModel usage = new VoucherusageModel();
+		usage.setUser(user);
+		usage.setVoucher(voucher);
+		usageRepo.save(usage);
+		
+		//Create bought log
+		BoughtLogModel boughtLog = new BoughtLogModel();
+		boughtLog.setUser(user);
+		boughtLog.setAccSold(acc);
+		boughtRepo.save(boughtLog);
+		
+		acc.setBoughtLog(boughtLog);
+		acc.setSold(true);
+		accRepo.save(acc);
+		
+		TransactionsModel tx = new TransactionsModel();
+		tx.setTransactionUser(user);
+		tx.setAmount(-priceAfterDiscount);
+		tx.setType("BUY_ACC_"+acc.getAccount_type());
+		tx.setDescrp("Buy account type: "+acc.getAccount_type());
+		tx.setStatus("APPROVED");
+		
+		transRepo.save(tx);
 	}
-	
-	//Create bought log
-	BoughtLogModel boughtLog = new BoughtLogModel();
-	boughtLog.setUser(user);
-	boughtLog.setAccSold(acc);
-	boughtRepo.save(boughtLog);
-	
-	acc.setBoughtLog(boughtLog);
-	acc.setSold(true);
-	accRepo.save(acc);
-	
-	TransactionsModel tx = new TransactionsModel();
-	tx.setTransactionUser(user);
-	tx.setAmount(-acc.getPrice());
-	tx.setType("BUY_ACC_"+acc.getAccount_type());
-	tx.setDescrp("Buy account type: "+acc.getAccount_type());
-	tx.setStatus("APPROVED");
-	
-	transRepo.save(tx);
-	
 	return new BuyRes(acc.getUsername(), acc.getEmail(), acc.getAccount_psw());
 }
 
