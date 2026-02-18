@@ -83,7 +83,9 @@
     "voucherQuote":"Vui lòng nhập mã giảm giá nếu bạn có",
     "totalPrice":"Tổng thanh toán",
     "retry": "Thử lại",
-    "dismiss": "Đóng"
+    "dismiss": "Đóng",
+    "no": "Không",
+    "yes": "Có"
   },
   "main": {
     "welcomeBack": "CHÀO MỪNG TRỞ LẠI!",
