@@ -58,7 +58,7 @@
 
                 <td class="px-3 py-3">
                   <div class="flex items-center gap-2">
-                    <div>{{ formatDate(v.expire_at || v.expireAt) }}</div>
+                    <div>{{ formatDate(v.expired_at || v.expireAt) }}</div>
                     <div v-if="isExpiringSoon(v)" class="text-xs bg-red-600/80 text-black px-2 py-0.5 rounded">{{ t('admin.voucherPage.expiringSoon') || 'Expiring' }}</div>
                   </div>
                 </td>
@@ -102,7 +102,7 @@
             <div class="mt-4 space-y-3 text-amber-100">
               <div>
                 <label class="text-amber-300 text-sm">{{ t('admin.voucherPage.form.code') }}</label>
-                <input v-model="form.voucher_code" class="w-full mt-2 bg-[#121212] border border-amber-900/40 px-3 py-2 rounded" />
+                <input v-model="form.voucher_code" @input="form.voucher_code = form.voucher_code.toUpperCase()" class="w-full mt-2 bg-[#121212] border border-amber-900/40 px-3 py-2 rounded" />
               </div>
 
               <div class="grid grid-cols-2 gap-3">
@@ -213,7 +213,8 @@ const normalize = (r) => ({
   discount_percent: r.discount_percent ?? r.discount ?? 0,
   max_usage: r.max_usage ?? r.maxUsage ?? null,
   used_count: r.used_count ?? r.usedCount ?? 0,
-  expire_at: r.expire_at ?? r.expireAt ?? null,
+  expired_at: r.expire_at ?? r.expired_at ?? r.expireAt ?? null,
+  max_discount: r.max_discount ?? r.maxDiscount ?? 0,
   isActive: r.isActive ?? r.is_active ?? false,
   ...r
 });
@@ -390,11 +391,12 @@ async function toggleActive(v){
   // optimistic UI
   v.isActive = !prev;
   try {
-    await axios.put(`/api/vouchers/updateVoucher/${id}`, { isActive: v.isActive });
+    await axios.put(`/api/vouchers/updateVoucher/${id}`, v);
     toast(t('admin.voucherPage.msg.updated') || 'Cập nhật thành công', 'ok');
   } catch (e) {
     v.isActive = prev; // revert
     toast(t('admin.voucherPage.msg.updateFail') || 'Cập nhật thất bại', 'err');
+    console.error('toggleActive error', e);
   }
 }
 
